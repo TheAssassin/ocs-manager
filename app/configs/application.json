@@ -1,0 +1,13 @@
+{
+    "id": "ocs-manager",
+    "name": "ocs-manager",
+    "version": "0.0.0",
+    "organization": "Opendesktop.org",
+    "domain": "org.opendesktop.ocs-manager",
+    "icon": "",
+    "description": "A management tool for ocs.",
+    "license": "LGPL-3+",
+    "author": "Opendesktop.org",
+    "contact": "contact@opendesktop.org",
+    "homepage": "https://github.com/opendesktop/ocs-manager"
+}
