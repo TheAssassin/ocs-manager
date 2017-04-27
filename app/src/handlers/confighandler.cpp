@@ -45,11 +45,6 @@ QJsonObject ConfigHandler::getAppConfigInstallTypes()
     return appConfigInstallTypes_;
 }
 
-QJsonObject ConfigHandler::getAppConfigFeaturedProviders()
-{
-    return appConfig_.get("featured_providers");
-}
-
 QJsonObject ConfigHandler::getUsrConfigApplication()
 {
     return usrConfig_.get("application");

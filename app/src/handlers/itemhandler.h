@@ -29,7 +29,7 @@ signals:
 public slots:
     QJsonObject metadataSet() const;
 
-    void download(const QString &url, const QString &installType, const QString &providerKey, const QString &contentId);
+    void download(const QString &url, const QString &installType, const QString &providerKey = "", const QString &contentId = "");
     void uninstall(const QString &itemKey);
 
 private slots:

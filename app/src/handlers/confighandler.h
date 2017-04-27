@@ -15,7 +15,6 @@ public:
 public slots:
     QJsonObject getAppConfigApplication();
     QJsonObject getAppConfigInstallTypes();
-    QJsonObject getAppConfigFeaturedProviders();
 
     QJsonObject getUsrConfigApplication();
     bool setUsrConfigApplication(const QJsonObject &object);
