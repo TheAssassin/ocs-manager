@@ -1,10 +1,12 @@
 QT += \
     core \
-    network
+    network \
+    websockets
 
 QT -= gui
 
 HEADERS += \
+    $${PWD}/src/websockets/websocketserver.h \
     $${PWD}/src/handlers/confighandler.h \
     $${PWD}/src/handlers/systemhandler.h \
     $${PWD}/src/handlers/ocshandler.h \
@@ -12,6 +14,7 @@ HEADERS += \
 
 SOURCES += \
     $${PWD}/src/main.cpp \
+    $${PWD}/src/websockets/websocketserver.cpp \
     $${PWD}/src/handlers/confighandler.cpp \
     $${PWD}/src/handlers/systemhandler.cpp \
     $${PWD}/src/handlers/ocshandler.cpp \

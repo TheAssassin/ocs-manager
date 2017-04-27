@@ -8,13 +8,14 @@
 #include "handlers/systemhandler.h"
 #include "handlers/ocshandler.h"
 #include "handlers/itemhandler.h"
+#include "websockets/websocketserver.h"
 
 int main(int argc, char *argv[])
 {
     // Init
     QCoreApplication app(argc, argv);
 
-    ConfigHandler *configHandler = new ConfigHandler();
+    ConfigHandler *configHandler = new ConfigHandler(&app);
     QJsonObject appConfigApplication = configHandler->getAppConfigApplication();
 
     app.setApplicationName(appConfigApplication["name"].toString());
@@ -34,6 +35,10 @@ int main(int argc, char *argv[])
     clParser.addHelpOption();
     clParser.addVersionOption();
     clParser.process(app);
+
+    // Setup websocket server
+    WebSocketServer *webSocketServer = new WebSocketServer(appConfigApplication["id"].toString(), 443, &app);
+    webSocketServer->start();
 
     return app.exec();
 }
