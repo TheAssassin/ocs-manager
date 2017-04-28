@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     // Setup websocket server
     WebSocketServer *webSocketServer = new WebSocketServer(appConfigApplication["id"].toString(), port, &app);
     if (!webSocketServer->start()) {
-        qFatal("Failed to start websocket server");
+        qFatal(webSocketServer->errorString());
     }
 
     return app.exec();

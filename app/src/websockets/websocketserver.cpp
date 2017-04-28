@@ -23,3 +23,21 @@ void WebSocketServer::stop()
 {
     webSocketServer_->close();
 }
+
+bool WebSocketServer::isError()
+{
+    if (webSocketServer_->error() != QWebSocketProtocol::CloseCodeNormal) {
+        return true;
+    }
+    return false;
+}
+
+QString WebSocketServer::errorString()
+{
+    return webSocketServer_->errorString();
+}
+
+QUrl WebSocketServer::serverUrl()
+{
+    return webSocketServer_->serverUrl();
+}

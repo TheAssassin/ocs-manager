@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QUrl>
 
 class QWebSocketServer;
 
@@ -15,6 +16,11 @@ public:
 public slots:
     bool start();
     void stop();
+
+    bool isError();
+    QString errorString();
+
+    QUrl serverUrl();
 
 private:
     QString serverName_;
