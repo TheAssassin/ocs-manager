@@ -2,23 +2,25 @@
 
 #include <QHostAddress>
 #include <QWebSocketServer>
+#include <QWebSocket>
 
 WebSocketServer::WebSocketServer(const QString &serverName, quint16 serverPort, QObject *parent)
     : QObject(parent), serverName_(serverName), serverPort_(serverPort)
 {
-    webSocketServer_ = new QWebSocketServer(serverName_, QWebSocketServer::NonSecureMode, this);
-    connect(webSocketServer_, &QWebSocketServer::closed, this, &WebSocketServer::stopped);
+    wsServer_ = new QWebSocketServer(serverName_, QWebSocketServer::NonSecureMode, this);
+    connect(wsServer_, &QWebSocketServer::newConnection, this, &WebSocketServer::wsNewConnection);
+    connect(wsServer_, &QWebSocketServer::closed, this, &WebSocketServer::stopped);
 }
 
 WebSocketServer::~WebSocketServer()
 {
     stop();
-    webSocketServer_->deleteLater();
+    wsServer_->deleteLater();
 }
 
 bool WebSocketServer::start()
 {
-    if (webSocketServer_->listen(QHostAddress::Any, serverPort_)) {
+    if (wsServer_->listen(QHostAddress::Any, serverPort_)) {
         emit started();
         return true;
     }
@@ -27,12 +29,12 @@ bool WebSocketServer::start()
 
 void WebSocketServer::stop()
 {
-    webSocketServer_->close();
+    wsServer_->close();
 }
 
 bool WebSocketServer::isError()
 {
-    if (webSocketServer_->error() != QWebSocketProtocol::CloseCodeNormal) {
+    if (wsServer_->error() != QWebSocketProtocol::CloseCodeNormal) {
         return true;
     }
     return false;
@@ -40,10 +42,44 @@ bool WebSocketServer::isError()
 
 QString WebSocketServer::errorString()
 {
-    return webSocketServer_->errorString();
+    return wsServer_->errorString();
 }
 
 QUrl WebSocketServer::serverUrl()
 {
-    return webSocketServer_->serverUrl();
+    return wsServer_->serverUrl();
+}
+
+void WebSocketServer::wsNewConnection()
+{
+    QWebSocket *wsClient = wsServer_->nextPendingConnection();
+    connect(wsClient, &QWebSocket::binaryMessageReceived, this, &WebSocketServer::wsBinaryMessageReceived);
+    connect(wsClient, &QWebSocket::textMessageReceived, this, &WebSocketServer::wsTextMessageReceived);
+    connect(wsClient, &QWebSocket::disconnected, this, &WebSocketServer::wsDisconnected);
+    wsClients_ << wsClient;
+}
+
+void WebSocketServer::wsBinaryMessageReceived(const QByteArray &message)
+{
+    QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
+    if (wsClient) {
+        wsClient->sendBinaryMessage(message);
+    }
+}
+
+void WebSocketServer::wsTextMessageReceived(const QString &message)
+{
+    QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
+    if (wsClient) {
+        wsClient->sendTextMessage(message);
+    }
+}
+
+void WebSocketServer::wsDisconnected()
+{
+    QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
+    if (wsClient) {
+        wsClients_.removeAll(wsClient);
+        wsClient->deleteLater();
+    }
 }

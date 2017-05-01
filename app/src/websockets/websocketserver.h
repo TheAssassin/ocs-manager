@@ -4,6 +4,7 @@
 #include <QUrl>
 
 class QWebSocketServer;
+class QWebSocket;
 
 class WebSocketServer : public QObject
 {
@@ -20,14 +21,19 @@ signals:
 public slots:
     bool start();
     void stop();
-
     bool isError();
     QString errorString();
-
     QUrl serverUrl();
+
+private slots:
+    void wsNewConnection();
+    void wsBinaryMessageReceived(const QByteArray &message);
+    void wsTextMessageReceived(const QString &message);
+    void wsDisconnected();
 
 private:
     QString serverName_;
     quint16 serverPort_;
-    QWebSocketServer *webSocketServer_;
+    QWebSocketServer *wsServer_;
+    QList<QWebSocket *> wsClients_;
 };

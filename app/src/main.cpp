@@ -48,14 +48,14 @@ int main(int argc, char *argv[])
     int port = clParser.value(clOptionPort).toInt();
 
     // Setup websocket server
-    WebSocketServer *webSocketServer = new WebSocketServer(appConfigApplication["id"].toString(), port, &app);
-    QObject::connect(webSocketServer, &WebSocketServer::stopped, &app, &QCoreApplication::quit);
+    WebSocketServer *wsServer = new WebSocketServer(appConfigApplication["id"].toString(), port, &app);
+    QObject::connect(wsServer, &WebSocketServer::stopped, &app, &QCoreApplication::quit);
 
-    if (webSocketServer->start()) {
-        qDebug() << "Websocket server started at:" << webSocketServer->serverUrl().toString();
+    if (wsServer->start()) {
+        qDebug() << "Websocket server started at:" << wsServer->serverUrl().toString();
     }
     else {
-        qCritical() << "Failed to start websocket server:" << webSocketServer->errorString();
+        qCritical() << "Failed to start websocket server:" << wsServer->errorString();
         return 1;
     }
 
