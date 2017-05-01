@@ -5,6 +5,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QCoreApplication>
+#include <QDebug>
 
 #include "handlers/confighandler.h"
 //#include "handlers/systemhandler.h"
@@ -36,17 +37,24 @@ int main(int argc, char *argv[])
     clParser.setApplicationDescription(appConfigApplication["description"].toString());
     clParser.addHelpOption();
     clParser.addVersionOption();
-    QCommandLineOption clPortOption(QStringList() << "p" << "port", "Port for websocket server [default: 443].", "port", "443");
-    clParser.addOption(clPortOption);
+
+    // Port 49152-61000 will available as ephemeral port
+    // https://en.wikipedia.org/wiki/Ephemeral_port
+    QCommandLineOption clOptionPort(QStringList() << "p" << "port", "Port for websocket server [default: 49152].", "port", "49152");
+    clParser.addOption(clOptionPort);
+
     clParser.process(app);
 
-    int port = clParser.value(clPortOption).toInt();
+    int port = clParser.value(clOptionPort).toInt();
 
     // Setup websocket server
     WebSocketServer *webSocketServer = new WebSocketServer(appConfigApplication["id"].toString(), port, &app);
     if (!webSocketServer->start()) {
-        qFatal(webSocketServer->errorString());
+        qCritical() << "Failed to start websocket server:" << webSocketServer->errorString();
+        return 1;
     }
+
+    qDebug() << "Websocket server started at:" <<webSocketServer->serverUrl().toString();
 
     return app.exec();
 }
