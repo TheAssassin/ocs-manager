@@ -13,6 +13,10 @@ public:
     explicit WebSocketServer(const QString &serverName, quint16 serverPort = 0, QObject *parent = 0);
     ~WebSocketServer();
 
+signals:
+    void started();
+    void stopped();
+
 public slots:
     bool start();
     void stop();

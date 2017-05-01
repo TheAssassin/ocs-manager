@@ -7,19 +7,22 @@ WebSocketServer::WebSocketServer(const QString &serverName, quint16 serverPort, 
     : QObject(parent), serverName_(serverName), serverPort_(serverPort)
 {
     webSocketServer_ = new QWebSocketServer(serverName_, QWebSocketServer::NonSecureMode, this);
+    connect(webSocketServer_, &QWebSocketServer::closed, this, &WebSocketServer::stopped);
 }
 
 WebSocketServer::~WebSocketServer()
 {
-    if (webSocketServer_->isListening()) {
-        webSocketServer_->close();
-    }
+    stop();
     webSocketServer_->deleteLater();
 }
 
 bool WebSocketServer::start()
 {
-    return webSocketServer_->listen(QHostAddress::Any, serverPort_);
+    if (webSocketServer_->listen(QHostAddress::Any, serverPort_)) {
+        emit started();
+        return true;
+    }
+    return false;
 }
 
 void WebSocketServer::stop()
