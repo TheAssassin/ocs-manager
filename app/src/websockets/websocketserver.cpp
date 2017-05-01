@@ -11,6 +11,9 @@ WebSocketServer::WebSocketServer(const QString &serverName, quint16 serverPort, 
 
 WebSocketServer::~WebSocketServer()
 {
+    if (webSocketServer_->isListening()) {
+        webSocketServer_->close();
+    }
     webSocketServer_->deleteLater();
 }
 

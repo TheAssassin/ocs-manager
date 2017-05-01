@@ -49,12 +49,13 @@ int main(int argc, char *argv[])
 
     // Setup websocket server
     WebSocketServer *webSocketServer = new WebSocketServer(appConfigApplication["id"].toString(), port, &app);
-    if (!webSocketServer->start()) {
+    if (webSocketServer->start()) {
+        qDebug() << "Websocket server started at:" << webSocketServer->serverUrl().toString();
+    }
+    else {
         qCritical() << "Failed to start websocket server:" << webSocketServer->errorString();
         return 1;
     }
-
-    qDebug() << "Websocket server started at:" <<webSocketServer->serverUrl().toString();
 
     return app.exec();
 }
