@@ -4,6 +4,8 @@
 #include <QWebSocketServer>
 #include <QWebSocket>
 
+#include "qtlib_json.h"
+
 WebSocketServer::WebSocketServer(const QString &serverName, quint16 serverPort, QObject *parent)
     : QObject(parent), serverName_(serverName), serverPort_(serverPort)
 {
@@ -71,6 +73,13 @@ void WebSocketServer::wsTextMessageReceived(const QString &message)
 {
     QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
     if (wsClient) {
+        qtlib::Json json(message.toUtf8());
+        if (json.isValid()) {
+            QJsonObject jsonObject = json.toObject();
+            if (jsonObject["method"].toString() == "stop") {
+                stop();
+            }
+        }
         wsClient->sendTextMessage(message);
     }
 }
