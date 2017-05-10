@@ -55,33 +55,10 @@ QUrl WebSocketServer::serverUrl()
 void WebSocketServer::wsNewConnection()
 {
     QWebSocket *wsClient = wsServer_->nextPendingConnection();
-    connect(wsClient, &QWebSocket::binaryMessageReceived, this, &WebSocketServer::wsBinaryMessageReceived);
-    connect(wsClient, &QWebSocket::textMessageReceived, this, &WebSocketServer::wsTextMessageReceived);
     connect(wsClient, &QWebSocket::disconnected, this, &WebSocketServer::wsDisconnected);
+    connect(wsClient, &QWebSocket::textMessageReceived, this, &WebSocketServer::wsTextMessageReceived);
+    connect(wsClient, &QWebSocket::binaryMessageReceived, this, &WebSocketServer::wsBinaryMessageReceived);
     wsClients_ << wsClient;
-}
-
-void WebSocketServer::wsBinaryMessageReceived(const QByteArray &message)
-{
-    QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
-    if (wsClient) {
-        wsClient->sendBinaryMessage(message);
-    }
-}
-
-void WebSocketServer::wsTextMessageReceived(const QString &message)
-{
-    QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
-    if (wsClient) {
-        qtlib::Json json(message.toUtf8());
-        if (json.isValid()) {
-            QJsonObject jsonObject = json.toObject();
-            if (jsonObject["method"].toString() == "stop") {
-                stop();
-            }
-        }
-        wsClient->sendTextMessage(message);
-    }
 }
 
 void WebSocketServer::wsDisconnected()
@@ -91,4 +68,65 @@ void WebSocketServer::wsDisconnected()
         wsClients_.removeAll(wsClient);
         wsClient->deleteLater();
     }
+}
+
+void WebSocketServer::wsTextMessageReceived(const QString &message)
+{
+    QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
+    if (wsClient) {
+        qtlib::Json json(message.toUtf8());
+        if (json.isValid()) {
+            callFunction(json.toObject(), wsClient);
+        }
+    }
+}
+
+void WebSocketServer::wsBinaryMessageReceived(const QByteArray &message)
+{
+    QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
+    if (wsClient) {
+        qtlib::Json json(message);
+        if (json.isValid()) {
+            callFunction(json.toObject(), wsClient);
+        }
+    }
+}
+
+void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsClient)
+{
+    /* request object format
+    {
+        "id": "example",
+        "call": "functionName",
+        "args": {
+            "arg1": "value",
+            "arg2": 2,
+            "arg3": true
+        }
+    }
+    */
+
+    /* response object format
+    {
+        "id": "example",
+        "result": {}
+    }
+    */
+
+    QString id = request["id"].toString();
+    QString call = request["call"].toString();
+    QJsonObject args = request["args"].toObject();
+
+    QJsonObject response;
+    response["id"] = id;
+
+    if (call == "WebSocketServer::stop") {
+        stop();
+    }
+    else if (call == "WebSocketServer::serverUrl") {
+        response["result"] = serverUrl().toString();
+    }
+
+    wsClient->sendTextMessage(QString(qtlib::Json(response).toJson()));
+    //wsClient->sendBinaryMessage(qtlib::Json(response).toJson());
 }
