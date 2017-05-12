@@ -227,6 +227,16 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
     else if (call == "OcsHandler::getContent") {
         response["result"] = ocsHandler_->getContent(arg[0].toString(), arg[1].toString());
     }
+    // ItemHandler
+    else if (call == "ItemHandler::metadataSet") {
+        response["result"] = itemHandler_->metadataSet();
+    }
+    else if (call == "ItemHandler::download") {
+        itemHandler_->download(arg[0].toString(), arg[1].toString(), arg[2].toString(), arg[3].toString());
+    }
+    else if (call == "ItemHandler::uninstall") {
+        itemHandler_->uninstall(arg[0].toString());
+    }
 
     wsClient->sendTextMessage(QString(qtlib::Json(response).toJson()));
     //wsClient->sendBinaryMessage(qtlib::Json(response).toJson());
