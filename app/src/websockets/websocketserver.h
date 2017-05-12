@@ -37,6 +37,15 @@ private slots:
     void wsTextMessageReceived(const QString &message);
     void wsBinaryMessageReceived(const QByteArray &message);
 
+    void itemMetadataSetChanged();
+    void itemDownloadStarted(QJsonObject result);
+    void itemDownloadFinished(QJsonObject result);
+    void itemDownloadProgress(QString id, qint64 bytesReceived, qint64 bytesTotal);
+    void itemInstallStarted(QJsonObject result);
+    void itemInstallFinished(QJsonObject result);
+    void itemUninstallStarted(QJsonObject result);
+    void itemUninstallFinished(QJsonObject result);
+
 private:
     void execRequest(const QJsonObject &request);
     void sendResponse(const QJsonObject &response);
