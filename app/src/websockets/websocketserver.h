@@ -2,7 +2,8 @@
 
 #include <QObject>
 #include <QUrl>
-//#include <QJsonObject>
+#include <QJsonObject>
+#include <QJsonArray>
 
 class QWebSocketServer;
 class QWebSocket;
@@ -47,8 +48,8 @@ private slots:
     void itemUninstallFinished(QJsonObject result);
 
 private:
-    void execRequest(const QJsonObject &request);
-    void sendResponse(const QJsonObject &response);
+    void receiveMessage(const QString &id, const QString &func, const QJsonArray &data);
+    void sendMessage(const QString &id, const QString &func, const QJsonArray &data);
 
     ConfigHandler *configHandler_;
     SystemHandler *systemHandler_;
