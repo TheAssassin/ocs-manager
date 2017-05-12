@@ -108,11 +108,7 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
     {
         "id": "example",
         "call": "functionName",
-        "args": {
-            "arg1": "value",
-            "arg2": 2,
-            "arg3": true
-        }
+        "arg": ["value", 2, true]
     }
     */
 
@@ -125,11 +121,12 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
 
     QString id = request["id"].toString();
     QString call = request["call"].toString();
-    QJsonObject args = request["args"].toObject();
+    QJsonArray arg = request["arg"].toArray();
 
     QJsonObject response;
     response["id"] = id;
 
+    // WebSocketServer
     if (call == "WebSocketServer::stop") {
         stop();
     }
@@ -141,6 +138,58 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
     }
     else if (call == "WebSocketServer::serverUrl") {
         response["result"] = serverUrl().toString();
+    }
+    // ConfigHandler
+    else if (call == "ConfigHandler::getAppConfigApplication") {
+        response["result"] = configHandler_->getAppConfigApplication();
+    }
+    else if (call == "ConfigHandler::getAppConfigInstallTypes") {
+        response["result"] = configHandler_->getAppConfigInstallTypes();
+    }
+    else if (call == "ConfigHandler::getUsrConfigApplication") {
+        response["result"] = configHandler_->getUsrConfigApplication();
+    }
+    else if (call == "ConfigHandler::setUsrConfigApplication") {
+        response["result"] = configHandler_->setUsrConfigApplication(arg[0].toObject());
+    }
+    else if (call == "ConfigHandler::getUsrConfigProviders") {
+        response["result"] = configHandler_->getUsrConfigProviders();
+    }
+    else if (call == "ConfigHandler::setUsrConfigProviders") {
+        response["result"] = configHandler_->setUsrConfigProviders(arg[0].toObject());
+    }
+    else if (call == "ConfigHandler::getUsrConfigCategories") {
+        response["result"] = configHandler_->getUsrConfigCategories();
+    }
+    else if (call == "ConfigHandler::setUsrConfigCategories") {
+        response["result"] = configHandler_->setUsrConfigCategories(arg[0].toObject());
+    }
+    else if (call == "ConfigHandler::getUsrConfigInstalledItems") {
+        response["result"] = configHandler_->getUsrConfigInstalledItems();
+    }
+    else if (call == "ConfigHandler::setUsrConfigInstalledItems") {
+        response["result"] = configHandler_->setUsrConfigInstalledItems(arg[0].toObject());
+    }
+    else if (call == "ConfigHandler::setUsrConfigProvidersProvider") {
+        response["result"] = configHandler_->setUsrConfigProvidersProvider(arg[0].toString(), arg[1].toObject());
+    }
+    else if (call == "ConfigHandler::removeUsrConfigProvidersProvider") {
+        response["result"] = configHandler_->removeUsrConfigProvidersProvider(arg[0].toString());
+    }
+    else if (call == "ConfigHandler::setUsrConfigCategoriesProvider") {
+        response["result"] = configHandler_->setUsrConfigCategoriesProvider(arg[0].toString(), arg[1].toObject());
+    }
+    else if (call == "ConfigHandler::removeUsrConfigCategoriesProvider") {
+        response["result"] = configHandler_->removeUsrConfigCategoriesProvider(arg[0].toString());
+    }
+    else if (call == "ConfigHandler::setUsrConfigCategoriesInstallType") {
+        response["result"] = configHandler_->setUsrConfigCategoriesInstallType(arg[0].toString(), arg[1].toString(), arg[2].toString());
+    }
+    else if (call == "ConfigHandler::setUsrConfigInstalledItemsItem") {
+        response["result"] = configHandler_->setUsrConfigInstalledItemsItem(arg[0].toString(), arg[1].toObject());
+    }
+    else if (call == "ConfigHandler::removeUsrConfigInstalledItemsItem") {
+        response["result"] = configHandler_->removeUsrConfigInstalledItemsItem(arg[0].toString());
     }
 
     wsClient->sendTextMessage(QString(qtlib::Json(response).toJson()));
