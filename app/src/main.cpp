@@ -8,9 +8,6 @@
 #include <QDebug>
 
 #include "handlers/confighandler.h"
-//#include "handlers/systemhandler.h"
-//#include "handlers/ocshandler.h"
-//#include "handlers/itemhandler.h"
 #include "websockets/websocketserver.h"
 
 int main(int argc, char *argv[])
@@ -18,7 +15,7 @@ int main(int argc, char *argv[])
     // Init
     QCoreApplication app(argc, argv);
 
-    ConfigHandler *configHandler = new ConfigHandler(&app);
+    ConfigHandler *configHandler = new ConfigHandler();
     QJsonObject appConfigApplication = configHandler->getAppConfigApplication();
 
     app.setApplicationName(appConfigApplication["name"].toString());
@@ -48,7 +45,7 @@ int main(int argc, char *argv[])
     int port = clParser.value(clOptionPort).toInt();
 
     // Setup websocket server
-    WebSocketServer *wsServer = new WebSocketServer(appConfigApplication["id"].toString(), port, &app);
+    WebSocketServer *wsServer = new WebSocketServer(configHandler, appConfigApplication["id"].toString(), port, &app);
     QObject::connect(wsServer, &WebSocketServer::stopped, &app, &QCoreApplication::quit);
 
     if (wsServer->start()) {

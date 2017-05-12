@@ -7,23 +7,29 @@
 class QWebSocketServer;
 class QWebSocket;
 
+class ConfigHandler;
+class SystemHandler;
+class OcsHandler;
+class ItemHandler;
+
 class WebSocketServer : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit WebSocketServer(const QString &serverName, quint16 serverPort = 0, QObject *parent = 0);
+    explicit WebSocketServer(ConfigHandler *configHandler, const QString &serverName = "WebSocketServer", quint16 serverPort = 0, QObject *parent = 0);
     ~WebSocketServer();
 
+signals:
+    void started();
+    void stopped();
+
+public slots:
     bool start();
     void stop();
     bool isError();
     QString errorString();
     QUrl serverUrl();
-
-signals:
-    void started();
-    void stopped();
 
 private slots:
     void wsNewConnection();
@@ -38,4 +44,9 @@ private:
     quint16 serverPort_;
     QWebSocketServer *wsServer_;
     QList<QWebSocket *> wsClients_;
+
+    ConfigHandler *configHandler_;
+    SystemHandler *systemHandler_;
+    OcsHandler *ocsHandler_;
+    ItemHandler *itemHandler_;
 };

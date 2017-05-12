@@ -6,12 +6,22 @@
 
 #include "qtlib_json.h"
 
-WebSocketServer::WebSocketServer(const QString &serverName, quint16 serverPort, QObject *parent)
-    : QObject(parent), serverName_(serverName), serverPort_(serverPort)
+#include "handlers/confighandler.h"
+#include "handlers/systemhandler.h"
+#include "handlers/ocshandler.h"
+#include "handlers/itemhandler.h"
+
+WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &serverName, quint16 serverPort, QObject *parent)
+    : QObject(parent), configHandler_(configHandler), serverName_(serverName), serverPort_(serverPort)
 {
     wsServer_ = new QWebSocketServer(serverName_, QWebSocketServer::NonSecureMode, this);
     connect(wsServer_, &QWebSocketServer::newConnection, this, &WebSocketServer::wsNewConnection);
     connect(wsServer_, &QWebSocketServer::closed, this, &WebSocketServer::stopped);
+
+    configHandler_->setParent(this);
+    systemHandler_ = new SystemHandler(this);
+    ocsHandler_ = new OcsHandler(configHandler_, this);
+    itemHandler_ = new ItemHandler(configHandler_, this);
 }
 
 WebSocketServer::~WebSocketServer()
