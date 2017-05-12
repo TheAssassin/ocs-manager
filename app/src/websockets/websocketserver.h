@@ -40,13 +40,13 @@ private slots:
 private:
     void callFunction(const QJsonObject &request, QWebSocket *wsClient);
 
-    QString serverName_;
-    quint16 serverPort_;
-    QWebSocketServer *wsServer_;
-    QList<QWebSocket *> wsClients_;
-
     ConfigHandler *configHandler_;
     SystemHandler *systemHandler_;
     OcsHandler *ocsHandler_;
     ItemHandler *itemHandler_;
+
+    QString serverName_;
+    quint16 serverPort_;
+    QWebSocketServer *wsServer_;
+    QList<QWebSocket *> wsClients_;
 };
