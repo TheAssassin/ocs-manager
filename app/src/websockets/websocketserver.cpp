@@ -191,6 +191,21 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
     else if (call == "ConfigHandler::removeUsrConfigInstalledItemsItem") {
         response["result"] = configHandler_->removeUsrConfigInstalledItemsItem(arg[0].toString());
     }
+    // SystemHandler
+    else if (call == "SystemHandler::isUnix") {
+        response["result"] = systemHandler_->isUnix();
+    }
+    else if (call == "SystemHandler::desktopEnvironment") {
+        response["result"] = systemHandler_->desktopEnvironment();
+    }
+    else if (call == "SystemHandler::isApplicableType") {
+        response["result"] = systemHandler_->isApplicableType(arg[0].toString());
+    }
+    else if (call == "SystemHandler::applyFile") {
+#ifdef QTLIB_UNIX
+        response["result"] = systemHandler_->applyFile(arg[0].toString(), arg[1].toString());
+#endif
+    }
 
     wsClient->sendTextMessage(QString(qtlib::Json(response).toJson()));
     //wsClient->sendBinaryMessage(qtlib::Json(response).toJson());
