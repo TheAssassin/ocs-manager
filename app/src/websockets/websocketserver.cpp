@@ -121,51 +121,51 @@ void WebSocketServer::itemMetadataSetChanged()
 void WebSocketServer::itemDownloadStarted(QJsonObject result)
 {
     QJsonArray data;
-    data[0] = result;
+    data.append(result);
     sendMessage("", "ItemHandler::downloadStarted", data);
 }
 
 void WebSocketServer::itemDownloadFinished(QJsonObject result)
 {
     QJsonArray data;
-    data[0] = result;
+    data.append(result);
     sendMessage("", "ItemHandler::downloadFinished", data);
 }
 
 void WebSocketServer::itemDownloadProgress(QString id, qint64 bytesReceived, qint64 bytesTotal)
 {
     QJsonArray data;
-    data[0] = id;
-    data[1] = bytesReceived;
-    data[2] = bytesTotal;
+    data.append(id);
+    data.append(bytesReceived);
+    data.append(bytesTotal);
     sendMessage("", "ItemHandler::downloadProgress", data);
 }
 
 void WebSocketServer::itemInstallStarted(QJsonObject result)
 {
     QJsonArray data;
-    data[0] = result;
+    data.append(result);
     sendMessage("", "ItemHandler::installStarted", data);
 }
 
 void WebSocketServer::itemInstallFinished(QJsonObject result)
 {
     QJsonArray data;
-    data[0] = result;
+    data.append(result);
     sendMessage("", "ItemHandler::installFinished", data);
 }
 
 void WebSocketServer::itemUninstallStarted(QJsonObject result)
 {
     QJsonArray data;
-    data[0] = result;
+    data.append(result);
     sendMessage("", "ItemHandler::uninstallStarted", data);
 }
 
 void WebSocketServer::itemUninstallFinished(QJsonObject result)
 {
     QJsonArray data;
-    data[0] = result;
+    data.append(result);
     sendMessage("", "ItemHandler::uninstallFinished", data);
 }
 
@@ -186,112 +186,113 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
         stop();
     }
     else if (func == "WebSocketServer::isError") {
-        resultData[0] = isError();
+        resultData.append(isError());
     }
     else if (func == "WebSocketServer::errorString") {
-        resultData[0] = errorString();
+        resultData.append(errorString());
     }
     else if (func == "WebSocketServer::serverUrl") {
-        resultData[0] = serverUrl().toString();
+        resultData.append(serverUrl().toString());
     }
     // ConfigHandler
     else if (func == "ConfigHandler::getAppConfigApplication") {
-        resultData[0] = configHandler_->getAppConfigApplication();
+        resultData.append(configHandler_->getAppConfigApplication());
     }
     else if (func == "ConfigHandler::getAppConfigInstallTypes") {
-        resultData[0] = configHandler_->getAppConfigInstallTypes();
+        resultData.append(configHandler_->getAppConfigInstallTypes());
     }
     else if (func == "ConfigHandler::getUsrConfigApplication") {
-        resultData[0] = configHandler_->getUsrConfigApplication();
+        resultData.append(configHandler_->getUsrConfigApplication());
     }
     else if (func == "ConfigHandler::setUsrConfigApplication") {
-        resultData[0] = configHandler_->setUsrConfigApplication(data[0].toObject());
+        resultData.append(configHandler_->setUsrConfigApplication(data.at(0).toObject()));
     }
     else if (func == "ConfigHandler::getUsrConfigProviders") {
-        resultData[0] = configHandler_->getUsrConfigProviders();
+        resultData.append(configHandler_->getUsrConfigProviders());
     }
     else if (func == "ConfigHandler::setUsrConfigProviders") {
-        resultData[0] = configHandler_->setUsrConfigProviders(data[0].toObject());
+        resultData.append(configHandler_->setUsrConfigProviders(data.at(0).toObject()));
     }
     else if (func == "ConfigHandler::getUsrConfigCategories") {
-        resultData[0] = configHandler_->getUsrConfigCategories();
+        resultData.append(configHandler_->getUsrConfigCategories());
     }
     else if (func == "ConfigHandler::setUsrConfigCategories") {
-        resultData[0] = configHandler_->setUsrConfigCategories(data[0].toObject());
+        resultData.append(configHandler_->setUsrConfigCategories(data.at(0).toObject()));
     }
     else if (func == "ConfigHandler::getUsrConfigInstalledItems") {
-        resultData[0] = configHandler_->getUsrConfigInstalledItems();
+        resultData.append(configHandler_->getUsrConfigInstalledItems());
     }
     else if (func == "ConfigHandler::setUsrConfigInstalledItems") {
-        resultData[0] = configHandler_->setUsrConfigInstalledItems(data[0].toObject());
+        resultData.append(configHandler_->setUsrConfigInstalledItems(data.at(0).toObject()));
     }
     else if (func == "ConfigHandler::setUsrConfigProvidersProvider") {
-        resultData[0] = configHandler_->setUsrConfigProvidersProvider(data[0].toString(), data[1].toObject());
+        resultData.append(configHandler_->setUsrConfigProvidersProvider(data.at(0).toString(), data.at(1).toObject()));
     }
     else if (func == "ConfigHandler::removeUsrConfigProvidersProvider") {
-        resultData[0] = configHandler_->removeUsrConfigProvidersProvider(data[0].toString());
+        resultData.append(configHandler_->removeUsrConfigProvidersProvider(data.at(0).toString()));
     }
     else if (func == "ConfigHandler::setUsrConfigCategoriesProvider") {
-        resultData[0] = configHandler_->setUsrConfigCategoriesProvider(data[0].toString(), data[1].toObject());
+        resultData.append(configHandler_->setUsrConfigCategoriesProvider(data.at(0).toString(), data.at(1).toObject()));
     }
     else if (func == "ConfigHandler::removeUsrConfigCategoriesProvider") {
-        resultData[0] = configHandler_->removeUsrConfigCategoriesProvider(data[0].toString());
+        resultData.append(configHandler_->removeUsrConfigCategoriesProvider(data.at(0).toString()));
     }
     else if (func == "ConfigHandler::setUsrConfigCategoriesInstallType") {
-        resultData[0] = configHandler_->setUsrConfigCategoriesInstallType(data[0].toString(), data[1].toString(), data[2].toString());
+        resultData.append(configHandler_->setUsrConfigCategoriesInstallType(data.at(0).toString(), data.at(1).toString(), data.at(2).toString()));
     }
     else if (func == "ConfigHandler::setUsrConfigInstalledItemsItem") {
-        resultData[0] = configHandler_->setUsrConfigInstalledItemsItem(data[0].toString(), data[1].toObject());
+        resultData.append(configHandler_->setUsrConfigInstalledItemsItem(data.at(0).toString(), data.at(1).toObject()));
     }
     else if (func == "ConfigHandler::removeUsrConfigInstalledItemsItem") {
-        resultData[0] = configHandler_->removeUsrConfigInstalledItemsItem(data[0].toString());
+        resultData.append(configHandler_->removeUsrConfigInstalledItemsItem(data.at(0).toString()));
     }
     // SystemHandler
     else if (func == "SystemHandler::isUnix") {
-        resultData[0] = systemHandler_->isUnix();
+        resultData.append(systemHandler_->isUnix());
     }
     else if (func == "SystemHandler::desktopEnvironment") {
-        resultData[0] = systemHandler_->desktopEnvironment();
+        resultData.append(systemHandler_->desktopEnvironment());
     }
     else if (func == "SystemHandler::isApplicableType") {
-        resultData[0] = systemHandler_->isApplicableType(data[0].toString());
+        resultData.append(systemHandler_->isApplicableType(data.at(0).toString()));
     }
     else if (func == "SystemHandler::applyFile") {
-        resultData[0] = false;
 #ifdef QTLIB_UNIX
-        resultData[0] = systemHandler_->applyFile(data[0].toString(), data[1].toString());
+        resultData.append(systemHandler_->applyFile(data.at(0).toString(), data.at(1).toString()));
+#else
+        resultData.append(false);
 #endif
     }
     // OcsHandler
     else if (func == "OcsHandler::addProviders") {
-        resultData[0] = ocsHandler_->addProviders(data[0].toString());
+        resultData.append(ocsHandler_->addProviders(data.at(0).toString()));
     }
     else if (func == "OcsHandler::removeProvider") {
-        resultData[0] = ocsHandler_->removeProvider(data[0].toString());
+        resultData.append(ocsHandler_->removeProvider(data.at(0).toString()));
     }
     else if (func == "OcsHandler::updateAllCategories") {
-        resultData[0] = ocsHandler_->updateAllCategories(data[0].toBool());
+        resultData.append(ocsHandler_->updateAllCategories(data.at(0).toBool()));
     }
     else if (func == "OcsHandler::updateCategories") {
-        resultData[0] = ocsHandler_->updateCategories(data[0].toString(), data[1].toBool());
+        resultData.append(ocsHandler_->updateCategories(data.at(0).toString(), data.at(1).toBool()));
     }
     else if (func == "OcsHandler::getContents") {
-        resultData[0] = ocsHandler_->getContents(data[0].toString(), data[1].toString(),
-                data[2].toString(), data[3].toString(),
-                data[4].toString(), data[5].toString(), data[6].toInt(), data[7].toInt());
+        resultData.append(ocsHandler_->getContents(data.at(0).toString(), data.at(1).toString(),
+                                                   data.at(2).toString(), data.at(3).toString(),
+                                                   data.at(4).toString(), data.at(5).toString(), data.at(6).toInt(), data.at(7).toInt()));
     }
     else if (func == "OcsHandler::getContent") {
-        resultData[0] = ocsHandler_->getContent(data[0].toString(), data[1].toString());
+        resultData.append(ocsHandler_->getContent(data.at(0).toString(), data.at(1).toString()));
     }
     // ItemHandler
     else if (func == "ItemHandler::metadataSet") {
-        resultData[0] = itemHandler_->metadataSet();
+        resultData.append(itemHandler_->metadataSet());
     }
     else if (func == "ItemHandler::download") {
-        itemHandler_->download(data[0].toString(), data[1].toString(), data[2].toString(), data[3].toString());
+        itemHandler_->download(data.at(0).toString(), data.at(1).toString(), data.at(2).toString(), data.at(3).toString());
     }
     else if (func == "ItemHandler::uninstall") {
-        itemHandler_->uninstall(data[0].toString());
+        itemHandler_->uninstall(data.at(0).toString());
     }
     // Not supported
     else {
