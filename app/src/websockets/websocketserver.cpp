@@ -206,6 +206,27 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
         response["result"] = systemHandler_->applyFile(arg[0].toString(), arg[1].toString());
 #endif
     }
+    // OcsHandler
+    else if (call == "OcsHandler::addProviders") {
+        response["result"] = ocsHandler_->addProviders(arg[0].toString());
+    }
+    else if (call == "OcsHandler::removeProvider") {
+        response["result"] = ocsHandler_->removeProvider(arg[0].toString());
+    }
+    else if (call == "OcsHandler::updateAllCategories") {
+        response["result"] = ocsHandler_->updateAllCategories(arg[0].toBool());
+    }
+    else if (call == "OcsHandler::updateCategories") {
+        response["result"] = ocsHandler_->updateCategories(arg[0].toString(), arg[1].toBool());
+    }
+    else if (call == "OcsHandler::getContents") {
+        response["result"] = ocsHandler_->getContents(arg[0].toString(), arg[1].toString(),
+                arg[2].toString(), arg[3].toString(),
+                arg[4].toString(), arg[5].toString(), arg[6].toInt(), arg[7].toInt());
+    }
+    else if (call == "OcsHandler::getContent") {
+        response["result"] = ocsHandler_->getContent(arg[0].toString(), arg[1].toString());
+    }
 
     wsClient->sendTextMessage(QString(qtlib::Json(response).toJson()));
     //wsClient->sendBinaryMessage(qtlib::Json(response).toJson());
