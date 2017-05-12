@@ -38,7 +38,8 @@ private slots:
     void wsBinaryMessageReceived(const QByteArray &message);
 
 private:
-    void callFunction(const QJsonObject &request, QWebSocket *wsClient);
+    void execRequest(const QJsonObject &request);
+    void sendResponse(const QJsonObject &response);
 
     ConfigHandler *configHandler_;
     SystemHandler *systemHandler_;

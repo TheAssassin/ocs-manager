@@ -86,7 +86,7 @@ void WebSocketServer::wsTextMessageReceived(const QString &message)
     if (wsClient) {
         qtlib::Json json(message.toUtf8());
         if (json.isValid()) {
-            callFunction(json.toObject(), wsClient);
+            execRequest(json.toObject());
         }
     }
 }
@@ -97,145 +97,141 @@ void WebSocketServer::wsBinaryMessageReceived(const QByteArray &message)
     if (wsClient) {
         qtlib::Json json(message);
         if (json.isValid()) {
-            callFunction(json.toObject(), wsClient);
+            execRequest(json.toObject());
         }
     }
 }
 
-void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsClient)
+void WebSocketServer::execRequest(const QJsonObject &request)
 {
     /* request object format
     {
         "id": "example",
-        "call": "functionName",
+        "func": "functionName",
         "arg": ["value", 2, true]
     }
     */
+
     QString id = request["id"].toString();
-    QString call = request["call"].toString();
+    QString func = request["func"].toString();
     QJsonArray arg = request["arg"].toArray();
 
-    /* response object format
-    {
-        "id": "example",
-        "result": {}
-    }
-    */
     QJsonObject response;
     response["id"] = id;
+    response["func"] = func;
 
     // WebSocketServer
-    if (call == "WebSocketServer::stop") {
+    if (func == "WebSocketServer::stop") {
         stop();
         return;
     }
-    else if (call == "WebSocketServer::isError") {
+    else if (func == "WebSocketServer::isError") {
         response["result"] = isError();
     }
-    else if (call == "WebSocketServer::errorString") {
+    else if (func == "WebSocketServer::errorString") {
         response["result"] = errorString();
     }
-    else if (call == "WebSocketServer::serverUrl") {
+    else if (func == "WebSocketServer::serverUrl") {
         response["result"] = serverUrl().toString();
     }
     // ConfigHandler
-    else if (call == "ConfigHandler::getAppConfigApplication") {
+    else if (func == "ConfigHandler::getAppConfigApplication") {
         response["result"] = configHandler_->getAppConfigApplication();
     }
-    else if (call == "ConfigHandler::getAppConfigInstallTypes") {
+    else if (func == "ConfigHandler::getAppConfigInstallTypes") {
         response["result"] = configHandler_->getAppConfigInstallTypes();
     }
-    else if (call == "ConfigHandler::getUsrConfigApplication") {
+    else if (func == "ConfigHandler::getUsrConfigApplication") {
         response["result"] = configHandler_->getUsrConfigApplication();
     }
-    else if (call == "ConfigHandler::setUsrConfigApplication") {
+    else if (func == "ConfigHandler::setUsrConfigApplication") {
         response["result"] = configHandler_->setUsrConfigApplication(arg[0].toObject());
     }
-    else if (call == "ConfigHandler::getUsrConfigProviders") {
+    else if (func == "ConfigHandler::getUsrConfigProviders") {
         response["result"] = configHandler_->getUsrConfigProviders();
     }
-    else if (call == "ConfigHandler::setUsrConfigProviders") {
+    else if (func == "ConfigHandler::setUsrConfigProviders") {
         response["result"] = configHandler_->setUsrConfigProviders(arg[0].toObject());
     }
-    else if (call == "ConfigHandler::getUsrConfigCategories") {
+    else if (func == "ConfigHandler::getUsrConfigCategories") {
         response["result"] = configHandler_->getUsrConfigCategories();
     }
-    else if (call == "ConfigHandler::setUsrConfigCategories") {
+    else if (func == "ConfigHandler::setUsrConfigCategories") {
         response["result"] = configHandler_->setUsrConfigCategories(arg[0].toObject());
     }
-    else if (call == "ConfigHandler::getUsrConfigInstalledItems") {
+    else if (func == "ConfigHandler::getUsrConfigInstalledItems") {
         response["result"] = configHandler_->getUsrConfigInstalledItems();
     }
-    else if (call == "ConfigHandler::setUsrConfigInstalledItems") {
+    else if (func == "ConfigHandler::setUsrConfigInstalledItems") {
         response["result"] = configHandler_->setUsrConfigInstalledItems(arg[0].toObject());
     }
-    else if (call == "ConfigHandler::setUsrConfigProvidersProvider") {
+    else if (func == "ConfigHandler::setUsrConfigProvidersProvider") {
         response["result"] = configHandler_->setUsrConfigProvidersProvider(arg[0].toString(), arg[1].toObject());
     }
-    else if (call == "ConfigHandler::removeUsrConfigProvidersProvider") {
+    else if (func == "ConfigHandler::removeUsrConfigProvidersProvider") {
         response["result"] = configHandler_->removeUsrConfigProvidersProvider(arg[0].toString());
     }
-    else if (call == "ConfigHandler::setUsrConfigCategoriesProvider") {
+    else if (func == "ConfigHandler::setUsrConfigCategoriesProvider") {
         response["result"] = configHandler_->setUsrConfigCategoriesProvider(arg[0].toString(), arg[1].toObject());
     }
-    else if (call == "ConfigHandler::removeUsrConfigCategoriesProvider") {
+    else if (func == "ConfigHandler::removeUsrConfigCategoriesProvider") {
         response["result"] = configHandler_->removeUsrConfigCategoriesProvider(arg[0].toString());
     }
-    else if (call == "ConfigHandler::setUsrConfigCategoriesInstallType") {
+    else if (func == "ConfigHandler::setUsrConfigCategoriesInstallType") {
         response["result"] = configHandler_->setUsrConfigCategoriesInstallType(arg[0].toString(), arg[1].toString(), arg[2].toString());
     }
-    else if (call == "ConfigHandler::setUsrConfigInstalledItemsItem") {
+    else if (func == "ConfigHandler::setUsrConfigInstalledItemsItem") {
         response["result"] = configHandler_->setUsrConfigInstalledItemsItem(arg[0].toString(), arg[1].toObject());
     }
-    else if (call == "ConfigHandler::removeUsrConfigInstalledItemsItem") {
+    else if (func == "ConfigHandler::removeUsrConfigInstalledItemsItem") {
         response["result"] = configHandler_->removeUsrConfigInstalledItemsItem(arg[0].toString());
     }
     // SystemHandler
-    else if (call == "SystemHandler::isUnix") {
+    else if (func == "SystemHandler::isUnix") {
         response["result"] = systemHandler_->isUnix();
     }
-    else if (call == "SystemHandler::desktopEnvironment") {
+    else if (func == "SystemHandler::desktopEnvironment") {
         response["result"] = systemHandler_->desktopEnvironment();
     }
-    else if (call == "SystemHandler::isApplicableType") {
+    else if (func == "SystemHandler::isApplicableType") {
         response["result"] = systemHandler_->isApplicableType(arg[0].toString());
     }
-    else if (call == "SystemHandler::applyFile") {
+    else if (func == "SystemHandler::applyFile") {
         response["result"] = false;
 #ifdef QTLIB_UNIX
         response["result"] = systemHandler_->applyFile(arg[0].toString(), arg[1].toString());
 #endif
     }
     // OcsHandler
-    else if (call == "OcsHandler::addProviders") {
+    else if (func == "OcsHandler::addProviders") {
         response["result"] = ocsHandler_->addProviders(arg[0].toString());
     }
-    else if (call == "OcsHandler::removeProvider") {
+    else if (func == "OcsHandler::removeProvider") {
         response["result"] = ocsHandler_->removeProvider(arg[0].toString());
     }
-    else if (call == "OcsHandler::updateAllCategories") {
+    else if (func == "OcsHandler::updateAllCategories") {
         response["result"] = ocsHandler_->updateAllCategories(arg[0].toBool());
     }
-    else if (call == "OcsHandler::updateCategories") {
+    else if (func == "OcsHandler::updateCategories") {
         response["result"] = ocsHandler_->updateCategories(arg[0].toString(), arg[1].toBool());
     }
-    else if (call == "OcsHandler::getContents") {
+    else if (func == "OcsHandler::getContents") {
         response["result"] = ocsHandler_->getContents(arg[0].toString(), arg[1].toString(),
                 arg[2].toString(), arg[3].toString(),
                 arg[4].toString(), arg[5].toString(), arg[6].toInt(), arg[7].toInt());
     }
-    else if (call == "OcsHandler::getContent") {
+    else if (func == "OcsHandler::getContent") {
         response["result"] = ocsHandler_->getContent(arg[0].toString(), arg[1].toString());
     }
     // ItemHandler
-    else if (call == "ItemHandler::metadataSet") {
+    else if (func == "ItemHandler::metadataSet") {
         response["result"] = itemHandler_->metadataSet();
     }
-    else if (call == "ItemHandler::download") {
+    else if (func == "ItemHandler::download") {
         itemHandler_->download(arg[0].toString(), arg[1].toString(), arg[2].toString(), arg[3].toString());
         return;
     }
-    else if (call == "ItemHandler::uninstall") {
+    else if (func == "ItemHandler::uninstall") {
         itemHandler_->uninstall(arg[0].toString());
         return;
     }
@@ -244,6 +240,21 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
         return;
     }
 
-    wsClient->sendTextMessage(QString(qtlib::Json(response).toJson()));
-    //wsClient->sendBinaryMessage(qtlib::Json(response).toJson());
+    sendResponse(response);
+}
+
+void WebSocketServer::sendResponse(const QJsonObject &response)
+{
+    /* response object format
+    {
+        "id": "example",
+        "func": "functionName",
+        "result": mixed
+    }
+    */
+
+    foreach (QWebSocket *wsClient, wsClients_) {
+        wsClient->sendTextMessage(QString(qtlib::Json(response).toJson()));
+        //wsClient->sendBinaryMessage(qtlib::Json(response).toJson());
+    }
 }
