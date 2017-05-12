@@ -239,6 +239,10 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
         itemHandler_->uninstall(arg[0].toString());
         return;
     }
+    // Default
+    else {
+        return;
+    }
 
     wsClient->sendTextMessage(QString(qtlib::Json(response).toJson()));
     //wsClient->sendBinaryMessage(qtlib::Json(response).toJson());
