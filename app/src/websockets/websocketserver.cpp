@@ -111,6 +111,9 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
         "arg": ["value", 2, true]
     }
     */
+    QString id = request["id"].toString();
+    QString call = request["call"].toString();
+    QJsonArray arg = request["arg"].toArray();
 
     /* response object format
     {
@@ -118,17 +121,13 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
         "result": {}
     }
     */
-
-    QString id = request["id"].toString();
-    QString call = request["call"].toString();
-    QJsonArray arg = request["arg"].toArray();
-
     QJsonObject response;
     response["id"] = id;
 
     // WebSocketServer
     if (call == "WebSocketServer::stop") {
         stop();
+        return;
     }
     else if (call == "WebSocketServer::isError") {
         response["result"] = isError();
@@ -202,6 +201,7 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
         response["result"] = systemHandler_->isApplicableType(arg[0].toString());
     }
     else if (call == "SystemHandler::applyFile") {
+        response["result"] = false;
 #ifdef QTLIB_UNIX
         response["result"] = systemHandler_->applyFile(arg[0].toString(), arg[1].toString());
 #endif
@@ -233,9 +233,11 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
     }
     else if (call == "ItemHandler::download") {
         itemHandler_->download(arg[0].toString(), arg[1].toString(), arg[2].toString(), arg[3].toString());
+        return;
     }
     else if (call == "ItemHandler::uninstall") {
         itemHandler_->uninstall(arg[0].toString());
+        return;
     }
 
     wsClient->sendTextMessage(QString(qtlib::Json(response).toJson()));
