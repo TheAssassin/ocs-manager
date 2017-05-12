@@ -133,6 +133,12 @@ void WebSocketServer::callFunction(const QJsonObject &request, QWebSocket *wsCli
     if (call == "WebSocketServer::stop") {
         stop();
     }
+    else if (call == "WebSocketServer::isError") {
+        response["result"] = isError();
+    }
+    else if (call == "WebSocketServer::errorString") {
+        response["result"] = errorString();
+    }
     else if (call == "WebSocketServer::serverUrl") {
         response["result"] = serverUrl().toString();
     }
