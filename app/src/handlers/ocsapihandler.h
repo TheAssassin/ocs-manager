@@ -5,12 +5,12 @@
 
 class ConfigHandler;
 
-class OcsHandler : public QObject
+class OcsApiHandler : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit OcsHandler(ConfigHandler *configHandler, QObject *parent = 0);
+    explicit OcsApiHandler(ConfigHandler *configHandler, QObject *parent = 0);
 
 public slots:
     bool addProviders(const QString &providerFileUrl);

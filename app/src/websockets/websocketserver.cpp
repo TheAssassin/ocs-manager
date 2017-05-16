@@ -8,7 +8,7 @@
 
 #include "handlers/confighandler.h"
 #include "handlers/systemhandler.h"
-#include "handlers/ocshandler.h"
+#include "handlers/ocsapihandler.h"
 #include "handlers/itemhandler.h"
 
 WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &serverName, quint16 serverPort, QObject *parent)
@@ -20,12 +20,14 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
 
     configHandler_->setParent(this);
     systemHandler_ = new SystemHandler(this);
-    ocsHandler_ = new OcsHandler(configHandler_, this);
+    ocsApiHandler_ = new OcsApiHandler(configHandler_, this);
     itemHandler_ = new ItemHandler(configHandler_, this);
     connect(itemHandler_, &ItemHandler::metadataSetChanged, this, &WebSocketServer::itemMetadataSetChanged);
     connect(itemHandler_, &ItemHandler::downloadStarted, this, &WebSocketServer::itemDownloadStarted);
     connect(itemHandler_, &ItemHandler::downloadFinished, this, &WebSocketServer::itemDownloadFinished);
     connect(itemHandler_, &ItemHandler::downloadProgress, this, &WebSocketServer::itemDownloadProgress);
+    connect(itemHandler_, &ItemHandler::saveStarted, this, &WebSocketServer::itemSaveStarted);
+    connect(itemHandler_, &ItemHandler::saveFinished, this, &WebSocketServer::itemSaveFinished);
     connect(itemHandler_, &ItemHandler::installStarted, this, &WebSocketServer::itemInstallStarted);
     connect(itemHandler_, &ItemHandler::installFinished, this, &WebSocketServer::itemInstallFinished);
     connect(itemHandler_, &ItemHandler::uninstallStarted, this, &WebSocketServer::itemUninstallStarted);
@@ -139,6 +141,20 @@ void WebSocketServer::itemDownloadProgress(QString id, qint64 bytesReceived, qin
     data.append(bytesReceived);
     data.append(bytesTotal);
     sendMessage("", "ItemHandler::downloadProgress", data);
+}
+
+void WebSocketServer::itemSaveStarted(QJsonObject result)
+{
+    QJsonArray data;
+    data.append(result);
+    sendMessage("", "ItemHandler::saveStarted", data);
+}
+
+void WebSocketServer::itemSaveFinished(QJsonObject result)
+{
+    QJsonArray data;
+    data.append(result);
+    sendMessage("", "ItemHandler::saveFinished", data);
 }
 
 void WebSocketServer::itemInstallStarted(QJsonObject result)
@@ -263,33 +279,37 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
         resultData.append(false);
 #endif
     }
-    // OcsHandler
-    else if (func == "OcsHandler::addProviders") {
-        resultData.append(ocsHandler_->addProviders(data.at(0).toString()));
+    // OcsApiHandler
+    else if (func == "OcsApiHandler::addProviders") {
+        resultData.append(ocsApiHandler_->addProviders(data.at(0).toString()));
     }
-    else if (func == "OcsHandler::removeProvider") {
-        resultData.append(ocsHandler_->removeProvider(data.at(0).toString()));
+    else if (func == "OcsApiHandler::removeProvider") {
+        resultData.append(ocsApiHandler_->removeProvider(data.at(0).toString()));
     }
-    else if (func == "OcsHandler::updateAllCategories") {
-        resultData.append(ocsHandler_->updateAllCategories(data.at(0).toBool()));
+    else if (func == "OcsApiHandler::updateAllCategories") {
+        resultData.append(ocsApiHandler_->updateAllCategories(data.at(0).toBool()));
     }
-    else if (func == "OcsHandler::updateCategories") {
-        resultData.append(ocsHandler_->updateCategories(data.at(0).toString(), data.at(1).toBool()));
+    else if (func == "OcsApiHandler::updateCategories") {
+        resultData.append(ocsApiHandler_->updateCategories(data.at(0).toString(), data.at(1).toBool()));
     }
-    else if (func == "OcsHandler::getContents") {
-        resultData.append(ocsHandler_->getContents(data.at(0).toString(), data.at(1).toString(),
-                                                   data.at(2).toString(), data.at(3).toString(),
-                                                   data.at(4).toString(), data.at(5).toString(), data.at(6).toInt(), data.at(7).toInt()));
+    else if (func == "OcsApiHandler::getContents") {
+        resultData.append(ocsApiHandler_->getContents(data.at(0).toString(), data.at(1).toString(),
+                                                      data.at(2).toString(), data.at(3).toString(),
+                                                      data.at(4).toString(), data.at(5).toString(), data.at(6).toInt(), data.at(7).toInt()));
     }
-    else if (func == "OcsHandler::getContent") {
-        resultData.append(ocsHandler_->getContent(data.at(0).toString(), data.at(1).toString()));
+    else if (func == "OcsApiHandler::getContent") {
+        resultData.append(ocsApiHandler_->getContent(data.at(0).toString(), data.at(1).toString()));
     }
     // ItemHandler
     else if (func == "ItemHandler::metadataSet") {
         resultData.append(itemHandler_->metadataSet());
     }
-    else if (func == "ItemHandler::download") {
-        itemHandler_->download(data.at(0).toString(), data.at(1).toString(), data.at(2).toString(), data.at(3).toString());
+    else if (func == "ItemHandler::getItem") {
+        itemHandler_->getItem(data.at(0).toString(), data.at(1).toString(), data.at(2).toString(), data.at(3).toString(),
+                              data.at(4).toString(), data.at(5).toString());
+    }
+    else if (func == "ItemHandler::getItemByOcsUrl") {
+        itemHandler_->getItemByOcsUrl(data.at(0).toString());
     }
     else if (func == "ItemHandler::uninstall") {
         itemHandler_->uninstall(data.at(0).toString());

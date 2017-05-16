@@ -10,7 +10,7 @@ class QWebSocket;
 
 class ConfigHandler;
 class SystemHandler;
-class OcsHandler;
+class OcsApiHandler;
 class ItemHandler;
 
 class WebSocketServer : public QObject
@@ -42,6 +42,8 @@ private slots:
     void itemDownloadStarted(QJsonObject result);
     void itemDownloadFinished(QJsonObject result);
     void itemDownloadProgress(QString id, qint64 bytesReceived, qint64 bytesTotal);
+    void itemSaveStarted(QJsonObject result);
+    void itemSaveFinished(QJsonObject result);
     void itemInstallStarted(QJsonObject result);
     void itemInstallFinished(QJsonObject result);
     void itemUninstallStarted(QJsonObject result);
@@ -53,7 +55,7 @@ private:
 
     ConfigHandler *configHandler_;
     SystemHandler *systemHandler_;
-    OcsHandler *ocsHandler_;
+    OcsApiHandler *ocsApiHandler_;
     ItemHandler *itemHandler_;
 
     QString serverName_;
