@@ -10,7 +10,7 @@ class QWebSocket;
 
 class ConfigHandler;
 class SystemHandler;
-class OcsHandler;
+class OcsApiHandler;
 class ItemHandler;
 
 class WebSocketServer : public QObject
@@ -53,7 +53,7 @@ private:
 
     ConfigHandler *configHandler_;
     SystemHandler *systemHandler_;
-    OcsHandler *ocsHandler_;
+    OcsApiHandler *ocsApiHandler_;
     ItemHandler *itemHandler_;
 
     QString serverName_;

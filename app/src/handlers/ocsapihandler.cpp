@@ -1,4 +1,4 @@
-#include "ocshandler.h"
+#include "ocsapihandler.h"
 
 #include <QJsonValue>
 
@@ -6,11 +6,11 @@
 
 #include "handlers/confighandler.h"
 
-OcsHandler::OcsHandler(ConfigHandler *configHandler, QObject *parent)
+OcsApiHandler::OcsApiHandler(ConfigHandler *configHandler, QObject *parent)
     : QObject(parent), configHandler_(configHandler)
 {}
 
-bool OcsHandler::addProviders(const QString &providerFileUrl)
+bool OcsApiHandler::addProviders(const QString &providerFileUrl)
 {
     QJsonArray providers = qtlib::OcsApi::getProviderFile(QUrl(providerFileUrl));
     if (!providers.isEmpty()) {
@@ -29,7 +29,7 @@ bool OcsHandler::addProviders(const QString &providerFileUrl)
     return false;
 }
 
-bool OcsHandler::removeProvider(const QString &providerKey)
+bool OcsApiHandler::removeProvider(const QString &providerKey)
 {
     if (configHandler_->removeUsrConfigProvidersProvider(providerKey)) {
         configHandler_->removeUsrConfigCategoriesProvider(providerKey);
@@ -38,7 +38,7 @@ bool OcsHandler::removeProvider(const QString &providerKey)
     return false;
 }
 
-bool OcsHandler::updateAllCategories(bool force)
+bool OcsApiHandler::updateAllCategories(bool force)
 {
     QJsonObject providers = configHandler_->getUsrConfigProviders();
     if (!providers.isEmpty()) {
@@ -50,7 +50,7 @@ bool OcsHandler::updateAllCategories(bool force)
     return false;
 }
 
-bool OcsHandler::updateCategories(const QString &providerKey, bool force)
+bool OcsApiHandler::updateCategories(const QString &providerKey, bool force)
 {
     QJsonObject providers = configHandler_->getUsrConfigProviders();
 
@@ -133,7 +133,7 @@ bool OcsHandler::updateCategories(const QString &providerKey, bool force)
     return configHandler_->setUsrConfigCategoriesProvider(providerKey, newProviderCategories);
 }
 
-QJsonObject OcsHandler::getContents(const QString &providerKeys, const QString &categoryKeys,
+QJsonObject OcsApiHandler::getContents(const QString &providerKeys, const QString &categoryKeys,
                                     const QString &xdgTypes, const QString &packageTypes,
                                     const QString &search, const QString &sortmode, int pagesize, int page)
 {
@@ -191,7 +191,7 @@ QJsonObject OcsHandler::getContents(const QString &providerKeys, const QString &
     return responseSet;
 }
 
-QJsonObject OcsHandler::getContent(const QString &providerKey, const QString &contentId)
+QJsonObject OcsApiHandler::getContent(const QString &providerKey, const QString &contentId)
 {
     QJsonObject response;
     QJsonObject providers = configHandler_->getUsrConfigProviders();
