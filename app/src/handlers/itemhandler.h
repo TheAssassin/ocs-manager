@@ -21,6 +21,8 @@ signals:
     void downloadStarted(QJsonObject result);
     void downloadFinished(QJsonObject result);
     void downloadProgress(QString id, qint64 bytesReceived, qint64 bytesTotal);
+    void saveStarted(QJsonObject result);
+    void saveFinished(QJsonObject result);
     void installStarted(QJsonObject result);
     void installFinished(QJsonObject result);
     void uninstallStarted(QJsonObject result);
@@ -29,7 +31,9 @@ signals:
 public slots:
     QJsonObject metadataSet() const;
 
-    void download(const QString &url, const QString &installType, const QString &providerKey = "", const QString &contentId = "");
+    void getItem(const QString &command, const QString &url, const QString &installType, const QString &filename = "",
+                 const QString &providerKey = "", const QString &contentId = "");
+    void getItemByOcsUrl(const QString &ocsUrl);
     void uninstall(const QString &itemKey);
 
 private slots:
@@ -38,7 +42,8 @@ private slots:
 private:
     void setMetadataSet(const QJsonObject &metadataSet);
 
-    void install(qtlib::NetworkResource *resource);
+    void saveDownloadedFile(qtlib::NetworkResource *resource);
+    void installDownloadedFile(qtlib::NetworkResource *resource);
 
     ConfigHandler *configHandler_;
     QJsonObject metadataSet_;

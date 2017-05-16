@@ -42,6 +42,8 @@ private slots:
     void itemDownloadStarted(QJsonObject result);
     void itemDownloadFinished(QJsonObject result);
     void itemDownloadProgress(QString id, qint64 bytesReceived, qint64 bytesTotal);
+    void itemSaveStarted(QJsonObject result);
+    void itemSaveFinished(QJsonObject result);
     void itemInstallStarted(QJsonObject result);
     void itemInstallFinished(QJsonObject result);
     void itemUninstallStarted(QJsonObject result);

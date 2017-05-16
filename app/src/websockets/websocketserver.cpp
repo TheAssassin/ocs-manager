@@ -26,6 +26,8 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
     connect(itemHandler_, &ItemHandler::downloadStarted, this, &WebSocketServer::itemDownloadStarted);
     connect(itemHandler_, &ItemHandler::downloadFinished, this, &WebSocketServer::itemDownloadFinished);
     connect(itemHandler_, &ItemHandler::downloadProgress, this, &WebSocketServer::itemDownloadProgress);
+    connect(itemHandler_, &ItemHandler::saveStarted, this, &WebSocketServer::itemSaveStarted);
+    connect(itemHandler_, &ItemHandler::saveFinished, this, &WebSocketServer::itemSaveFinished);
     connect(itemHandler_, &ItemHandler::installStarted, this, &WebSocketServer::itemInstallStarted);
     connect(itemHandler_, &ItemHandler::installFinished, this, &WebSocketServer::itemInstallFinished);
     connect(itemHandler_, &ItemHandler::uninstallStarted, this, &WebSocketServer::itemUninstallStarted);
@@ -139,6 +141,20 @@ void WebSocketServer::itemDownloadProgress(QString id, qint64 bytesReceived, qin
     data.append(bytesReceived);
     data.append(bytesTotal);
     sendMessage("", "ItemHandler::downloadProgress", data);
+}
+
+void WebSocketServer::itemSaveStarted(QJsonObject result)
+{
+    QJsonArray data;
+    data.append(result);
+    sendMessage("", "ItemHandler::saveStarted", data);
+}
+
+void WebSocketServer::itemSaveFinished(QJsonObject result)
+{
+    QJsonArray data;
+    data.append(result);
+    sendMessage("", "ItemHandler::saveFinished", data);
 }
 
 void WebSocketServer::itemInstallStarted(QJsonObject result)
@@ -278,8 +294,8 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     }
     else if (func == "OcsApiHandler::getContents") {
         resultData.append(ocsApiHandler_->getContents(data.at(0).toString(), data.at(1).toString(),
-                                                   data.at(2).toString(), data.at(3).toString(),
-                                                   data.at(4).toString(), data.at(5).toString(), data.at(6).toInt(), data.at(7).toInt()));
+                                                      data.at(2).toString(), data.at(3).toString(),
+                                                      data.at(4).toString(), data.at(5).toString(), data.at(6).toInt(), data.at(7).toInt()));
     }
     else if (func == "OcsApiHandler::getContent") {
         resultData.append(ocsApiHandler_->getContent(data.at(0).toString(), data.at(1).toString()));
@@ -288,8 +304,12 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     else if (func == "ItemHandler::metadataSet") {
         resultData.append(itemHandler_->metadataSet());
     }
-    else if (func == "ItemHandler::download") {
-        itemHandler_->download(data.at(0).toString(), data.at(1).toString(), data.at(2).toString(), data.at(3).toString());
+    else if (func == "ItemHandler::getItem") {
+        itemHandler_->getItem(data.at(0).toString(), data.at(1).toString(), data.at(2).toString(), data.at(3).toString(),
+                              data.at(4).toString(), data.at(5).toString());
+    }
+    else if (func == "ItemHandler::getItemByOcsUrl") {
+        itemHandler_->getItemByOcsUrl(data.at(0).toString());
     }
     else if (func == "ItemHandler::uninstall") {
         itemHandler_->uninstall(data.at(0).toString());

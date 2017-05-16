@@ -134,8 +134,8 @@ bool OcsApiHandler::updateCategories(const QString &providerKey, bool force)
 }
 
 QJsonObject OcsApiHandler::getContents(const QString &providerKeys, const QString &categoryKeys,
-                                    const QString &xdgTypes, const QString &packageTypes,
-                                    const QString &search, const QString &sortmode, int pagesize, int page)
+                                       const QString &xdgTypes, const QString &packageTypes,
+                                       const QString &search, const QString &sortmode, int pagesize, int page)
 {
     QJsonObject responseSet;
 
