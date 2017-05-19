@@ -1,2 +1,2 @@
-# ocs-lib
-a shared library to handle filemanagement and "apply"
+# ocs-manager
+a tool to handle filemanagement and "apply"
