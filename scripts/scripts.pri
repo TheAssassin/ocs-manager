@@ -1,0 +1,1 @@
+DISTFILES += $${PWD}/import.sh
