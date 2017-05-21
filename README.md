@@ -9,3 +9,16 @@ A management tool for ocs.
 Copyright: 2017, Opendesktop.org
 
 License: LGPL-3+
+
+
+## Note
+
+### Package depends
+
+* libqt5websockets5
+
+### Package depends (build)
+
+* build-essential
+* qt5-default
+* libqt5websockets5-dev
