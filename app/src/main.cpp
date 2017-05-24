@@ -1,7 +1,7 @@
 #include <QStringList>
 #include <QJsonObject>
-//#include <QTranslator>
-//#include <QLocale>
+#include <QTranslator>
+#include <QLocale>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QCoreApplication>
@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain(appConfigApplication["domain"].toString());
 
     // Setup translator
-    //QTranslator translator;
-    //if (translator.load(QLocale(), "messages", ".", ":/i18n")) {
-    //    app.installTranslator(&translator);
-    //}
+    QTranslator translator;
+    if (translator.load(QLocale(), "messages", ".", ":/i18n")) {
+        app.installTranslator(&translator);
+    }
 
     // Setup CLI
     QCommandLineParser clParser;
