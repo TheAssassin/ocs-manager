@@ -4,7 +4,7 @@
 #include <QLocale>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
-#include <QCoreApplication>
+#include <QGuiApplication>
 #include <QDebug>
 
 #include "handlers/confighandler.h"
@@ -13,7 +13,7 @@
 int main(int argc, char *argv[])
 {
     // Init
-    QCoreApplication app(argc, argv);
+    QGuiApplication app(argc, argv); // This is backend program, but need GUI module
 
     ConfigHandler *configHandler = new ConfigHandler();
     QJsonObject appConfigApplication = configHandler->getAppConfigApplication();
