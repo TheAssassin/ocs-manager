@@ -5,8 +5,8 @@
     "organization": "Opendesktop.org",
     "domain": "org.opendesktop.ocs-manager",
     "icon": "",
-    "description": "A management tool for ocs.",
-    "license": "LGPL-3+",
+    "description": "A tool to handle filemanagement and apply.",
+    "license": "GPL-3+",
     "author": "Opendesktop.org",
     "contact": "contact@opendesktop.org",
     "homepage": "https://github.com/opendesktop/ocs-manager"
