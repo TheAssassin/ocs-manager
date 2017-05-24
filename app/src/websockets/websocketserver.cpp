@@ -266,6 +266,12 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     else if (func == "SystemHandler::isUnix") {
         resultData.append(systemHandler_->isUnix());
     }
+    else if (func == "SystemHandler::isMobileDevice") {
+        resultData.append(systemHandler_->isMobileDevice());
+    }
+    else if (func == "SystemHandler::openUrl") {
+        resultData.append(systemHandler_->openUrl(data.at(0).toString()));
+    }
     else if (func == "SystemHandler::desktopEnvironment") {
         resultData.append(systemHandler_->desktopEnvironment());
     }

@@ -1,10 +1,10 @@
 #include <QStringList>
 #include <QJsonObject>
-//#include <QTranslator>
-//#include <QLocale>
+#include <QTranslator>
+#include <QLocale>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
-#include <QCoreApplication>
+#include <QGuiApplication>
 #include <QDebug>
 
 #include "handlers/confighandler.h"
@@ -13,7 +13,7 @@
 int main(int argc, char *argv[])
 {
     // Init
-    QCoreApplication app(argc, argv);
+    QGuiApplication app(argc, argv); // This is backend program, but need GUI module
 
     ConfigHandler *configHandler = new ConfigHandler();
     QJsonObject appConfigApplication = configHandler->getAppConfigApplication();
@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain(appConfigApplication["domain"].toString());
 
     // Setup translator
-    //QTranslator translator;
-    //if (translator.load(QLocale(), "messages", ".", ":/i18n")) {
-    //    app.installTranslator(&translator);
-    //}
+    QTranslator translator;
+    if (translator.load(QLocale(), "messages", ".", ":/i18n")) {
+        app.installTranslator(&translator);
+    }
 
     // Setup CLI
     QCommandLineParser clParser;

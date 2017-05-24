@@ -1,5 +1,11 @@
 message("Please execute scripts/import.sh for build dependencies")
 
+ios|android|!isEmpty(APP_MOBILE) {
+    DEFINES += APP_MOBILE
+} else {
+    DEFINES += APP_DESKTOP
+}
+
 TARGET = ocs-manager
 
 TEMPLATE = app
@@ -16,4 +22,5 @@ DISTFILES += $${PWD}/README.md
 
 include($${PWD}/lib/lib.pri)
 include($${PWD}/app/app.pri)
+include($${PWD}/i18n/i18n.pri)
 include($${PWD}/scripts/scripts.pri)

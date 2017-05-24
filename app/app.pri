@@ -1,9 +1,8 @@
 QT += \
     core \
+    gui \
     network \
     websockets
-
-QT -= gui
 
 HEADERS += \
     $${PWD}/src/websockets/websocketserver.h \

@@ -11,6 +11,8 @@ public:
 
 public slots:
     bool isUnix();
+    bool isMobileDevice();
+    bool openUrl(const QString &url);
 
     QString desktopEnvironment();
     bool isApplicableType(const QString &installType);
