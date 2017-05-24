@@ -1,5 +1,11 @@
 message("Please execute scripts/import.sh for build dependencies")
 
+ios|android|!isEmpty(APP_MOBILE) {
+    DEFINES += APP_MOBILE
+} else {
+    DEFINES += APP_DESKTOP
+}
+
 TARGET = ocs-manager
 
 TEMPLATE = app
