@@ -135,7 +135,7 @@ void ItemHandler::uninstall(const QString &itemKey)
 #ifdef QTLIB_UNIX
     destDir.setPath(configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString());
 
-    foreach (const QJsonValue &filename, installedItem["files"].toArray()) {
+    for (const QJsonValue &filename : installedItem["files"].toArray()) {
         QFileInfo fileInfo(destDir.path() + "/" + filename.toString());
 
         // plasmapkg: Installation process has should be saved plasmapkg into destination directory
@@ -180,7 +180,7 @@ void ItemHandler::uninstall(const QString &itemKey)
 #else
     destDir.setPath(configHandler_->getAppConfigInstallTypes()[installType].toObject()["generic_destination"].toString());
 
-    foreach (const QJsonValue &filename, installedItem["files"].toArray()) {
+    for (const QJsonValue &filename : installedItem["files"].toArray()) {
         QFileInfo fileInfo(destDir.path() + "/" + filename.toString());
         if (fileInfo.isDir()) {
             qtlib::Dir(fileInfo.filePath()).remove();
@@ -392,7 +392,7 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
     destDir.make();
 
     QJsonArray installedFiles;
-    foreach (const QFileInfo &fileInfo, tempDestDir.list()) {
+    for (const QFileInfo &fileInfo : tempDestDir.list()) {
         installedFiles.append(QJsonValue(fileInfo.fileName()));
         if (fileInfo.isDir()) {
             qtlib::Dir(fileInfo.filePath()).move(destDir.path() + "/" + fileInfo.fileName());

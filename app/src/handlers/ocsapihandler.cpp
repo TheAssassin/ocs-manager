@@ -1,5 +1,6 @@
 #include "ocsapihandler.h"
 
+#include <QStringList>
 #include <QJsonValue>
 
 #include "qtlib_ocsapi.h"
@@ -14,7 +15,7 @@ bool OcsApiHandler::addProviders(const QString &providerFileUrl)
 {
     QJsonArray providers = qtlib::OcsApi::getProviderFile(QUrl(providerFileUrl));
     if (!providers.isEmpty()) {
-        foreach (const QJsonValue &providerValue, providers) {
+        for (const QJsonValue &providerValue : providers) {
             QJsonObject provider = providerValue.toObject();
             if (provider.contains("location")) {
                 // Use location (API base URL) as unique key
@@ -42,7 +43,7 @@ bool OcsApiHandler::updateAllCategories(bool force)
 {
     QJsonObject providers = configHandler_->getUsrConfigProviders();
     if (!providers.isEmpty()) {
-        foreach (const QString &providerKey, providers.keys()) {
+        for (const QString &providerKey : providers.keys()) {
             updateCategories(providerKey, force);
         }
         return true;
@@ -68,7 +69,7 @@ bool OcsApiHandler::updateCategories(const QString &providerKey, bool force)
     // Data type variation workaround, convert object to array
     QJsonArray responseData;
     if (response["data"].isObject()) {
-        foreach (const QJsonValue &dataValue, response["data"].toObject()) {
+        for (const QJsonValue &dataValue : response["data"].toObject()) {
             responseData.append(dataValue);
         }
     }
@@ -85,7 +86,7 @@ bool OcsApiHandler::updateCategories(const QString &providerKey, bool force)
     }
 
     QJsonObject newProviderCategories;
-    foreach (const QJsonValue &dataValue, responseData) {
+    for (const QJsonValue &dataValue : responseData) {
         QJsonObject data = dataValue.toObject();
 
         // Data type variation workaround, convert int to string
@@ -152,13 +153,13 @@ QJsonObject OcsApiHandler::getContents(const QString &providerKeys, const QStrin
     QJsonObject providers = configHandler_->getUsrConfigProviders();
     QJsonObject categories = configHandler_->getUsrConfigCategories();
 
-    foreach (const QString &providerKey, providers.keys()) {
+    for (const QString &providerKey : providers.keys()) {
         if (!providerKeyList.isEmpty() && !providerKeyList.contains(providerKey)) {
             continue;
         }
         QStringList categoryIdList;
         QJsonObject providerCategories = categories[providerKey].toObject();
-        foreach (const QString &categoryKey, providerCategories.keys()) {
+        for (const QString &categoryKey : providerCategories.keys()) {
             if (!categoryKeyList.isEmpty() && !categoryKeyList.contains(categoryKey)) {
                 continue;
             }

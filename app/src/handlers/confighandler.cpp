@@ -23,14 +23,14 @@ QJsonObject ConfigHandler::getAppConfigInstallTypes()
 {
     if (appConfigInstallTypes_.isEmpty()) {
         QJsonObject installTypes = appConfig_.get("install_types");
-        foreach (const QString &key, installTypes.keys()) {
+        for (const QString &key : installTypes.keys()) {
             QJsonObject installtype = installTypes[key].toObject();
             installtype["destination"] = convertPathString(installtype["destination"].toString());
             installtype["generic_destination"] = convertPathString(installtype["generic_destination"].toString());
             installTypes[key] = installtype;
         }
         QJsonObject installTypesAlias = appConfig_.get("install_types_alias");
-        foreach (const QString &key, installTypesAlias.keys()) {
+        for (const QString &key : installTypesAlias.keys()) {
             QJsonObject installTypeAlias = installTypesAlias[key].toObject();
             QString baseKey = installTypeAlias["base"].toString();
             if (installTypes.contains(baseKey)) {
