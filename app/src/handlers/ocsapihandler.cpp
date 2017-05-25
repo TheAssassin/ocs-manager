@@ -1,5 +1,6 @@
 #include "ocsapihandler.h"
 
+#include <QStringList>
 #include <QJsonValue>
 
 #include "qtlib_ocsapi.h"
