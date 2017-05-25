@@ -346,7 +346,7 @@ void WebSocketServer::sendMessage(const QString &id, const QString &func, const 
     QByteArray binaryMessage = qtlib::Json(object).toJson();
     QString textMessage = QString::fromUtf8(binaryMessage);
 
-    foreach (QWebSocket *wsClient, wsClients_) {
+    for (QWebSocket *wsClient : wsClients_) {
         wsClient->sendTextMessage(textMessage);
         //wsClient->sendBinaryMessage(binaryMessage);
     }
