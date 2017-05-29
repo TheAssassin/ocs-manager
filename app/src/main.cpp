@@ -15,8 +15,8 @@ int main(int argc, char *argv[])
     // Init
     QGuiApplication app(argc, argv); // This is backend program, but need GUI module
 
-    ConfigHandler *configHandler = new ConfigHandler();
-    QJsonObject appConfigApplication = configHandler->getAppConfigApplication();
+    auto *configHandler = new ConfigHandler();
+    auto appConfigApplication = configHandler->getAppConfigApplication();
 
     app.setApplicationName(appConfigApplication["name"].toString());
     app.setApplicationVersion(appConfigApplication["version"].toString());
@@ -42,10 +42,10 @@ int main(int argc, char *argv[])
 
     clParser.process(app);
 
-    int port = clParser.value(clOptionPort).toInt();
+    auto port = clParser.value(clOptionPort).toInt();
 
     // Setup websocket server
-    WebSocketServer *wsServer = new WebSocketServer(configHandler, appConfigApplication["id"].toString(), port, &app);
+    auto *wsServer = new WebSocketServer(configHandler, appConfigApplication["id"].toString(), port, &app);
     QObject::connect(wsServer, &WebSocketServer::stopped, &app, &QCoreApplication::quit);
 
     if (wsServer->start()) {

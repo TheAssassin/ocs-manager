@@ -42,7 +42,7 @@ bool SystemHandler::isMobileDevice()
 
 bool SystemHandler::openUrl(const QString &url)
 {
-    QString path = url;
+    auto path = url;
     path.replace("file://localhost", "", Qt::CaseInsensitive);
     path.replace("file://", "", Qt::CaseInsensitive);
 
@@ -91,7 +91,7 @@ QString SystemHandler::desktopEnvironment()
 
 bool SystemHandler::isApplicableType(const QString &installType)
 {
-    QString desktop = desktopEnvironment();
+    auto desktop = desktopEnvironment();
 
     if (installType == "wallpapers"
             && (desktop == "kde" || desktop == "gnome" || desktop == "xfce")) {
@@ -139,11 +139,11 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType)
 #ifdef QTLIB_UNIX
 bool SystemHandler::applyWallpaper(const QString &path)
 {
-    QString desktop = desktopEnvironment();
+    auto desktop = desktopEnvironment();
 
     if (desktop == "kde") {
         // plasma5.6+
-        QDBusMessage message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
+        auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
         QVariantList arguments;
 
         QString script;
@@ -158,7 +158,7 @@ bool SystemHandler::applyWallpaper(const QString &path)
         arguments << QVariant(script);
         message.setArguments(arguments);
 
-        QDBusMessage reply = QDBusConnection::sessionBus().call(message);
+        auto reply = QDBusConnection::sessionBus().call(message);
 
         if (reply.type() == QDBusMessage::ErrorMessage) {
             qWarning() << reply.errorMessage();
@@ -167,16 +167,15 @@ bool SystemHandler::applyWallpaper(const QString &path)
         return true;
     }
     else if (desktop == "gnome") {
-        QStringList arguments;
         // gnome3
-        arguments << "set" << "org.gnome.desktop.background" << "picture-uri" << "file://" + path;
+        QStringList arguments{"set", "org.gnome.desktop.background", "picture-uri", "file://" + path};
         return QProcess::startDetached("gsettings", arguments);
         // gnome2
-        //arguments << "--type=string" << "--set" << "/desktop/gnome/background/picture_filename" << path;
+        //QStringList arguments{"--type=string", "--set", "/desktop/gnome/background/picture_filename", path};
         //return QProcess::startDetached("gconftool-2", arguments);
     }
     else if (desktop == "xfce") {
-        QDBusMessage message = QDBusMessage::createMethodCall("org.xfce.Xfconf", "/org/xfce/Xfconf", "org.xfce.Xfconf", "SetProperty");
+        auto message = QDBusMessage::createMethodCall("org.xfce.Xfconf", "/org/xfce/Xfconf", "org.xfce.Xfconf", "SetProperty");
         QVariantList arguments;
 
         QString channelValue = "xfce4-desktop";
@@ -187,7 +186,7 @@ bool SystemHandler::applyWallpaper(const QString &path)
         arguments << QVariant(channelValue) << QVariant(propertyValue) << QVariant::fromValue(valueValue);
         message.setArguments(arguments);
 
-        QDBusMessage reply = QDBusConnection::sessionBus().call(message);
+        auto reply = QDBusConnection::sessionBus().call(message);
 
         if (reply.type() == QDBusMessage::ErrorMessage) {
             qWarning() << reply.errorMessage();
@@ -202,7 +201,7 @@ bool SystemHandler::applyIcon(const QString &path)
 {
     qDebug() << path;
 
-    QString desktop = desktopEnvironment();
+    auto desktop = desktopEnvironment();
 
     if (desktop == "kde") {
     }
@@ -217,7 +216,7 @@ bool SystemHandler::applyCursor(const QString &path)
 {
     qDebug() << path;
 
-    QString desktop = desktopEnvironment();
+    auto desktop = desktopEnvironment();
 
     if (desktop == "kde") {
     }
@@ -232,7 +231,7 @@ bool SystemHandler::applyWindowTheme(const QString &path)
 {
     qDebug() << path;
 
-    QString desktop = desktopEnvironment();
+    auto desktop = desktopEnvironment();
 
     if (desktop == "kde") {
     }

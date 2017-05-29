@@ -30,7 +30,7 @@ void ItemHandler::getItem(const QString &command, const QString &url, const QStr
                           const QString &providerKey, const QString &contentId)
 {
     // Use URL as unique key for metadata, network resource, and installed item
-    QString itemKey = url;
+    auto itemKey = url;
 
     QJsonObject metadata;
     metadata["command"] = command;
@@ -48,7 +48,7 @@ void ItemHandler::getItem(const QString &command, const QString &url, const QStr
     QJsonObject result;
     result["metadata"] = metadata;
 
-    QJsonObject itemMetadataSet = metadataSet();
+    auto itemMetadataSet = metadataSet();
 
     if (itemMetadataSet.contains(itemKey)) {
         result["status"] = QString("error_downloadstart");
@@ -60,7 +60,7 @@ void ItemHandler::getItem(const QString &command, const QString &url, const QStr
     itemMetadataSet[itemKey] = metadata;
     setMetadataSet(itemMetadataSet);
 
-    qtlib::NetworkResource *resource = new qtlib::NetworkResource(itemKey, QUrl(url), true, this);
+    auto *resource = new qtlib::NetworkResource(itemKey, QUrl(url), true, this);
     connect(resource, &qtlib::NetworkResource::downloadProgress, this, &ItemHandler::downloadProgress);
     connect(resource, &qtlib::NetworkResource::finished, this, &ItemHandler::networkResourceFinished);
     resource->get();
@@ -128,14 +128,14 @@ void ItemHandler::uninstall(const QString &itemKey)
     result["message"] = tr("Uninstalling");
     emit uninstallStarted(result);
 
-    QJsonObject installedItem = configHandler_->getUsrConfigInstalledItems()[itemKey].toObject();
-    QString installType = installedItem["install_type"].toString();
+    auto installedItem = configHandler_->getUsrConfigInstalledItems()[itemKey].toObject();
+    auto installType = installedItem["install_type"].toString();
 
     qtlib::Dir destDir;
 #ifdef QTLIB_UNIX
     destDir.setPath(configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString());
 
-    for (const QJsonValue &filename : installedItem["files"].toArray()) {
+    for (const auto &filename : installedItem["files"].toArray()) {
         QFileInfo fileInfo(destDir.path() + "/" + filename.toString());
 
         // plasmapkg: Installation process has should be saved plasmapkg into destination directory
@@ -180,7 +180,7 @@ void ItemHandler::uninstall(const QString &itemKey)
 #else
     destDir.setPath(configHandler_->getAppConfigInstallTypes()[installType].toObject()["generic_destination"].toString());
 
-    for (const QJsonValue &filename : installedItem["files"].toArray()) {
+    for (const auto &filename : installedItem["files"].toArray()) {
         QFileInfo fileInfo(destDir.path() + "/" + filename.toString());
         if (fileInfo.isDir()) {
             qtlib::Dir(fileInfo.filePath()).remove();
@@ -200,10 +200,10 @@ void ItemHandler::uninstall(const QString &itemKey)
 
 void ItemHandler::networkResourceFinished(qtlib::NetworkResource *resource)
 {
-    QString itemKey = resource->id();
+    auto itemKey = resource->id();
 
-    QJsonObject itemMetadataSet = metadataSet();
-    QJsonObject metadata = itemMetadataSet[itemKey].toObject();
+    auto itemMetadataSet = metadataSet();
+    auto metadata = itemMetadataSet[itemKey].toObject();
 
     QJsonObject result;
     result["metadata"] = metadata;
@@ -238,10 +238,10 @@ void ItemHandler::setMetadataSet(const QJsonObject &metadataSet)
 
 void ItemHandler::saveDownloadedFile(qtlib::NetworkResource *resource)
 {
-    QString itemKey = resource->id();
+    auto itemKey = resource->id();
 
-    QJsonObject itemMetadataSet = metadataSet();
-    QJsonObject metadata = itemMetadataSet[itemKey].toObject();
+    auto itemMetadataSet = metadataSet();
+    auto metadata = itemMetadataSet[itemKey].toObject();
 
     itemMetadataSet.remove(itemKey);
     setMetadataSet(itemMetadataSet);
@@ -252,8 +252,8 @@ void ItemHandler::saveDownloadedFile(qtlib::NetworkResource *resource)
     result["message"] = tr("Saving");
     emit saveStarted(result);
 
-    QString filename = metadata["filename"].toString();
-    QString installType = metadata["install_type"].toString();
+    auto filename = metadata["filename"].toString();
+    auto installType = metadata["install_type"].toString();
 
     qtlib::Dir destDir(configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString());
     destDir.make();
@@ -277,10 +277,10 @@ void ItemHandler::saveDownloadedFile(qtlib::NetworkResource *resource)
 void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
 {
     // Installation pre-process
-    QString itemKey = resource->id();
+    auto itemKey = resource->id();
 
-    QJsonObject itemMetadataSet = metadataSet();
-    QJsonObject metadata = itemMetadataSet[itemKey].toObject();
+    auto itemMetadataSet = metadataSet();
+    auto metadata = itemMetadataSet[itemKey].toObject();
 
     itemMetadataSet.remove(itemKey);
     setMetadataSet(itemMetadataSet);
@@ -291,10 +291,10 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
     result["message"] = tr("Saving");
     emit saveStarted(result);
 
-    QString filename = metadata["filename"].toString();
-    QString installType = metadata["install_type"].toString();
+    auto filename = metadata["filename"].toString();
+    auto installType = metadata["install_type"].toString();
 
-    QString prefix = configHandler_->getAppConfigApplication()["id"].toString() + "_" + filename;
+    auto prefix = configHandler_->getAppConfigApplication()["id"].toString() + "_" + filename;
     qtlib::Dir tempDir(qtlib::Dir::tempPath() + "/" + prefix);
     tempDir.make();
     qtlib::Dir tempDestDir(tempDir.path() + "/dest");
@@ -392,7 +392,7 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
     destDir.make();
 
     QJsonArray installedFiles;
-    for (const QFileInfo &fileInfo : tempDestDir.list()) {
+    for (const auto &fileInfo : tempDestDir.list()) {
         installedFiles.append(QJsonValue(fileInfo.fileName()));
         if (fileInfo.isDir()) {
             qtlib::Dir(fileInfo.filePath()).move(destDir.path() + "/" + fileInfo.fileName());
