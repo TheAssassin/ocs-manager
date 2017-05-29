@@ -10,7 +10,7 @@ class OcsApiHandler : public QObject
     Q_OBJECT
 
 public:
-    explicit OcsApiHandler(ConfigHandler *configHandler, QObject *parent = 0);
+    explicit OcsApiHandler(ConfigHandler *configHandler, QObject *parent = nullptr);
 
 public slots:
     bool addProviders(const QString &providerFileUrl);

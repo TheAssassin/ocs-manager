@@ -10,7 +10,7 @@ class ConfigHandler : public QObject
     Q_OBJECT
 
 public:
-    explicit ConfigHandler(QObject *parent = 0);
+    explicit ConfigHandler(QObject *parent = nullptr);
 
 public slots:
     QJsonObject getAppConfigApplication();

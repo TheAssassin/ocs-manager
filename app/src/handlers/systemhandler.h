@@ -7,7 +7,7 @@ class SystemHandler : public QObject
     Q_OBJECT
 
 public:
-    explicit SystemHandler(QObject *parent = 0);
+    explicit SystemHandler(QObject *parent = nullptr);
 
 public slots:
     bool isUnix();
