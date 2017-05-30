@@ -45,47 +45,47 @@ QJsonObject ConfigHandler::getAppConfigInstallTypes()
     return appConfigInstallTypes_;
 }
 
-QJsonObject ConfigHandler::getUsrConfigApplication()
+QJsonObject ConfigHandler::getUsrConfigApplication() const
 {
     return usrConfig_.get("application");
 }
 
-bool ConfigHandler::setUsrConfigApplication(const QJsonObject &object)
+bool ConfigHandler::setUsrConfigApplication(const QJsonObject &object) const
 {
     return usrConfig_.set("application", object);
 }
 
-QJsonObject ConfigHandler::getUsrConfigProviders()
+QJsonObject ConfigHandler::getUsrConfigProviders() const
 {
     return usrConfig_.get("providers");
 }
 
-bool ConfigHandler::setUsrConfigProviders(const QJsonObject &object)
+bool ConfigHandler::setUsrConfigProviders(const QJsonObject &object) const
 {
     return usrConfig_.set("providers", object);
 }
 
-QJsonObject ConfigHandler::getUsrConfigCategories()
+QJsonObject ConfigHandler::getUsrConfigCategories() const
 {
     return usrConfig_.get("categories");
 }
 
-bool ConfigHandler::setUsrConfigCategories(const QJsonObject &object)
+bool ConfigHandler::setUsrConfigCategories(const QJsonObject &object) const
 {
     return usrConfig_.set("categories", object);
 }
 
-QJsonObject ConfigHandler::getUsrConfigInstalledItems()
+QJsonObject ConfigHandler::getUsrConfigInstalledItems() const
 {
     return usrConfig_.get("installed_items");
 }
 
-bool ConfigHandler::setUsrConfigInstalledItems(const QJsonObject &object)
+bool ConfigHandler::setUsrConfigInstalledItems(const QJsonObject &object) const
 {
     return usrConfig_.set("installed_items", object);
 }
 
-bool ConfigHandler::setUsrConfigProvidersProvider(const QString &providerKey, const QJsonObject &object)
+bool ConfigHandler::setUsrConfigProvidersProvider(const QString &providerKey, const QJsonObject &object) const
 {
     /* object format
     {
@@ -103,14 +103,14 @@ bool ConfigHandler::setUsrConfigProvidersProvider(const QString &providerKey, co
     return setUsrConfigProviders(providers);
 }
 
-bool ConfigHandler::removeUsrConfigProvidersProvider(const QString &providerKey)
+bool ConfigHandler::removeUsrConfigProvidersProvider(const QString &providerKey) const
 {
     auto providers = getUsrConfigProviders();
     providers.remove(providerKey);
     return setUsrConfigProviders(providers);
 }
 
-bool ConfigHandler::setUsrConfigCategoriesProvider(const QString &providerKey, const QJsonObject &object)
+bool ConfigHandler::setUsrConfigCategoriesProvider(const QString &providerKey, const QJsonObject &object) const
 {
     /* object format
     {
@@ -131,14 +131,14 @@ bool ConfigHandler::setUsrConfigCategoriesProvider(const QString &providerKey, c
     return setUsrConfigCategories(categories);
 }
 
-bool ConfigHandler::removeUsrConfigCategoriesProvider(const QString &providerKey)
+bool ConfigHandler::removeUsrConfigCategoriesProvider(const QString &providerKey) const
 {
     auto categories = getUsrConfigCategories();
     categories.remove(providerKey);
     return setUsrConfigCategories(categories);
 }
 
-bool ConfigHandler::setUsrConfigCategoriesInstallType(const QString &providerKey, const QString &categoryKey, const QString &installType)
+bool ConfigHandler::setUsrConfigCategoriesInstallType(const QString &providerKey, const QString &categoryKey, const QString &installType) const
 {
     auto categories = getUsrConfigCategories();
     QJsonObject providerCategories;
@@ -155,7 +155,7 @@ bool ConfigHandler::setUsrConfigCategoriesInstallType(const QString &providerKey
     return setUsrConfigCategories(categories);
 }
 
-bool ConfigHandler::setUsrConfigInstalledItemsItem(const QString &itemKey, const QJsonObject &object)
+bool ConfigHandler::setUsrConfigInstalledItemsItem(const QString &itemKey, const QJsonObject &object) const
 {
     /* object format
     {
@@ -176,14 +176,14 @@ bool ConfigHandler::setUsrConfigInstalledItemsItem(const QString &itemKey, const
     return setUsrConfigInstalledItems(installedItems);
 }
 
-bool ConfigHandler::removeUsrConfigInstalledItemsItem(const QString &itemKey)
+bool ConfigHandler::removeUsrConfigInstalledItemsItem(const QString &itemKey) const
 {
     auto installedItems = getUsrConfigInstalledItems();
     installedItems.remove(itemKey);
     return setUsrConfigInstalledItems(installedItems);
 }
 
-QString ConfigHandler::convertPathString(const QString &path)
+QString ConfigHandler::convertPathString(const QString &path) const
 {
     auto newPath = path;
     if (newPath.contains("$HOME")) {

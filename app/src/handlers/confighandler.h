@@ -16,25 +16,25 @@ public slots:
     QJsonObject getAppConfigApplication();
     QJsonObject getAppConfigInstallTypes();
 
-    QJsonObject getUsrConfigApplication();
-    bool setUsrConfigApplication(const QJsonObject &object);
-    QJsonObject getUsrConfigProviders();
-    bool setUsrConfigProviders(const QJsonObject &object);
-    QJsonObject getUsrConfigCategories();
-    bool setUsrConfigCategories(const QJsonObject &object);
-    QJsonObject getUsrConfigInstalledItems();
-    bool setUsrConfigInstalledItems(const QJsonObject &object);
+    QJsonObject getUsrConfigApplication() const;
+    bool setUsrConfigApplication(const QJsonObject &object) const;
+    QJsonObject getUsrConfigProviders() const;
+    bool setUsrConfigProviders(const QJsonObject &object) const;
+    QJsonObject getUsrConfigCategories() const;
+    bool setUsrConfigCategories(const QJsonObject &object) const;
+    QJsonObject getUsrConfigInstalledItems() const;
+    bool setUsrConfigInstalledItems(const QJsonObject &object) const;
 
-    bool setUsrConfigProvidersProvider(const QString &providerKey, const QJsonObject &object);
-    bool removeUsrConfigProvidersProvider(const QString &providerKey);
-    bool setUsrConfigCategoriesProvider(const QString &providerKey, const QJsonObject &object);
-    bool removeUsrConfigCategoriesProvider(const QString &providerKey);
-    bool setUsrConfigCategoriesInstallType(const QString &providerKey, const QString &categoryKey, const QString &installType);
-    bool setUsrConfigInstalledItemsItem(const QString &itemKey, const QJsonObject &object);
-    bool removeUsrConfigInstalledItemsItem(const QString &itemKey);
+    bool setUsrConfigProvidersProvider(const QString &providerKey, const QJsonObject &object) const;
+    bool removeUsrConfigProvidersProvider(const QString &providerKey) const;
+    bool setUsrConfigCategoriesProvider(const QString &providerKey, const QJsonObject &object) const;
+    bool removeUsrConfigCategoriesProvider(const QString &providerKey) const;
+    bool setUsrConfigCategoriesInstallType(const QString &providerKey, const QString &categoryKey, const QString &installType) const;
+    bool setUsrConfigInstalledItemsItem(const QString &itemKey, const QJsonObject &object) const;
+    bool removeUsrConfigInstalledItemsItem(const QString &itemKey) const;
 
 private:
-    QString convertPathString(const QString &path);
+    QString convertPathString(const QString &path) const;
 
     qtlib::Config appConfig_;
     qtlib::Config usrConfig_;

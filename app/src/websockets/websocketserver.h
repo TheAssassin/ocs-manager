@@ -28,9 +28,9 @@ signals:
 public slots:
     bool start();
     void stop();
-    bool isError();
-    QString errorString();
-    QUrl serverUrl();
+    bool isError() const;
+    QString errorString() const;
+    QUrl serverUrl() const;
 
 private slots:
     void wsNewConnection();

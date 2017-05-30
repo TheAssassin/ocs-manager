@@ -10,22 +10,22 @@ public:
     explicit SystemHandler(QObject *parent = nullptr);
 
 public slots:
-    bool isUnix();
-    bool isMobileDevice();
-    bool openUrl(const QString &url);
+    bool isUnix() const;
+    bool isMobileDevice() const;
+    bool openUrl(const QString &url) const;
 
-    QString desktopEnvironment();
-    bool isApplicableType(const QString &installType);
+    QString desktopEnvironment() const;
+    bool isApplicableType(const QString &installType) const;
 
 #ifdef QTLIB_UNIX
-    bool applyFile(const QString &path, const QString &installType);
+    bool applyFile(const QString &path, const QString &installType) const;
 #endif
 
 private:
 #ifdef QTLIB_UNIX
-    bool applyWallpaper(const QString &path);
-    bool applyIcon(const QString &path);
-    bool applyCursor(const QString &path);
-    bool applyWindowTheme(const QString &path);
+    bool applyWallpaper(const QString &path) const;
+    bool applyIcon(const QString &path) const;
+    bool applyCursor(const QString &path) const;
+    bool applyWindowTheme(const QString &path) const;
 #endif
 };

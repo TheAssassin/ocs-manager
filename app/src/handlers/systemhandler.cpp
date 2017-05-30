@@ -20,7 +20,7 @@ SystemHandler::SystemHandler(QObject *parent)
     : QObject(parent)
 {}
 
-bool SystemHandler::isUnix()
+bool SystemHandler::isUnix() const
 {
 #ifdef QTLIB_UNIX
     return true;
@@ -28,7 +28,7 @@ bool SystemHandler::isUnix()
     return false;
 }
 
-bool SystemHandler::isMobileDevice()
+bool SystemHandler::isMobileDevice() const
 {
 #if defined(APP_MOBILE)
     return true;
@@ -40,7 +40,7 @@ bool SystemHandler::isMobileDevice()
     return false;
 }
 
-bool SystemHandler::openUrl(const QString &url)
+bool SystemHandler::openUrl(const QString &url) const
 {
     auto path = url;
     path.replace("file://localhost", "", Qt::CaseInsensitive);
@@ -62,7 +62,7 @@ bool SystemHandler::openUrl(const QString &url)
     return QDesktopServices::openUrl(QUrl(url));
 }
 
-QString SystemHandler::desktopEnvironment()
+QString SystemHandler::desktopEnvironment() const
 {
     QString desktop = "unknown";
     QString currentDesktop = "";
@@ -89,7 +89,7 @@ QString SystemHandler::desktopEnvironment()
     return desktop;
 }
 
-bool SystemHandler::isApplicableType(const QString &installType)
+bool SystemHandler::isApplicableType(const QString &installType) const
 {
     auto desktop = desktopEnvironment();
 
@@ -114,7 +114,7 @@ bool SystemHandler::isApplicableType(const QString &installType)
 }
 
 #ifdef QTLIB_UNIX
-bool SystemHandler::applyFile(const QString &path, const QString &installType)
+bool SystemHandler::applyFile(const QString &path, const QString &installType) const
 {
     if (QFileInfo::exists(path) && isApplicableType(installType)) {
         if (installType == "wallpapers") {
@@ -137,7 +137,7 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType)
 #endif
 
 #ifdef QTLIB_UNIX
-bool SystemHandler::applyWallpaper(const QString &path)
+bool SystemHandler::applyWallpaper(const QString &path) const
 {
     auto desktop = desktopEnvironment();
 
@@ -197,7 +197,7 @@ bool SystemHandler::applyWallpaper(const QString &path)
     return false;
 }
 
-bool SystemHandler::applyIcon(const QString &path)
+bool SystemHandler::applyIcon(const QString &path) const
 {
     qDebug() << path;
 
@@ -212,7 +212,7 @@ bool SystemHandler::applyIcon(const QString &path)
     return false;
 }
 
-bool SystemHandler::applyCursor(const QString &path)
+bool SystemHandler::applyCursor(const QString &path) const
 {
     qDebug() << path;
 
@@ -227,7 +227,7 @@ bool SystemHandler::applyCursor(const QString &path)
     return false;
 }
 
-bool SystemHandler::applyWindowTheme(const QString &path)
+bool SystemHandler::applyWindowTheme(const QString &path) const
 {
     qDebug() << path;
 

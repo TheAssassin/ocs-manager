@@ -54,7 +54,7 @@ void WebSocketServer::stop()
     wsServer_->close();
 }
 
-bool WebSocketServer::isError()
+bool WebSocketServer::isError() const
 {
     if (wsServer_->error() != QWebSocketProtocol::CloseCodeNormal) {
         return true;
@@ -62,12 +62,12 @@ bool WebSocketServer::isError()
     return false;
 }
 
-QString WebSocketServer::errorString()
+QString WebSocketServer::errorString() const
 {
     return wsServer_->errorString();
 }
 
-QUrl WebSocketServer::serverUrl()
+QUrl WebSocketServer::serverUrl() const
 {
     return wsServer_->serverUrl();
 }
