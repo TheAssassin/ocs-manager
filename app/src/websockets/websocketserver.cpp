@@ -54,7 +54,7 @@ void WebSocketServer::stop()
     wsServer_->close();
 }
 
-bool WebSocketServer::isError()
+bool WebSocketServer::isError() const
 {
     if (wsServer_->error() != QWebSocketProtocol::CloseCodeNormal) {
         return true;
@@ -62,19 +62,19 @@ bool WebSocketServer::isError()
     return false;
 }
 
-QString WebSocketServer::errorString()
+QString WebSocketServer::errorString() const
 {
     return wsServer_->errorString();
 }
 
-QUrl WebSocketServer::serverUrl()
+QUrl WebSocketServer::serverUrl() const
 {
     return wsServer_->serverUrl();
 }
 
 void WebSocketServer::wsNewConnection()
 {
-    QWebSocket *wsClient = wsServer_->nextPendingConnection();
+    auto *wsClient = wsServer_->nextPendingConnection();
     connect(wsClient, &QWebSocket::disconnected, this, &WebSocketServer::wsDisconnected);
     connect(wsClient, &QWebSocket::textMessageReceived, this, &WebSocketServer::wsTextMessageReceived);
     connect(wsClient, &QWebSocket::binaryMessageReceived, this, &WebSocketServer::wsBinaryMessageReceived);
@@ -83,7 +83,7 @@ void WebSocketServer::wsNewConnection()
 
 void WebSocketServer::wsDisconnected()
 {
-    QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
+    auto *wsClient = qobject_cast<QWebSocket *>(sender());
     if (wsClient) {
         wsClients_.removeAll(wsClient);
         wsClient->deleteLater();
@@ -92,11 +92,11 @@ void WebSocketServer::wsDisconnected()
 
 void WebSocketServer::wsTextMessageReceived(const QString &message)
 {
-    QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
+    auto *wsClient = qobject_cast<QWebSocket *>(sender());
     if (wsClient) {
         qtlib::Json json(message.toUtf8());
         if (json.isObject()) {
-            QJsonObject object = json.toObject();
+            auto object = json.toObject();
             receiveMessage(object["id"].toString(), object["func"].toString(), object["data"].toArray());
         }
     }
@@ -104,11 +104,11 @@ void WebSocketServer::wsTextMessageReceived(const QString &message)
 
 void WebSocketServer::wsBinaryMessageReceived(const QByteArray &message)
 {
-    QWebSocket *wsClient = qobject_cast<QWebSocket *>(sender());
+    auto *wsClient = qobject_cast<QWebSocket *>(sender());
     if (wsClient) {
         qtlib::Json json(message);
         if (json.isObject()) {
-            QJsonObject object = json.toObject();
+            auto object = json.toObject();
             receiveMessage(object["id"].toString(), object["func"].toString(), object["data"].toArray());
         }
     }
@@ -343,10 +343,10 @@ void WebSocketServer::sendMessage(const QString &id, const QString &func, const 
     object["func"] = func;
     object["data"] = data;
 
-    QByteArray binaryMessage = qtlib::Json(object).toJson();
-    QString textMessage = QString::fromUtf8(binaryMessage);
+    auto binaryMessage = qtlib::Json(object).toJson();
+    auto textMessage = QString::fromUtf8(binaryMessage);
 
-    for (QWebSocket *wsClient : wsClients_) {
+    for (auto *wsClient : wsClients_) {
         wsClient->sendTextMessage(textMessage);
         //wsClient->sendBinaryMessage(binaryMessage);
     }

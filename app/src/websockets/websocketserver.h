@@ -18,7 +18,7 @@ class WebSocketServer : public QObject
     Q_OBJECT
 
 public:
-    explicit WebSocketServer(ConfigHandler *configHandler, const QString &serverName = "WebSocketServer", quint16 serverPort = 0, QObject *parent = 0);
+    explicit WebSocketServer(ConfigHandler *configHandler, const QString &serverName = "WebSocketServer", quint16 serverPort = 0, QObject *parent = nullptr);
     ~WebSocketServer();
 
 signals:
@@ -28,9 +28,9 @@ signals:
 public slots:
     bool start();
     void stop();
-    bool isError();
-    QString errorString();
-    QUrl serverUrl();
+    bool isError() const;
+    QString errorString() const;
+    QUrl serverUrl() const;
 
 private slots:
     void wsNewConnection();

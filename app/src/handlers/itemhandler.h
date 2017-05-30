@@ -14,7 +14,7 @@ class ItemHandler : public QObject
     Q_OBJECT
 
 public:
-    explicit ItemHandler(ConfigHandler *configHandler, QObject *parent = 0);
+    explicit ItemHandler(ConfigHandler *configHandler, QObject *parent = nullptr);
 
 signals:
     void metadataSetChanged();

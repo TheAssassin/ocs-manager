@@ -11,15 +11,15 @@ OcsApiHandler::OcsApiHandler(ConfigHandler *configHandler, QObject *parent)
     : QObject(parent), configHandler_(configHandler)
 {}
 
-bool OcsApiHandler::addProviders(const QString &providerFileUrl)
+bool OcsApiHandler::addProviders(const QString &providerFileUrl) const
 {
-    QJsonArray providers = qtlib::OcsApi::getProviderFile(QUrl(providerFileUrl));
+    auto providers = qtlib::OcsApi::getProviderFile(QUrl(providerFileUrl));
     if (!providers.isEmpty()) {
-        for (const QJsonValue &providerValue : providers) {
-            QJsonObject provider = providerValue.toObject();
+        for (const auto &providerValue : providers) {
+            auto provider = providerValue.toObject();
             if (provider.contains("location")) {
                 // Use location (API base URL) as unique key
-                QString providerKey = provider["location"].toString();
+                auto providerKey = provider["location"].toString();
                 if (configHandler_->setUsrConfigProvidersProvider(providerKey, provider)) {
                     updateCategories(providerKey, true);
                 }
@@ -30,7 +30,7 @@ bool OcsApiHandler::addProviders(const QString &providerFileUrl)
     return false;
 }
 
-bool OcsApiHandler::removeProvider(const QString &providerKey)
+bool OcsApiHandler::removeProvider(const QString &providerKey) const
 {
     if (configHandler_->removeUsrConfigProvidersProvider(providerKey)) {
         configHandler_->removeUsrConfigCategoriesProvider(providerKey);
@@ -39,11 +39,11 @@ bool OcsApiHandler::removeProvider(const QString &providerKey)
     return false;
 }
 
-bool OcsApiHandler::updateAllCategories(bool force)
+bool OcsApiHandler::updateAllCategories(bool force) const
 {
-    QJsonObject providers = configHandler_->getUsrConfigProviders();
+    auto providers = configHandler_->getUsrConfigProviders();
     if (!providers.isEmpty()) {
-        for (const QString &providerKey : providers.keys()) {
+        for (const auto &providerKey : providers.keys()) {
             updateCategories(providerKey, force);
         }
         return true;
@@ -51,16 +51,16 @@ bool OcsApiHandler::updateAllCategories(bool force)
     return false;
 }
 
-bool OcsApiHandler::updateCategories(const QString &providerKey, bool force)
+bool OcsApiHandler::updateCategories(const QString &providerKey, bool force) const
 {
-    QJsonObject providers = configHandler_->getUsrConfigProviders();
+    auto providers = configHandler_->getUsrConfigProviders();
 
     if (!providers.contains(providerKey)) {
         return false;
     }
 
-    QString baseUrl = providers[providerKey].toObject()["location"].toString();
-    QJsonObject response = qtlib::OcsApi(baseUrl, QUrl(baseUrl)).getContentCategories();
+    auto baseUrl = providers[providerKey].toObject()["location"].toString();
+    auto response = qtlib::OcsApi(baseUrl, QUrl(baseUrl)).getContentCategories();
 
     if (!response.contains("data")) {
         return false;
@@ -69,7 +69,7 @@ bool OcsApiHandler::updateCategories(const QString &providerKey, bool force)
     // Data type variation workaround, convert object to array
     QJsonArray responseData;
     if (response["data"].isObject()) {
-        for (const QJsonValue &dataValue : response["data"].toObject()) {
+        for (const auto &dataValue : response["data"].toObject()) {
             responseData.append(dataValue);
         }
     }
@@ -77,17 +77,17 @@ bool OcsApiHandler::updateCategories(const QString &providerKey, bool force)
         responseData = response["data"].toArray();
     }
 
-    QJsonObject installTypes = configHandler_->getAppConfigInstallTypes();
+    auto installTypes = configHandler_->getAppConfigInstallTypes();
 
-    QJsonObject categories = configHandler_->getUsrConfigCategories();
+    auto categories = configHandler_->getUsrConfigCategories();
     QJsonObject providerCategories;
     if (!force && categories.contains(providerKey)) {
         providerCategories = categories[providerKey].toObject();
     }
 
     QJsonObject newProviderCategories;
-    for (const QJsonValue &dataValue : responseData) {
-        QJsonObject data = dataValue.toObject();
+    for (const auto &dataValue : responseData) {
+        auto data = dataValue.toObject();
 
         // Data type variation workaround, convert int to string
         QString id;
@@ -99,9 +99,9 @@ bool OcsApiHandler::updateCategories(const QString &providerKey, bool force)
         }
 
         // Use category id as unique key
-        QString categoryKey = id;
+        auto categoryKey = id;
 
-        QString name = data["name"].toString();
+        auto name = data["name"].toString();
         // display_name: Not compatible to legacy OCS-API
         if (data.contains("display_name") && data["display_name"].toString() != "") {
             name = data["display_name"].toString();
@@ -113,7 +113,7 @@ bool OcsApiHandler::updateCategories(const QString &providerKey, bool force)
             parentId = data["parent_id"].toString();
         }
 
-        QString installType = configHandler_->getAppConfigApplication()["options"].toObject()["default_install_type"].toString();
+        auto installType = configHandler_->getAppConfigApplication()["options"].toObject()["default_install_type"].toString();
         if (!force && providerCategories.contains(categoryKey)) {
             installType = providerCategories[categoryKey].toObject()["install_type"].toString();
         }
@@ -136,7 +136,7 @@ bool OcsApiHandler::updateCategories(const QString &providerKey, bool force)
 
 QJsonObject OcsApiHandler::getContents(const QString &providerKeys, const QString &categoryKeys,
                                        const QString &xdgTypes, const QString &packageTypes,
-                                       const QString &search, const QString &sortmode, int pagesize, int page)
+                                       const QString &search, const QString &sortmode, int pagesize, int page) const
 {
     QJsonObject responseSet;
 
@@ -150,23 +150,23 @@ QJsonObject OcsApiHandler::getContents(const QString &providerKeys, const QStrin
         categoryKeyList = categoryKeys.split(",");
     }
 
-    QJsonObject providers = configHandler_->getUsrConfigProviders();
-    QJsonObject categories = configHandler_->getUsrConfigCategories();
+    auto providers = configHandler_->getUsrConfigProviders();
+    auto categories = configHandler_->getUsrConfigCategories();
 
-    for (const QString &providerKey : providers.keys()) {
+    for (const auto &providerKey : providers.keys()) {
         if (!providerKeyList.isEmpty() && !providerKeyList.contains(providerKey)) {
             continue;
         }
         QStringList categoryIdList;
-        QJsonObject providerCategories = categories[providerKey].toObject();
-        for (const QString &categoryKey : providerCategories.keys()) {
+        auto providerCategories = categories[providerKey].toObject();
+        for (const auto &categoryKey : providerCategories.keys()) {
             if (!categoryKeyList.isEmpty() && !categoryKeyList.contains(categoryKey)) {
                 continue;
             }
             categoryIdList.append(providerCategories[categoryKey].toObject()["id"].toString());
         }
         if (!categoryIdList.isEmpty()) {
-            QString baseUrl = providers[providerKey].toObject()["location"].toString();
+            auto baseUrl = providers[providerKey].toObject()["location"].toString();
             QUrlQuery query;
             // categories: Comma-separated list is not compatible to legacy OCS-API
             //query.addQueryItem("categories", categoryIdList.join(","));
@@ -192,12 +192,12 @@ QJsonObject OcsApiHandler::getContents(const QString &providerKeys, const QStrin
     return responseSet;
 }
 
-QJsonObject OcsApiHandler::getContent(const QString &providerKey, const QString &contentId)
+QJsonObject OcsApiHandler::getContent(const QString &providerKey, const QString &contentId) const
 {
     QJsonObject response;
-    QJsonObject providers = configHandler_->getUsrConfigProviders();
+    auto providers = configHandler_->getUsrConfigProviders();
     if (providers.contains(providerKey)) {
-        QString baseUrl = providers[providerKey].toObject()["location"].toString();
+        auto baseUrl = providers[providerKey].toObject()["location"].toString();
         response = qtlib::OcsApi(baseUrl, QUrl(baseUrl)).getContentData(contentId);
     }
     return response;

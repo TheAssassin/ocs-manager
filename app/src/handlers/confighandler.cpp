@@ -1,6 +1,7 @@
 #include "confighandler.h"
 
 #include <QStringList>
+#include <QStandardPaths>
 
 #include "qtlib_dir.h"
 
@@ -8,84 +9,62 @@ ConfigHandler::ConfigHandler(QObject *parent)
     : QObject(parent)
 {
     appConfig_ = qtlib::Config(":/configs");
+    importAppConfigApplication();
+    importAppConfigInstallTypes();
     usrConfig_ = qtlib::Config(qtlib::Dir::genericConfigPath() + "/" + getAppConfigApplication()["id"].toString());
 }
 
-QJsonObject ConfigHandler::getAppConfigApplication()
+QJsonObject ConfigHandler::getAppConfigApplication() const
 {
-    if (appConfigApplication_.isEmpty()) {
-        appConfigApplication_ = appConfig_.get("application");
-    }
     return appConfigApplication_;
 }
 
-QJsonObject ConfigHandler::getAppConfigInstallTypes()
+QJsonObject ConfigHandler::getAppConfigInstallTypes() const
 {
-    if (appConfigInstallTypes_.isEmpty()) {
-        QJsonObject installTypes = appConfig_.get("install_types");
-        for (const QString &key : installTypes.keys()) {
-            QJsonObject installtype = installTypes[key].toObject();
-            installtype["destination"] = convertPathString(installtype["destination"].toString());
-            installtype["generic_destination"] = convertPathString(installtype["generic_destination"].toString());
-            installTypes[key] = installtype;
-        }
-        QJsonObject installTypesAlias = appConfig_.get("install_types_alias");
-        for (const QString &key : installTypesAlias.keys()) {
-            QJsonObject installTypeAlias = installTypesAlias[key].toObject();
-            QString baseKey = installTypeAlias["base"].toString();
-            if (installTypes.contains(baseKey)) {
-                QJsonObject installType = installTypes[baseKey].toObject();
-                installType["base"] = baseKey;
-                installType["name"] = installTypeAlias["name"].toString();
-                installTypes[key] = installType;
-            }
-        }
-        appConfigInstallTypes_ = installTypes;
-    }
     return appConfigInstallTypes_;
 }
 
-QJsonObject ConfigHandler::getUsrConfigApplication()
+QJsonObject ConfigHandler::getUsrConfigApplication() const
 {
     return usrConfig_.get("application");
 }
 
-bool ConfigHandler::setUsrConfigApplication(const QJsonObject &object)
+bool ConfigHandler::setUsrConfigApplication(const QJsonObject &object) const
 {
     return usrConfig_.set("application", object);
 }
 
-QJsonObject ConfigHandler::getUsrConfigProviders()
+QJsonObject ConfigHandler::getUsrConfigProviders() const
 {
     return usrConfig_.get("providers");
 }
 
-bool ConfigHandler::setUsrConfigProviders(const QJsonObject &object)
+bool ConfigHandler::setUsrConfigProviders(const QJsonObject &object) const
 {
     return usrConfig_.set("providers", object);
 }
 
-QJsonObject ConfigHandler::getUsrConfigCategories()
+QJsonObject ConfigHandler::getUsrConfigCategories() const
 {
     return usrConfig_.get("categories");
 }
 
-bool ConfigHandler::setUsrConfigCategories(const QJsonObject &object)
+bool ConfigHandler::setUsrConfigCategories(const QJsonObject &object) const
 {
     return usrConfig_.set("categories", object);
 }
 
-QJsonObject ConfigHandler::getUsrConfigInstalledItems()
+QJsonObject ConfigHandler::getUsrConfigInstalledItems() const
 {
     return usrConfig_.get("installed_items");
 }
 
-bool ConfigHandler::setUsrConfigInstalledItems(const QJsonObject &object)
+bool ConfigHandler::setUsrConfigInstalledItems(const QJsonObject &object) const
 {
     return usrConfig_.set("installed_items", object);
 }
 
-bool ConfigHandler::setUsrConfigProvidersProvider(const QString &providerKey, const QJsonObject &object)
+bool ConfigHandler::setUsrConfigProvidersProvider(const QString &providerKey, const QJsonObject &object) const
 {
     /* object format
     {
@@ -98,19 +77,19 @@ bool ConfigHandler::setUsrConfigProvidersProvider(const QString &providerKey, co
         "_providerfile": "https://example.com/ocs/providers.xml"
     }
     */
-    QJsonObject providers = getUsrConfigProviders();
+    auto providers = getUsrConfigProviders();
     providers[providerKey] = object;
     return setUsrConfigProviders(providers);
 }
 
-bool ConfigHandler::removeUsrConfigProvidersProvider(const QString &providerKey)
+bool ConfigHandler::removeUsrConfigProvidersProvider(const QString &providerKey) const
 {
-    QJsonObject providers = getUsrConfigProviders();
+    auto providers = getUsrConfigProviders();
     providers.remove(providerKey);
     return setUsrConfigProviders(providers);
 }
 
-bool ConfigHandler::setUsrConfigCategoriesProvider(const QString &providerKey, const QJsonObject &object)
+bool ConfigHandler::setUsrConfigCategoriesProvider(const QString &providerKey, const QJsonObject &object) const
 {
     /* object format
     {
@@ -126,21 +105,21 @@ bool ConfigHandler::setUsrConfigCategoriesProvider(const QString &providerKey, c
         }
     }
     */
-    QJsonObject categories = getUsrConfigCategories();
+    auto categories = getUsrConfigCategories();
     categories[providerKey] = object;
     return setUsrConfigCategories(categories);
 }
 
-bool ConfigHandler::removeUsrConfigCategoriesProvider(const QString &providerKey)
+bool ConfigHandler::removeUsrConfigCategoriesProvider(const QString &providerKey) const
 {
-    QJsonObject categories = getUsrConfigCategories();
+    auto categories = getUsrConfigCategories();
     categories.remove(providerKey);
     return setUsrConfigCategories(categories);
 }
 
-bool ConfigHandler::setUsrConfigCategoriesInstallType(const QString &providerKey, const QString &categoryKey, const QString &installType)
+bool ConfigHandler::setUsrConfigCategoriesInstallType(const QString &providerKey, const QString &categoryKey, const QString &installType) const
 {
-    QJsonObject categories = getUsrConfigCategories();
+    auto categories = getUsrConfigCategories();
     QJsonObject providerCategories;
     if (categories.contains(providerKey)) {
         providerCategories = categories[providerKey].toObject();
@@ -155,7 +134,7 @@ bool ConfigHandler::setUsrConfigCategoriesInstallType(const QString &providerKey
     return setUsrConfigCategories(categories);
 }
 
-bool ConfigHandler::setUsrConfigInstalledItemsItem(const QString &itemKey, const QJsonObject &object)
+bool ConfigHandler::setUsrConfigInstalledItemsItem(const QString &itemKey, const QJsonObject &object) const
 {
     /* object format
     {
@@ -171,23 +150,66 @@ bool ConfigHandler::setUsrConfigInstalledItemsItem(const QString &itemKey, const
         "installed_at": 1483658977219
     }
     */
-    QJsonObject installedItems = getUsrConfigInstalledItems();
+    auto installedItems = getUsrConfigInstalledItems();
     installedItems[itemKey] = object;
     return setUsrConfigInstalledItems(installedItems);
 }
 
-bool ConfigHandler::removeUsrConfigInstalledItemsItem(const QString &itemKey)
+bool ConfigHandler::removeUsrConfigInstalledItemsItem(const QString &itemKey) const
 {
-    QJsonObject installedItems = getUsrConfigInstalledItems();
+    auto installedItems = getUsrConfigInstalledItems();
     installedItems.remove(itemKey);
     return setUsrConfigInstalledItems(installedItems);
 }
 
-QString ConfigHandler::convertPathString(const QString &path)
+void ConfigHandler::importAppConfigApplication()
 {
-    QString newPath = path;
+    appConfigApplication_ = appConfig_.get("application");
+}
+
+void ConfigHandler::importAppConfigInstallTypes()
+{
+    auto installTypes = appConfig_.get("install_types");
+    for (const auto &key : installTypes.keys()) {
+        auto installtype = installTypes[key].toObject();
+        installtype["destination"] = convertPathString(installtype["destination"].toString());
+        installtype["generic_destination"] = convertPathString(installtype["generic_destination"].toString());
+        installTypes[key] = installtype;
+    }
+    auto installTypesAlias = appConfig_.get("install_types_alias");
+    for (const auto &key : installTypesAlias.keys()) {
+        auto installTypeAlias = installTypesAlias[key].toObject();
+        auto baseKey = installTypeAlias["base"].toString();
+        if (installTypes.contains(baseKey)) {
+            auto installType = installTypes[baseKey].toObject();
+            installType["base"] = baseKey;
+            installType["name"] = installTypeAlias["name"].toString();
+            installTypes[key] = installType;
+        }
+    }
+    appConfigInstallTypes_ = installTypes;
+}
+
+QString ConfigHandler::convertPathString(const QString &path) const
+{
+    auto newPath = path;
     if (newPath.contains("$HOME")) {
         newPath.replace("$HOME", qtlib::Dir::homePath());
+    }
+    else if (newPath.contains("$XDG_DOCUMENTS_DIR")) {
+        newPath.replace("$XDG_DOCUMENTS_DIR", QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+    }
+    else if (newPath.contains("$XDG_DOWNLOAD_DIR")) {
+        newPath.replace("$XDG_DOWNLOAD_DIR", QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+    }
+    else if (newPath.contains("$XDG_PICTURES_DIR")) {
+        newPath.replace("$XDG_PICTURES_DIR", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation));
+    }
+    else if (newPath.contains("$XDG_MUSIC_DIR")) {
+        newPath.replace("$XDG_MUSIC_DIR", QStandardPaths::writableLocation(QStandardPaths::MusicLocation));
+    }
+    else if (newPath.contains("$XDG_VIDEOS_DIR")) {
+        newPath.replace("$XDG_VIDEOS_DIR", QStandardPaths::writableLocation(QStandardPaths::MoviesLocation));
     }
     else if (newPath.contains("$XDG_DATA_HOME")) {
         newPath.replace("$XDG_DATA_HOME", qtlib::Dir::genericDataPath());
