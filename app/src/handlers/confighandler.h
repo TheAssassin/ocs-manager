@@ -13,8 +13,8 @@ public:
     explicit ConfigHandler(QObject *parent = nullptr);
 
 public slots:
-    QJsonObject getAppConfigApplication();
-    QJsonObject getAppConfigInstallTypes();
+    QJsonObject getAppConfigApplication() const;
+    QJsonObject getAppConfigInstallTypes() const;
 
     QJsonObject getUsrConfigApplication() const;
     bool setUsrConfigApplication(const QJsonObject &object) const;
@@ -34,6 +34,8 @@ public slots:
     bool removeUsrConfigInstalledItemsItem(const QString &itemKey) const;
 
 private:
+    void importAppConfigApplication();
+    void importAppConfigInstallTypes();
     QString convertPathString(const QString &path) const;
 
     qtlib::Config appConfig_;

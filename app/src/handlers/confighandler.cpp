@@ -8,40 +8,18 @@ ConfigHandler::ConfigHandler(QObject *parent)
     : QObject(parent)
 {
     appConfig_ = qtlib::Config(":/configs");
+    importAppConfigApplication();
+    importAppConfigInstallTypes();
     usrConfig_ = qtlib::Config(qtlib::Dir::genericConfigPath() + "/" + getAppConfigApplication()["id"].toString());
 }
 
-QJsonObject ConfigHandler::getAppConfigApplication()
+QJsonObject ConfigHandler::getAppConfigApplication() const
 {
-    if (appConfigApplication_.isEmpty()) {
-        appConfigApplication_ = appConfig_.get("application");
-    }
     return appConfigApplication_;
 }
 
-QJsonObject ConfigHandler::getAppConfigInstallTypes()
+QJsonObject ConfigHandler::getAppConfigInstallTypes() const
 {
-    if (appConfigInstallTypes_.isEmpty()) {
-        auto installTypes = appConfig_.get("install_types");
-        for (const auto &key : installTypes.keys()) {
-            auto installtype = installTypes[key].toObject();
-            installtype["destination"] = convertPathString(installtype["destination"].toString());
-            installtype["generic_destination"] = convertPathString(installtype["generic_destination"].toString());
-            installTypes[key] = installtype;
-        }
-        auto installTypesAlias = appConfig_.get("install_types_alias");
-        for (const auto &key : installTypesAlias.keys()) {
-            auto installTypeAlias = installTypesAlias[key].toObject();
-            auto baseKey = installTypeAlias["base"].toString();
-            if (installTypes.contains(baseKey)) {
-                auto installType = installTypes[baseKey].toObject();
-                installType["base"] = baseKey;
-                installType["name"] = installTypeAlias["name"].toString();
-                installTypes[key] = installType;
-            }
-        }
-        appConfigInstallTypes_ = installTypes;
-    }
     return appConfigInstallTypes_;
 }
 
@@ -181,6 +159,34 @@ bool ConfigHandler::removeUsrConfigInstalledItemsItem(const QString &itemKey) co
     auto installedItems = getUsrConfigInstalledItems();
     installedItems.remove(itemKey);
     return setUsrConfigInstalledItems(installedItems);
+}
+
+void ConfigHandler::importAppConfigApplication()
+{
+    appConfigApplication_ = appConfig_.get("application");
+}
+
+void ConfigHandler::importAppConfigInstallTypes()
+{
+    auto installTypes = appConfig_.get("install_types");
+    for (const auto &key : installTypes.keys()) {
+        auto installtype = installTypes[key].toObject();
+        installtype["destination"] = convertPathString(installtype["destination"].toString());
+        installtype["generic_destination"] = convertPathString(installtype["generic_destination"].toString());
+        installTypes[key] = installtype;
+    }
+    auto installTypesAlias = appConfig_.get("install_types_alias");
+    for (const auto &key : installTypesAlias.keys()) {
+        auto installTypeAlias = installTypesAlias[key].toObject();
+        auto baseKey = installTypeAlias["base"].toString();
+        if (installTypes.contains(baseKey)) {
+            auto installType = installTypes[baseKey].toObject();
+            installType["base"] = baseKey;
+            installType["name"] = installTypeAlias["name"].toString();
+            installTypes[key] = installType;
+        }
+    }
+    appConfigInstallTypes_ = installTypes;
 }
 
 QString ConfigHandler::convertPathString(const QString &path) const
