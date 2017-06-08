@@ -315,7 +315,7 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
                               data.at(4).toString(), data.at(5).toString());
     }
     else if (func == "ItemHandler::getItemByOcsUrl") {
-        itemHandler_->getItemByOcsUrl(data.at(0).toString());
+        itemHandler_->getItemByOcsUrl(data.at(0).toString(), data.at(1).toString(), data.at(2).toString());
     }
     else if (func == "ItemHandler::uninstall") {
         itemHandler_->uninstall(data.at(0).toString());

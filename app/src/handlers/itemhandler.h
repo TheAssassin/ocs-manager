@@ -33,7 +33,7 @@ public slots:
 
     void getItem(const QString &command, const QString &url, const QString &installType, const QString &filename = "",
                  const QString &providerKey = "", const QString &contentId = "");
-    void getItemByOcsUrl(const QString &ocsUrl);
+    void getItemByOcsUrl(const QString &ocsUrl, const QString &providerKey = "", const QString &contentId = "");
     void uninstall(const QString &itemKey);
 
 private slots:
