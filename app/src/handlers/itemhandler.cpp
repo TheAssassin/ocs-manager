@@ -70,7 +70,7 @@ void ItemHandler::getItem(const QString &command, const QString &url, const QStr
     emit downloadStarted(result);
 }
 
-void ItemHandler::getItemByOcsUrl(const QString &ocsUrl)
+void ItemHandler::getItemByOcsUrl(const QString &ocsUrl, const QString &providerKey, const QString &contentId)
 {
     QUrl ocsUrlObj(ocsUrl);
     QUrlQuery query(ocsUrlObj);
@@ -111,7 +111,7 @@ void ItemHandler::getItemByOcsUrl(const QString &ocsUrl)
             && QUrl(url).isValid()
             && configHandler_->getAppConfigInstallTypes().contains(type)
             && !filename.isEmpty()) {
-        getItem(command, url, type, filename);
+        getItem(command, url, type, filename, providerKey, contentId);
     }
     else {
         QJsonObject result;
