@@ -97,11 +97,11 @@ bool SystemHandler::isApplicableType(const QString &installType) const
             && (desktop == "kde" || desktop == "gnome" || desktop == "xfce")) {
         return true;
     }
-    /*else if (installType == "icons"
+    else if (installType == "icons"
              && (desktop == "kde" || desktop == "gnome" || desktop == "xfce")) {
         return true;
     }
-    else if (installType == "cursors"
+    /*else if (installType == "cursors"
              && (desktop == "kde" || desktop == "gnome" || desktop == "xfce")) {
         return true;
     }
@@ -120,10 +120,10 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
         if (installType == "wallpapers") {
             return applyWallpaper(path);
         }
-        /*else if (installType == "icons") {
+        else if (installType == "icons") {
             return applyIcon(path);
         }
-        else if (installType == "cursors") {
+        /*else if (installType == "cursors") {
             return applyCursor(path);
         }
         else if (installType == "aurorae_themes"
@@ -199,13 +199,18 @@ bool SystemHandler::applyWallpaper(const QString &path) const
 
 bool SystemHandler::applyIcon(const QString &path) const
 {
-    qDebug() << path;
-
     auto desktop = desktopEnvironment();
+
+    if (path.endsWith("/")) {
+    }
 
     if (desktop == "kde") {
     }
     else if (desktop == "gnome") {
+        // gnome3
+        auto themeName = QFileInfo(path).fileName();
+        QStringList arguments{"set", "org.gnome.desktop.interface", "icon-theme", themeName};
+        return QProcess::startDetached("gsettings", arguments);
     }
     else if (desktop == "xfce") {
     }
