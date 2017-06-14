@@ -64,7 +64,7 @@ bool SystemHandler::openUrl(const QString &url) const
 
 QString SystemHandler::desktopEnvironment() const
 {
-    QString desktop = "unknown";
+    QString desktop = "";
     QString currentDesktop = "";
 
     if (!qgetenv("XDG_CURRENT_DESKTOP").isEmpty()) {
