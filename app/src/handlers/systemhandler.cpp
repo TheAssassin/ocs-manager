@@ -142,7 +142,6 @@ bool SystemHandler::applyWallpaper(const QString &path) const
     auto desktop = desktopEnvironment();
 
     if (desktop == "kde") {
-        // plasma5.6+
         auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
         QVariantList arguments;
 
@@ -167,12 +166,8 @@ bool SystemHandler::applyWallpaper(const QString &path) const
         return true;
     }
     else if (desktop == "gnome") {
-        // gnome3
         QStringList arguments{"set", "org.gnome.desktop.background", "picture-uri", "file://" + path};
         return QProcess::startDetached("gsettings", arguments);
-        // gnome2
-        //QStringList arguments{"--type=string", "--set", "/desktop/gnome/background/picture_filename", path};
-        //return QProcess::startDetached("gconftool-2", arguments);
     }
     else if (desktop == "xfce") {
         auto message = QDBusMessage::createMethodCall("org.xfce.Xfconf", "/org/xfce/Xfconf", "org.xfce.Xfconf", "SetProperty");
@@ -201,13 +196,9 @@ bool SystemHandler::applyIcon(const QString &path) const
 {
     auto desktop = desktopEnvironment();
 
-    if (path.endsWith("/")) {
-    }
-
     if (desktop == "kde") {
     }
     else if (desktop == "gnome") {
-        // gnome3
         auto themeName = QFileInfo(path).fileName();
         QStringList arguments{"set", "org.gnome.desktop.interface", "icon-theme", themeName};
         return QProcess::startDetached("gsettings", arguments);
