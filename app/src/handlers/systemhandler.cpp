@@ -101,11 +101,11 @@ bool SystemHandler::isApplicableType(const QString &installType) const
              && (desktop == "kde" || desktop == "gnome" || desktop == "xfce")) {
         return true;
     }
-    /*else if (installType == "cursors"
+    else if (installType == "cursors"
              && (desktop == "kde" || desktop == "gnome" || desktop == "xfce")) {
         return true;
     }
-    else if ((installType == "aurorae_themes" && desktop == "kde")
+    /*else if ((installType == "aurorae_themes" && desktop == "kde")
              || (installType == "metacity_themes" && desktop == "gnome")
              || (installType == "xfwm4_themes" && desktop == "xfce")) {
         return true;
@@ -123,10 +123,10 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
         else if (installType == "icons") {
             return applyIcon(path);
         }
-        /*else if (installType == "cursors") {
+        else if (installType == "cursors") {
             return applyCursor(path);
         }
-        else if (installType == "aurorae_themes"
+        /*else if (installType == "aurorae_themes"
                  || installType == "metacity_themes"
                  || installType == "xfwm4_themes") {
             return applyWindowTheme(path);
@@ -217,6 +217,9 @@ bool SystemHandler::applyCursor(const QString &path) const
     if (desktop == "kde") {
     }
     else if (desktop == "gnome") {
+        auto themeName = QFileInfo(path).fileName();
+        QStringList arguments{"set", "org.gnome.desktop.interface", "cursor-theme", themeName};
+        return QProcess::startDetached("gsettings", arguments);
     }
     else if (desktop == "xfce") {
     }
