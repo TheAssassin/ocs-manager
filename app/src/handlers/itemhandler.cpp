@@ -259,6 +259,11 @@ void ItemHandler::saveDownloadedFile(qtlib::NetworkResource *resource)
     destDir.make();
     qtlib::File destFile(destDir.path() + "/" + filename);
 
+    if (destFile.exists()) {
+        auto filenamePrefix = QString::number(QDateTime::currentMSecsSinceEpoch()) + "_";
+        destFile.setPath(destDir.path() + "/" + filenamePrefix + filename);
+    }
+
     if (!resource->saveData(destFile.path())) {
         result["status"] = QString("error_save");
         result["message"] = tr("Failed to save data");
@@ -294,8 +299,8 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
     auto filename = metadata["filename"].toString();
     auto installType = metadata["install_type"].toString();
 
-    auto prefix = configHandler_->getAppConfigApplication()["id"].toString() + "_" + filename;
-    qtlib::Dir tempDir(qtlib::Dir::tempPath() + "/" + prefix);
+    auto tempDirPrefix = configHandler_->getAppConfigApplication()["id"].toString() + "_" + filename;
+    qtlib::Dir tempDir(qtlib::Dir::tempPath() + "/" + tempDirPrefix);
     tempDir.make();
     qtlib::Dir tempDestDir(tempDir.path() + "/dest");
     tempDestDir.make();
@@ -392,14 +397,22 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
     destDir.make();
 
     QJsonArray installedFiles;
+    auto filenamePrefix = QString::number(QDateTime::currentMSecsSinceEpoch()) + "_";
+
     for (const auto &fileInfo : tempDestDir.list()) {
-        installedFiles.append(QJsonValue(fileInfo.fileName()));
+        auto destFilename = fileInfo.fileName();
+        if (QFileInfo::exists(destDir.path() + "/" + destFilename)) {
+            destFilename = filenamePrefix + destFilename;
+        }
+
         if (fileInfo.isDir()) {
-            qtlib::Dir(fileInfo.filePath()).move(destDir.path() + "/" + fileInfo.fileName());
+            qtlib::Dir(fileInfo.filePath()).move(destDir.path() + "/" + destFilename);
         }
         else {
-            qtlib::File(fileInfo.filePath()).move(destDir.path() + "/" + fileInfo.fileName());
+            qtlib::File(fileInfo.filePath()).move(destDir.path() + "/" + destFilename);
         }
+
+        installedFiles.append(QJsonValue(destFilename));
     }
 
     // Installation post-process
