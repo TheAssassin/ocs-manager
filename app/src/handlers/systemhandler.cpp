@@ -210,8 +210,6 @@ bool SystemHandler::applyIcon(const QString &path) const
 
 bool SystemHandler::applyCursor(const QString &path) const
 {
-    qDebug() << path;
-
     auto desktop = desktopEnvironment();
 
     if (desktop == "kde") {
@@ -228,8 +226,6 @@ bool SystemHandler::applyCursor(const QString &path) const
 
 bool SystemHandler::applyWindowTheme(const QString &path) const
 {
-    qDebug() << path;
-
     auto desktop = desktopEnvironment();
 
     if (desktop == "kde") {
