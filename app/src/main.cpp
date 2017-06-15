@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     // Init
     QGuiApplication app(argc, argv); // This is backend program, but need GUI module
 
-    auto *configHandler = new ConfigHandler();
+    auto *configHandler = new ConfigHandler(&app);
     auto appConfigApplication = configHandler->getAppConfigApplication();
 
     app.setApplicationName(appConfigApplication["name"].toString());
