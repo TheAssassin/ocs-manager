@@ -48,6 +48,13 @@ void ItemHandler::getItem(const QString &command, const QString &url, const QStr
     QJsonObject result;
     result["metadata"] = metadata;
 
+    if (command == "install" && configHandler_->getUsrConfigInstalledItems().contains(itemKey)) {
+        result["status"] = QString("error_downloadstart");
+        result["message"] = tr("The item already installed");
+        emit downloadStarted(result);
+        return;
+    }
+
     auto itemMetadataSet = metadataSet();
 
     if (itemMetadataSet.contains(itemKey)) {
@@ -124,6 +131,14 @@ void ItemHandler::getItemByOcsUrl(const QString &ocsUrl, const QString &provider
 void ItemHandler::uninstall(const QString &itemKey)
 {
     QJsonObject result;
+
+    if (!configHandler_->getUsrConfigInstalledItems().contains(itemKey)) {
+        result["status"] = QString("error_uninstallstart");
+        result["message"] = tr("The item not installed");
+        emit uninstallStarted(result);
+        return;
+    }
+
     result["status"] = QString("success_uninstallstart");
     result["message"] = tr("Uninstalling");
     emit uninstallStarted(result);
