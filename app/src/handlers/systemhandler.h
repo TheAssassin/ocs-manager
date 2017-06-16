@@ -29,6 +29,7 @@ private:
     bool applyGnomeIcon(const QString &path) const;
     bool applyGnomeCursor(const QString &path) const;
     bool applyGnomeGtk3Theme(const QString &path) const;
+    bool applyGnomeGnomeShellTheme(const QString &path) const;
 
     bool applyXfceWallpaper(const QString &path) const;
 #endif

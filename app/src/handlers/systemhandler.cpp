@@ -99,7 +99,11 @@ bool SystemHandler::isApplicableType(const QString &installType) const
         applicableTypes << "wallpapers";
     }
     else if (desktop == "gnome") {
-        applicableTypes << "wallpapers" << "icons" << "cursors" << "gtk3_themes";
+        applicableTypes << "wallpapers"
+                        << "icons"
+                        << "cursors"
+                        << "gtk3_themes"
+                        << "gnome_shell_themes";
     }
     else if (desktop == "xfce") {
         applicableTypes << "wallpapers";
@@ -131,6 +135,9 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
             }
             else if (installType == "gtk3_themes") {
                 return applyGnomeGtk3Theme(path);
+            }
+            else if (installType == "gnome_shell_themes") {
+                return applyGnomeGnomeShellTheme(path);
             }
         }
         else if (desktop == "xfce") {
@@ -196,6 +203,13 @@ bool SystemHandler::applyGnomeGtk3Theme(const QString &path) const
 {
     auto themeName = QFileInfo(path).fileName();
     QStringList arguments{"set", "org.gnome.desktop.interface", "gtk-theme", themeName};
+    return QProcess::startDetached("gsettings", arguments);
+}
+
+bool SystemHandler::applyGnomeGnomeShellTheme(const QString &path) const
+{
+    auto themeName = QFileInfo(path).fileName();
+    QStringList arguments{"set", "org.gnome.shell.extensions.user-theme", "name", themeName};
     return QProcess::startDetached("gsettings", arguments);
 }
 
