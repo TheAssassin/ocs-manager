@@ -123,10 +123,10 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
             if (installType == "wallpapers") {
                 return applyGnomeWallpaper(path);
             }
-            else if (desktop == "icons") {
+            else if (installType == "icons") {
                 return applyGnomeIcon(path);
             }
-            else if (desktop == "cursors") {
+            else if (installType == "cursors") {
                 return applyGnomeCursor(path);
             }
         }
