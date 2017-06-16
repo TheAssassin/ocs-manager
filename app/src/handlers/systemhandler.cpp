@@ -64,7 +64,7 @@ bool SystemHandler::openUrl(const QString &url) const
 
 QString SystemHandler::desktopEnvironment() const
 {
-    QString desktop = "unknown";
+    QString desktop = "";
     QString currentDesktop = "";
 
     if (!qgetenv("XDG_CURRENT_DESKTOP").isEmpty()) {
@@ -93,152 +93,146 @@ bool SystemHandler::isApplicableType(const QString &installType) const
 {
     auto desktop = desktopEnvironment();
 
-    if (installType == "wallpapers"
-            && (desktop == "kde" || desktop == "gnome" || desktop == "xfce")) {
-        return true;
+    QStringList applicableTypes;
+
+    if (desktop == "kde") {
+        applicableTypes << "wallpapers";
     }
-    /*else if (installType == "icons"
-             && (desktop == "kde" || desktop == "gnome" || desktop == "xfce")) {
-        return true;
+    else if (desktop == "gnome") {
+        applicableTypes << "wallpapers"
+                        << "icons"
+                        << "cursors"
+                        << "gtk3_themes"
+                        << "gnome_shell_themes";
     }
-    else if (installType == "cursors"
-             && (desktop == "kde" || desktop == "gnome" || desktop == "xfce")) {
-        return true;
+    else if (desktop == "xfce") {
+        applicableTypes << "wallpapers";
     }
-    else if ((installType == "aurorae_themes" && desktop == "kde")
-             || (installType == "metacity_themes" && desktop == "gnome")
-             || (installType == "xfwm4_themes" && desktop == "xfce")) {
-        return true;
-    }*/
-    return false;
+
+    return applicableTypes.contains(installType);
 }
 
 #ifdef QTLIB_UNIX
 bool SystemHandler::applyFile(const QString &path, const QString &installType) const
 {
     if (QFileInfo::exists(path) && isApplicableType(installType)) {
-        if (installType == "wallpapers") {
-            return applyWallpaper(path);
+        auto desktop = desktopEnvironment();
+
+        if (desktop == "kde") {
+            if (installType == "wallpapers") {
+                return applyKdeWallpaper(path);
+            }
         }
-        /*else if (installType == "icons") {
-            return applyIcon(path);
+        else if (desktop == "gnome") {
+            if (installType == "wallpapers") {
+                return applyGnomeWallpaper(path);
+            }
+            else if (installType == "icons") {
+                return applyGnomeIcon(path);
+            }
+            else if (installType == "cursors") {
+                return applyGnomeCursor(path);
+            }
+            else if (installType == "gtk3_themes") {
+                return applyGnomeGtk3Theme(path);
+            }
+            else if (installType == "gnome_shell_themes") {
+                return applyGnomeGnomeShellTheme(path);
+            }
         }
-        else if (installType == "cursors") {
-            return applyCursor(path);
+        else if (desktop == "xfce") {
+            if (installType == "wallpapers") {
+                return applyXfceWallpaper(path);
+            }
         }
-        else if (installType == "aurorae_themes"
-                 || installType == "metacity_themes"
-                 || installType == "xfwm4_themes") {
-            return applyWindowTheme(path);
-        }*/
     }
+
     return false;
 }
 #endif
 
 #ifdef QTLIB_UNIX
-bool SystemHandler::applyWallpaper(const QString &path) const
+bool SystemHandler::applyKdeWallpaper(const QString &path) const
 {
-    auto desktop = desktopEnvironment();
+    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
 
-    if (desktop == "kde") {
-        // plasma5.6+
-        auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
-        QVariantList arguments;
+    QString script;
+    QTextStream out(&script);
+    out << "for (var key in desktops()) {"
+        << "var d = desktops()[key];"
+        << "d.wallpaperPlugin = 'org.kde.image';"
+        << "d.currentConfigGroup = ['Wallpaper', 'org.kde.image', 'General'];"
+        << "d.writeConfig('Image', 'file://" + path + "');"
+        << "}";
 
-        QString script;
-        QTextStream out(&script);
-        out << "for (var key in desktops()) {"
-            << "var d = desktops()[key];"
-            << "d.wallpaperPlugin = 'org.kde.image';"
-            << "d.currentConfigGroup = ['Wallpaper', 'org.kde.image', 'General'];"
-            << "d.writeConfig('Image', 'file://" + path + "');"
-            << "}";
+    QVariantList arguments;
+    arguments << QVariant(script);
+    message.setArguments(arguments);
 
-        arguments << QVariant(script);
-        message.setArguments(arguments);
+    auto reply = QDBusConnection::sessionBus().call(message);
 
-        auto reply = QDBusConnection::sessionBus().call(message);
-
-        if (reply.type() == QDBusMessage::ErrorMessage) {
-            qWarning() << reply.errorMessage();
-            return false;
-        }
-        return true;
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qWarning() << reply.errorMessage();
+        return false;
     }
-    else if (desktop == "gnome") {
-        // gnome3
-        QStringList arguments{"set", "org.gnome.desktop.background", "picture-uri", "file://" + path};
-        return QProcess::startDetached("gsettings", arguments);
-        // gnome2
-        //QStringList arguments{"--type=string", "--set", "/desktop/gnome/background/picture_filename", path};
-        //return QProcess::startDetached("gconftool-2", arguments);
-    }
-    else if (desktop == "xfce") {
-        auto message = QDBusMessage::createMethodCall("org.xfce.Xfconf", "/org/xfce/Xfconf", "org.xfce.Xfconf", "SetProperty");
-        QVariantList arguments;
 
-        QString channelValue = "xfce4-desktop";
-        //QString propertyValue = "/backdrop/screen0/monitor0/image-path";
-        QString propertyValue = "/backdrop/screen0/monitor0/workspace0/last-image";
-        QDBusVariant valueValue(path);
-
-        arguments << QVariant(channelValue) << QVariant(propertyValue) << QVariant::fromValue(valueValue);
-        message.setArguments(arguments);
-
-        auto reply = QDBusConnection::sessionBus().call(message);
-
-        if (reply.type() == QDBusMessage::ErrorMessage) {
-            qWarning() << reply.errorMessage();
-            return false;
-        }
-        return true;
-    }
-    return false;
+    return true;
 }
 
-bool SystemHandler::applyIcon(const QString &path) const
+bool SystemHandler::applyGnomeWallpaper(const QString &path) const
 {
-    qDebug() << path;
-
-    auto desktop = desktopEnvironment();
-
-    if (desktop == "kde") {
-    }
-    else if (desktop == "gnome") {
-    }
-    else if (desktop == "xfce") {
-    }
-    return false;
+    QStringList arguments{"set", "org.gnome.desktop.background", "picture-uri", "file://" + path};
+    return QProcess::startDetached("gsettings", arguments);
 }
 
-bool SystemHandler::applyCursor(const QString &path) const
+bool SystemHandler::applyGnomeIcon(const QString &path) const
 {
-    qDebug() << path;
-
-    auto desktop = desktopEnvironment();
-
-    if (desktop == "kde") {
-    }
-    else if (desktop == "gnome") {
-    }
-    else if (desktop == "xfce") {
-    }
-    return false;
+    auto themeName = QFileInfo(path).fileName();
+    QStringList arguments{"set", "org.gnome.desktop.interface", "icon-theme", themeName};
+    return QProcess::startDetached("gsettings", arguments);
 }
 
-bool SystemHandler::applyWindowTheme(const QString &path) const
+bool SystemHandler::applyGnomeCursor(const QString &path) const
 {
-    qDebug() << path;
+    auto themeName = QFileInfo(path).fileName();
+    QStringList arguments{"set", "org.gnome.desktop.interface", "cursor-theme", themeName};
+    return QProcess::startDetached("gsettings", arguments);
+}
 
-    auto desktop = desktopEnvironment();
+bool SystemHandler::applyGnomeGtk3Theme(const QString &path) const
+{
+    auto themeName = QFileInfo(path).fileName();
+    QStringList arguments{"set", "org.gnome.desktop.interface", "gtk-theme", themeName};
+    return QProcess::startDetached("gsettings", arguments);
+}
 
-    if (desktop == "kde") {
+bool SystemHandler::applyGnomeGnomeShellTheme(const QString &path) const
+{
+    auto themeName = QFileInfo(path).fileName();
+    QStringList arguments{"set", "org.gnome.shell.extensions.user-theme", "name", themeName};
+    return QProcess::startDetached("gsettings", arguments);
+}
+
+bool SystemHandler::applyXfceWallpaper(const QString &path) const
+{
+    auto message = QDBusMessage::createMethodCall("org.xfce.Xfconf", "/org/xfce/Xfconf", "org.xfce.Xfconf", "SetProperty");
+
+    QString channelValue = "xfce4-desktop";
+    //QString propertyValue = "/backdrop/screen0/monitor0/image-path";
+    QString propertyValue = "/backdrop/screen0/monitor0/workspace0/last-image";
+    QDBusVariant valueValue(path);
+
+    QVariantList arguments;
+    arguments << QVariant(channelValue) << QVariant(propertyValue) << QVariant::fromValue(valueValue);
+    message.setArguments(arguments);
+
+    auto reply = QDBusConnection::sessionBus().call(message);
+
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qWarning() << reply.errorMessage();
+        return false;
     }
-    else if (desktop == "gnome") {
-    }
-    else if (desktop == "xfce") {
-    }
-    return false;
+
+    return true;
 }
 #endif

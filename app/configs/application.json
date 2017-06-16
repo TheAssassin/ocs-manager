@@ -1,11 +1,11 @@
 {
     "id": "ocs-manager",
     "name": "ocs-manager",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "organization": "Opendesktop.org",
     "domain": "org.opendesktop.ocs-manager",
     "icon": "",
-    "description": "A tool to handle filemanagement and apply.",
+    "description": "A tool to handle item installation from OCS provider, file management, and apply themes.",
     "license": "GPL-3+",
     "author": "Opendesktop.org",
     "contact": "contact@opendesktop.org",
