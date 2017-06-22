@@ -132,7 +132,7 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
             else if (installType == "cursors") {
                 return applyKdeCursor(path);
             }
-            else if (installType == "plasma_desktopthemes") {
+            else if (installType == "plasma5_desktopthemes") {
                 return applyKdePlasmaDesktoptheme(path);
             }
             else if (installType == "aurorae_themes") {
