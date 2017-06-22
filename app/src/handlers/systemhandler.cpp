@@ -98,7 +98,8 @@ bool SystemHandler::isApplicableType(const QString &installType) const
     if (desktop == "kde") {
         applicableTypes << "wallpapers"
                         << "icons"
-                        << "cursors";
+                        << "cursors"
+                        << "plasma_desktopthemes";
     }
     else if (desktop == "gnome") {
         applicableTypes << "wallpapers"
@@ -129,6 +130,9 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
             }
             else if (installType == "cursors") {
                 return applyKdeCursor(path);
+            }
+            else if (installType == "plasma_desktopthemes") {
+                return applyKdePlasmaDesktoptheme(path);
             }
         }
         else if (desktop == "gnome") {
@@ -222,6 +226,31 @@ bool SystemHandler::applyKdeCursor(const QString &path) const
     out << "var c = ConfigFile('kcminputrc');"
         << "c.group = 'Mouse';"
         << "c.writeEntry('cursorTheme', '" + themeName + "');";
+
+    QVariantList arguments;
+    arguments << QVariant(script);
+    message.setArguments(arguments);
+
+    auto reply = QDBusConnection::sessionBus().call(message);
+
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qWarning() << reply.errorMessage();
+        return false;
+    }
+
+    return true;
+}
+
+bool SystemHandler::applyKdePlasmaDesktoptheme(const QString &path) const
+{
+    auto themeName = QFileInfo(path).fileName();
+    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
+
+    QString script;
+    QTextStream out(&script);
+    out << "var c = ConfigFile('plasmarc');"
+        << "c.group = 'Theme';"
+        << "c.writeEntry('name', '" + themeName + "');";
 
     QVariantList arguments;
     arguments << QVariant(script);
