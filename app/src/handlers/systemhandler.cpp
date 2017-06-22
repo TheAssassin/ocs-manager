@@ -293,6 +293,9 @@ bool SystemHandler::applyKdeAuroraeTheme(const QString &path) const
         return false;
     }
 
+    auto refreshMessage = QDBusMessage::createMethodCall("org.kde.KWin", "/KWin", "org.kde.KWin", "reconfigure");
+    QDBusConnection::sessionBus().call(refreshMessage);
+
     return true;
 }
 
