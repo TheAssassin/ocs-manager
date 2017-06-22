@@ -96,7 +96,11 @@ bool SystemHandler::isApplicableType(const QString &installType) const
     QStringList applicableTypes;
 
     if (desktop == "kde") {
-        applicableTypes << "wallpapers";
+        applicableTypes << "wallpapers"
+                        << "icons"
+                        << "cursors"
+                        << "plasma_desktopthemes"
+                        << "aurorae_themes";
     }
     else if (desktop == "gnome") {
         applicableTypes << "wallpapers"
@@ -121,6 +125,18 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
         if (desktop == "kde") {
             if (installType == "wallpapers") {
                 return applyKdeWallpaper(path);
+            }
+            else if (installType == "icons") {
+                return applyKdeIcon(path);
+            }
+            else if (installType == "cursors") {
+                return applyKdeCursor(path);
+            }
+            else if (installType == "plasma_desktopthemes") {
+                return applyKdePlasmaDesktoptheme(path);
+            }
+            else if (installType == "aurorae_themes") {
+                return applyKdeAuroraeTheme(path);
             }
         }
         else if (desktop == "gnome") {
@@ -175,6 +191,116 @@ bool SystemHandler::applyKdeWallpaper(const QString &path) const
         qWarning() << reply.errorMessage();
         return false;
     }
+
+    return true;
+}
+
+bool SystemHandler::applyKdeIcon(const QString &path) const
+{
+    auto themeName = QFileInfo(path).fileName();
+    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
+
+    QString script;
+    QTextStream out(&script);
+    out << "var c = ConfigFile('kdeglobals');"
+        << "c.group = 'Icons';"
+        << "c.writeEntry('Theme', '" + themeName + "');";
+
+    QVariantList arguments;
+    arguments << QVariant(script);
+    message.setArguments(arguments);
+
+    auto reply = QDBusConnection::sessionBus().call(message);
+
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qWarning() << reply.errorMessage();
+        return false;
+    }
+
+    QProcess::startDetached("kquitapp5 plasmashell");
+    QProcess::startDetached("kstart5 plasmashell");
+
+    return true;
+}
+
+bool SystemHandler::applyKdeCursor(const QString &path) const
+{
+    auto themeName = QFileInfo(path).fileName();
+    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
+
+    QString script;
+    QTextStream out(&script);
+    out << "var c = ConfigFile('kcminputrc');"
+        << "c.group = 'Mouse';"
+        << "c.writeEntry('cursorTheme', '" + themeName + "');";
+
+    QVariantList arguments;
+    arguments << QVariant(script);
+    message.setArguments(arguments);
+
+    auto reply = QDBusConnection::sessionBus().call(message);
+
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qWarning() << reply.errorMessage();
+        return false;
+    }
+
+    return true;
+}
+
+bool SystemHandler::applyKdePlasmaDesktoptheme(const QString &path) const
+{
+    auto themeName = QFileInfo(path).fileName();
+    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
+
+    QString script;
+    QTextStream out(&script);
+    out << "var c = ConfigFile('plasmarc');"
+        << "c.group = 'Theme';"
+        << "c.writeEntry('name', '" + themeName + "');";
+
+    QVariantList arguments;
+    arguments << QVariant(script);
+    message.setArguments(arguments);
+
+    auto reply = QDBusConnection::sessionBus().call(message);
+
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qWarning() << reply.errorMessage();
+        return false;
+    }
+
+    QProcess::startDetached("kquitapp5 plasmashell");
+    QProcess::startDetached("kstart5 plasmashell");
+
+    return true;
+}
+
+bool SystemHandler::applyKdeAuroraeTheme(const QString &path) const
+{
+    auto themeName = QFileInfo(path).fileName();
+    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
+
+    QString script;
+    QTextStream out(&script);
+    out << "var c = ConfigFile('kwinrc');"
+        << "c.group = 'org.kde.kdecoration2';"
+        << "c.writeEntry('library', 'org.kde.kwin.aurorae');"
+        << "c.writeEntry('theme', '__aurorae__svg__" + themeName + "');";
+
+    QVariantList arguments;
+    arguments << QVariant(script);
+    message.setArguments(arguments);
+
+    auto reply = QDBusConnection::sessionBus().call(message);
+
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qWarning() << reply.errorMessage();
+        return false;
+    }
+
+    auto refreshMessage = QDBusMessage::createMethodCall("org.kde.KWin", "/KWin", "org.kde.KWin", "reconfigure");
+    QDBusConnection::sessionBus().call(refreshMessage);
 
     return true;
 }

@@ -24,6 +24,10 @@ public slots:
 private:
 #ifdef QTLIB_UNIX
     bool applyKdeWallpaper(const QString &path) const;
+    bool applyKdeIcon(const QString &path) const;
+    bool applyKdeCursor(const QString &path) const;
+    bool applyKdePlasmaDesktoptheme(const QString &path) const;
+    bool applyKdeAuroraeTheme(const QString &path) const;
 
     bool applyGnomeWallpaper(const QString &path) const;
     bool applyGnomeIcon(const QString &path) const;
