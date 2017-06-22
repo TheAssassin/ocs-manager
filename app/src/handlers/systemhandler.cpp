@@ -99,7 +99,7 @@ bool SystemHandler::isApplicableType(const QString &installType) const
         applicableTypes << "wallpapers"
                         << "icons"
                         << "cursors"
-                        << "plasma_desktopthemes"
+                        << "plasma5_desktopthemes"
                         << "aurorae_themes";
     }
     else if (desktop == "gnome") {
