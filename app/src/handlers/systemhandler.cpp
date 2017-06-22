@@ -96,7 +96,8 @@ bool SystemHandler::isApplicableType(const QString &installType) const
     QStringList applicableTypes;
 
     if (desktop == "kde") {
-        applicableTypes << "wallpapers";
+        applicableTypes << "wallpapers"
+                        << "icons";
     }
     else if (desktop == "gnome") {
         applicableTypes << "wallpapers"
@@ -121,6 +122,9 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
         if (desktop == "kde") {
             if (installType == "wallpapers") {
                 return applyKdeWallpaper(path);
+            }
+            else if (installType == "icons") {
+                return applyKdeIcon(path);
             }
         }
         else if (desktop == "gnome") {
@@ -164,6 +168,31 @@ bool SystemHandler::applyKdeWallpaper(const QString &path) const
         << "d.currentConfigGroup = ['Wallpaper', 'org.kde.image', 'General'];"
         << "d.writeConfig('Image', 'file://" + path + "');"
         << "}";
+
+    QVariantList arguments;
+    arguments << QVariant(script);
+    message.setArguments(arguments);
+
+    auto reply = QDBusConnection::sessionBus().call(message);
+
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qWarning() << reply.errorMessage();
+        return false;
+    }
+
+    return true;
+}
+
+bool SystemHandler::applyKdeIcon(const QString &path) const
+{
+    auto themeName = QFileInfo(path).fileName();
+    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
+
+    QString script;
+    QTextStream out(&script);
+    out << "var c = ConfigFile('kdeglobals');"
+        << "c.group = 'Icons';"
+        << "c.writeEntry('Theme', '" + themeName + "');";
 
     QVariantList arguments;
     arguments << QVariant(script);
