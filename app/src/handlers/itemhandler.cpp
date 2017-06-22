@@ -359,11 +359,11 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
         package.installAsFile(tempDestDir.path() + "/" + filename);
         result["message"] = tr("The plasma look and feel has been installed");
     }
-    else if ((installType == "plasma_desktopthemes" || installType == "plasma5_desktopthemes")
+    /*else if ((installType == "plasma_desktopthemes" || installType == "plasma5_desktopthemes")
              && package.installAsPlasmapkg("theme")) {
         package.installAsFile(tempDestDir.path() + "/" + filename);
         result["message"] = tr("The plasma desktop theme has been installed");
-    }
+    }*/
     else if (installType == "kwin_effects"
              && package.installAsPlasmapkg("kwineffect")) {
         package.installAsFile(tempDestDir.path() + "/" + filename);
