@@ -23,6 +23,7 @@ public slots:
 
 private:
 #ifdef QTLIB_UNIX
+    bool evaluateScriptWithPlasmaShell(const QString &script) const;
     bool applyKdeWallpaper(const QString &path) const;
     bool applyKdeIcon(const QString &path) const;
     bool applyKdeCursor(const QString &path) const;
