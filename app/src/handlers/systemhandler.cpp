@@ -299,24 +299,19 @@ bool SystemHandler::applyGnomeGnomeShellTheme(const QString &path) const
 
 bool SystemHandler::applyXfceWallpaper(const QString &path) const
 {
-    auto message = QDBusMessage::createMethodCall("org.xfce.Xfconf", "/org/xfce/Xfconf", "org.xfce.Xfconf", "SetProperty");
-
     QString channelValue = "xfce4-desktop";
     //QString propertyValue = "/backdrop/screen0/monitor0/image-path";
     QString propertyValue = "/backdrop/screen0/monitor0/workspace0/last-image";
     QDBusVariant valueValue(path);
 
-    QVariantList arguments;
-    arguments << QVariant(channelValue) << QVariant(propertyValue) << QVariant::fromValue(valueValue);
-    message.setArguments(arguments);
-
+    auto message = QDBusMessage::createMethodCall("org.xfce.Xfconf", "/org/xfce/Xfconf", "org.xfce.Xfconf", "SetProperty");
+    message.setArguments(QVariantList() << QVariant(channelValue) << QVariant(propertyValue) << QVariant::fromValue(valueValue));
     auto reply = QDBusConnection::sessionBus().call(message);
 
     if (reply.type() == QDBusMessage::ErrorMessage) {
         qWarning() << reply.errorMessage();
         return false;
     }
-
     return true;
 }
 #endif
