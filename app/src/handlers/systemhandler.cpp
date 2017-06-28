@@ -262,38 +262,34 @@ bool SystemHandler::applyKdeAuroraeTheme(const QString &path) const
     return false;
 }
 
+bool SystemHandler::setSchemaWithGsettings(const QString &schema, const QString &key, const QString &value) const
+{
+    return QProcess::startDetached("gsettings", QStringList() << "set" << schema << key << value);
+}
+
 bool SystemHandler::applyGnomeWallpaper(const QString &path) const
 {
-    QStringList arguments{"set", "org.gnome.desktop.background", "picture-uri", "file://" + path};
-    return QProcess::startDetached("gsettings", arguments);
+    return setSchemaWithGsettings("org.gnome.desktop.background", "picture-uri", "file://" + path);
 }
 
 bool SystemHandler::applyGnomeIcon(const QString &path) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    QStringList arguments{"set", "org.gnome.desktop.interface", "icon-theme", themeName};
-    return QProcess::startDetached("gsettings", arguments);
+    return setSchemaWithGsettings("org.gnome.desktop.interface", "icon-theme", QFileInfo(path).fileName());
 }
 
 bool SystemHandler::applyGnomeCursor(const QString &path) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    QStringList arguments{"set", "org.gnome.desktop.interface", "cursor-theme", themeName};
-    return QProcess::startDetached("gsettings", arguments);
+    return setSchemaWithGsettings("org.gnome.desktop.interface", "cursor-theme", QFileInfo(path).fileName());
 }
 
 bool SystemHandler::applyGnomeGtk3Theme(const QString &path) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    QStringList arguments{"set", "org.gnome.desktop.interface", "gtk-theme", themeName};
-    return QProcess::startDetached("gsettings", arguments);
+    return setSchemaWithGsettings("org.gnome.desktop.interface", "gtk-theme", QFileInfo(path).fileName());
 }
 
 bool SystemHandler::applyGnomeGnomeShellTheme(const QString &path) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    QStringList arguments{"set", "org.gnome.shell.extensions.user-theme", "name", themeName};
-    return QProcess::startDetached("gsettings", arguments);
+    return setSchemaWithGsettings("org.gnome.shell.extensions.user-theme", "name", QFileInfo(path).fileName());
 }
 
 bool SystemHandler::setPropertyWithXfconf(const QString &channel, const QString &property, const QDBusVariant &value) const

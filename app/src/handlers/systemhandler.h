@@ -34,6 +34,7 @@ private:
     bool applyKdePlasmaDesktoptheme(const QString &path) const;
     bool applyKdeAuroraeTheme(const QString &path) const;
 
+    bool setSchemaWithGsettings(const QString &schema, const QString &key, const QString &value) const;
     bool applyGnomeWallpaper(const QString &path) const;
     bool applyGnomeIcon(const QString &path) const;
     bool applyGnomeCursor(const QString &path) const;
