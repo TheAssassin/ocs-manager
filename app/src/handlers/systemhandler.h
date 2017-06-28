@@ -41,5 +41,6 @@ private:
     bool applyXfceWallpaper(const QString &path) const;
     bool applyXfceIcon(const QString &themeName) const;
     bool applyXfceCursor(const QString &themeName) const;
+    bool applyXfceGtk3Theme(const QString &themeName) const;
 #endif
 };
