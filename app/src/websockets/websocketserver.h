@@ -18,7 +18,7 @@ class WebSocketServer : public QObject
     Q_OBJECT
 
 public:
-    explicit WebSocketServer(ConfigHandler *configHandler, const QString &serverName = "WebSocketServer", quint16 serverPort = 0, QObject *parent = nullptr);
+    explicit WebSocketServer(ConfigHandler *configHandler, const QString &serverName = QString("WebSocketServer"), quint16 serverPort = 0, QObject *parent = nullptr);
     ~WebSocketServer();
 
 signals:

@@ -15,6 +15,7 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
     : QObject(parent), configHandler_(configHandler), serverName_(serverName), serverPort_(serverPort)
 {
     wsServer_ = new QWebSocketServer(serverName_, QWebSocketServer::NonSecureMode, this);
+
     connect(wsServer_, &QWebSocketServer::newConnection, this, &WebSocketServer::wsNewConnection);
     connect(wsServer_, &QWebSocketServer::closed, this, &WebSocketServer::stopped);
 
@@ -22,6 +23,7 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
     systemHandler_ = new SystemHandler(this);
     ocsApiHandler_ = new OcsApiHandler(configHandler_, this);
     itemHandler_ = new ItemHandler(configHandler_, this);
+
     connect(itemHandler_, &ItemHandler::metadataSetChanged, this, &WebSocketServer::itemMetadataSetChanged);
     connect(itemHandler_, &ItemHandler::downloadStarted, this, &WebSocketServer::itemDownloadStarted);
     connect(itemHandler_, &ItemHandler::downloadFinished, this, &WebSocketServer::itemDownloadFinished);
@@ -75,9 +77,11 @@ QUrl WebSocketServer::serverUrl() const
 void WebSocketServer::wsNewConnection()
 {
     auto *wsClient = wsServer_->nextPendingConnection();
+
     connect(wsClient, &QWebSocket::disconnected, this, &WebSocketServer::wsDisconnected);
     connect(wsClient, &QWebSocket::textMessageReceived, this, &WebSocketServer::wsTextMessageReceived);
     connect(wsClient, &QWebSocket::binaryMessageReceived, this, &WebSocketServer::wsBinaryMessageReceived);
+
     wsClients_ << wsClient;
 }
 

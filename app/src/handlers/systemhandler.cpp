@@ -64,8 +64,8 @@ bool SystemHandler::openUrl(const QString &url) const
 
 QString SystemHandler::desktopEnvironment() const
 {
-    QString desktop = "";
-    QString currentDesktop = "";
+    QString desktop;
+    QString currentDesktop;
 
     if (!qgetenv("XDG_CURRENT_DESKTOP").isEmpty()) {
         currentDesktop = QString::fromLocal8Bit(qgetenv("XDG_CURRENT_DESKTOP").constData()).toLower();
@@ -110,7 +110,11 @@ bool SystemHandler::isApplicableType(const QString &installType) const
                         << "gnome_shell_themes";
     }
     else if (desktop == "xfce") {
-        applicableTypes << "wallpapers";
+        applicableTypes << "wallpapers"
+                        << "icons"
+                        << "cursors"
+                        << "gtk2_themes"
+                        << "xfwm4_themes";
     }
 
     return applicableTypes.contains(installType);
@@ -121,22 +125,23 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
 {
     if (QFileInfo::exists(path) && isApplicableType(installType)) {
         auto desktop = desktopEnvironment();
+        auto themeName = QFileInfo(path).fileName();
 
         if (desktop == "kde") {
             if (installType == "wallpapers") {
                 return applyKdeWallpaper(path);
             }
             else if (installType == "icons") {
-                return applyKdeIcon(path);
+                return applyKdeIcon(themeName);
             }
             else if (installType == "cursors") {
-                return applyKdeCursor(path);
+                return applyKdeCursor(themeName);
             }
             else if (installType == "plasma5_desktopthemes") {
-                return applyKdePlasmaDesktoptheme(path);
+                return applyKdePlasmaDesktoptheme(themeName);
             }
             else if (installType == "aurorae_themes") {
-                return applyKdeAuroraeTheme(path);
+                return applyKdeAuroraeTheme(themeName);
             }
         }
         else if (desktop == "gnome") {
@@ -144,21 +149,33 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
                 return applyGnomeWallpaper(path);
             }
             else if (installType == "icons") {
-                return applyGnomeIcon(path);
+                return applyGnomeIcon(themeName);
             }
             else if (installType == "cursors") {
-                return applyGnomeCursor(path);
+                return applyGnomeCursor(themeName);
             }
             else if (installType == "gtk3_themes") {
-                return applyGnomeGtk3Theme(path);
+                return applyGnomeGtk3Theme(themeName);
             }
             else if (installType == "gnome_shell_themes") {
-                return applyGnomeGnomeShellTheme(path);
+                return applyGnomeGnomeShellTheme(themeName);
             }
         }
         else if (desktop == "xfce") {
             if (installType == "wallpapers") {
                 return applyXfceWallpaper(path);
+            }
+            else if (installType == "icons") {
+                return applyXfceIcon(themeName);
+            }
+            else if (installType == "cursors") {
+                return applyXfceCursor(themeName);
+            }
+            else if (installType == "gtk2_themes") {
+                return applyXfceGtk2Theme(themeName);
+            }
+            else if (installType == "xfwm4_themes") {
+                return applyXfceXfwm4Theme(themeName);
             }
         }
     }
@@ -168,10 +185,21 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
 #endif
 
 #ifdef QTLIB_UNIX
-bool SystemHandler::applyKdeWallpaper(const QString &path) const
+bool SystemHandler::setConfigWithPlasmaShell(const QString &script) const
 {
     auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
+    message.setArguments(QVariantList() << QVariant(script));
+    auto reply = QDBusConnection::sessionBus().call(message);
 
+    if (reply.type() == QDBusMessage::ErrorMessage) {
+        qWarning() << reply.errorMessage();
+        return false;
+    }
+    return true;
+}
+
+bool SystemHandler::applyKdeWallpaper(const QString &path) const
+{
     QString script;
     QTextStream out(&script);
     out << "for (var key in desktops()) {"
@@ -181,106 +209,52 @@ bool SystemHandler::applyKdeWallpaper(const QString &path) const
         << "d.writeConfig('Image', 'file://" + path + "');"
         << "}";
 
-    QVariantList arguments;
-    arguments << QVariant(script);
-    message.setArguments(arguments);
-
-    auto reply = QDBusConnection::sessionBus().call(message);
-
-    if (reply.type() == QDBusMessage::ErrorMessage) {
-        qWarning() << reply.errorMessage();
-        return false;
-    }
-
-    return true;
+    return setConfigWithPlasmaShell(script);
 }
 
-bool SystemHandler::applyKdeIcon(const QString &path) const
+bool SystemHandler::applyKdeIcon(const QString &themeName) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
-
     QString script;
     QTextStream out(&script);
     out << "var c = ConfigFile('kdeglobals');"
         << "c.group = 'Icons';"
         << "c.writeEntry('Theme', '" + themeName + "');";
 
-    QVariantList arguments;
-    arguments << QVariant(script);
-    message.setArguments(arguments);
-
-    auto reply = QDBusConnection::sessionBus().call(message);
-
-    if (reply.type() == QDBusMessage::ErrorMessage) {
-        qWarning() << reply.errorMessage();
-        return false;
+    if (setConfigWithPlasmaShell(script)) {
+        QProcess::startDetached("kquitapp5 plasmashell && kstart5 plasmashell");
+        return true;
     }
-
-    QProcess::startDetached("kquitapp5 plasmashell");
-    QProcess::startDetached("kstart5 plasmashell");
-
-    return true;
+    return false;
 }
 
-bool SystemHandler::applyKdeCursor(const QString &path) const
+bool SystemHandler::applyKdeCursor(const QString &themeName) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
-
     QString script;
     QTextStream out(&script);
     out << "var c = ConfigFile('kcminputrc');"
         << "c.group = 'Mouse';"
         << "c.writeEntry('cursorTheme', '" + themeName + "');";
 
-    QVariantList arguments;
-    arguments << QVariant(script);
-    message.setArguments(arguments);
-
-    auto reply = QDBusConnection::sessionBus().call(message);
-
-    if (reply.type() == QDBusMessage::ErrorMessage) {
-        qWarning() << reply.errorMessage();
-        return false;
-    }
-
-    return true;
+    return setConfigWithPlasmaShell(script);
 }
 
-bool SystemHandler::applyKdePlasmaDesktoptheme(const QString &path) const
+bool SystemHandler::applyKdePlasmaDesktoptheme(const QString &themeName) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
-
     QString script;
     QTextStream out(&script);
     out << "var c = ConfigFile('plasmarc');"
         << "c.group = 'Theme';"
         << "c.writeEntry('name', '" + themeName + "');";
 
-    QVariantList arguments;
-    arguments << QVariant(script);
-    message.setArguments(arguments);
-
-    auto reply = QDBusConnection::sessionBus().call(message);
-
-    if (reply.type() == QDBusMessage::ErrorMessage) {
-        qWarning() << reply.errorMessage();
-        return false;
+    if (setConfigWithPlasmaShell(script)) {
+        QProcess::startDetached("kquitapp5 plasmashell && kstart5 plasmashell");
+        return true;
     }
-
-    QProcess::startDetached("kquitapp5 plasmashell");
-    QProcess::startDetached("kstart5 plasmashell");
-
-    return true;
+    return false;
 }
 
-bool SystemHandler::applyKdeAuroraeTheme(const QString &path) const
+bool SystemHandler::applyKdeAuroraeTheme(const QString &themeName) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    auto message = QDBusMessage::createMethodCall("org.kde.plasmashell", "/PlasmaShell", "org.kde.PlasmaShell", "evaluateScript");
-
     QString script;
     QTextStream out(&script);
     out << "var c = ConfigFile('kwinrc');"
@@ -288,77 +262,79 @@ bool SystemHandler::applyKdeAuroraeTheme(const QString &path) const
         << "c.writeEntry('library', 'org.kde.kwin.aurorae');"
         << "c.writeEntry('theme', '__aurorae__svg__" + themeName + "');";
 
-    QVariantList arguments;
-    arguments << QVariant(script);
-    message.setArguments(arguments);
-
-    auto reply = QDBusConnection::sessionBus().call(message);
-
-    if (reply.type() == QDBusMessage::ErrorMessage) {
-        qWarning() << reply.errorMessage();
-        return false;
+    if (setConfigWithPlasmaShell(script)) {
+        auto message = QDBusMessage::createMethodCall("org.kde.KWin", "/KWin", "org.kde.KWin", "reconfigure");
+        QDBusConnection::sessionBus().call(message);
+        return true;
     }
+    return false;
+}
 
-    auto refreshMessage = QDBusMessage::createMethodCall("org.kde.KWin", "/KWin", "org.kde.KWin", "reconfigure");
-    QDBusConnection::sessionBus().call(refreshMessage);
-
-    return true;
+bool SystemHandler::setConfigWithGsettings(const QString &schema, const QString &key, const QString &value) const
+{
+    return QProcess::startDetached("gsettings", QStringList() << "set" << schema << key << value);
 }
 
 bool SystemHandler::applyGnomeWallpaper(const QString &path) const
 {
-    QStringList arguments{"set", "org.gnome.desktop.background", "picture-uri", "file://" + path};
-    return QProcess::startDetached("gsettings", arguments);
+    return setConfigWithGsettings("org.gnome.desktop.background", "picture-uri", "file://" + path);
 }
 
-bool SystemHandler::applyGnomeIcon(const QString &path) const
+bool SystemHandler::applyGnomeIcon(const QString &themeName) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    QStringList arguments{"set", "org.gnome.desktop.interface", "icon-theme", themeName};
-    return QProcess::startDetached("gsettings", arguments);
+    return setConfigWithGsettings("org.gnome.desktop.interface", "icon-theme", themeName);
 }
 
-bool SystemHandler::applyGnomeCursor(const QString &path) const
+bool SystemHandler::applyGnomeCursor(const QString &themeName) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    QStringList arguments{"set", "org.gnome.desktop.interface", "cursor-theme", themeName};
-    return QProcess::startDetached("gsettings", arguments);
+    return setConfigWithGsettings("org.gnome.desktop.interface", "cursor-theme", themeName);
 }
 
-bool SystemHandler::applyGnomeGtk3Theme(const QString &path) const
+bool SystemHandler::applyGnomeGtk3Theme(const QString &themeName) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    QStringList arguments{"set", "org.gnome.desktop.interface", "gtk-theme", themeName};
-    return QProcess::startDetached("gsettings", arguments);
+    return setConfigWithGsettings("org.gnome.desktop.interface", "gtk-theme", themeName);
 }
 
-bool SystemHandler::applyGnomeGnomeShellTheme(const QString &path) const
+bool SystemHandler::applyGnomeGnomeShellTheme(const QString &themeName) const
 {
-    auto themeName = QFileInfo(path).fileName();
-    QStringList arguments{"set", "org.gnome.shell.extensions.user-theme", "name", themeName};
-    return QProcess::startDetached("gsettings", arguments);
+    return setConfigWithGsettings("org.gnome.shell.extensions.user-theme", "name", themeName);
 }
 
-bool SystemHandler::applyXfceWallpaper(const QString &path) const
+bool SystemHandler::setConfigWithXfconf(const QString &channel, const QString &property, const QString &value) const
 {
     auto message = QDBusMessage::createMethodCall("org.xfce.Xfconf", "/org/xfce/Xfconf", "org.xfce.Xfconf", "SetProperty");
-
-    QString channelValue = "xfce4-desktop";
-    //QString propertyValue = "/backdrop/screen0/monitor0/image-path";
-    QString propertyValue = "/backdrop/screen0/monitor0/workspace0/last-image";
-    QDBusVariant valueValue(path);
-
-    QVariantList arguments;
-    arguments << QVariant(channelValue) << QVariant(propertyValue) << QVariant::fromValue(valueValue);
-    message.setArguments(arguments);
-
+    message.setArguments(QVariantList() << QVariant(channel) << QVariant(property) << QVariant::fromValue(QDBusVariant(value)));
     auto reply = QDBusConnection::sessionBus().call(message);
 
     if (reply.type() == QDBusMessage::ErrorMessage) {
         qWarning() << reply.errorMessage();
         return false;
     }
-
     return true;
+}
+
+bool SystemHandler::applyXfceWallpaper(const QString &path) const
+{
+    return setConfigWithXfconf("xfce4-desktop", "/backdrop/screen0/monitor0/workspace0/last-image", path);
+}
+
+bool SystemHandler::applyXfceIcon(const QString &themeName) const
+{
+    return setConfigWithXfconf("xsettings", "/Net/IconThemeName", themeName);
+}
+
+bool SystemHandler::applyXfceCursor(const QString &themeName) const
+{
+    return setConfigWithXfconf("xsettings", "/Gtk/CursorThemeName", themeName);
+}
+
+bool SystemHandler::applyXfceGtk2Theme(const QString &themeName) const
+{
+    return setConfigWithXfconf("xsettings", "/Net/ThemeName", themeName);
+}
+
+bool SystemHandler::applyXfceXfwm4Theme(const QString &themeName) const
+{
+    return setConfigWithXfconf("xfwm4", "/general/theme", themeName);
 }
 #endif
