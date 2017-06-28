@@ -27,21 +27,21 @@ public slots:
 
 private:
 #ifdef QTLIB_UNIX
-    bool evaluateScriptWithPlasmaShell(const QString &script) const;
+    bool setConfigWithPlasmaShell(const QString &script) const;
     bool applyKdeWallpaper(const QString &path) const;
     bool applyKdeIcon(const QString &path) const;
     bool applyKdeCursor(const QString &path) const;
     bool applyKdePlasmaDesktoptheme(const QString &path) const;
     bool applyKdeAuroraeTheme(const QString &path) const;
 
-    bool setSchemaWithGsettings(const QString &schema, const QString &key, const QString &value) const;
+    bool setConfigWithGsettings(const QString &schema, const QString &key, const QString &value) const;
     bool applyGnomeWallpaper(const QString &path) const;
     bool applyGnomeIcon(const QString &path) const;
     bool applyGnomeCursor(const QString &path) const;
     bool applyGnomeGtk3Theme(const QString &path) const;
     bool applyGnomeGnomeShellTheme(const QString &path) const;
 
-    bool setPropertyWithXfconf(const QString &channel, const QString &property, const QDBusVariant &value) const;
+    bool setConfigWithXfconf(const QString &channel, const QString &property, const QDBusVariant &value) const;
     bool applyXfceWallpaper(const QString &path) const;
 #endif
 };
