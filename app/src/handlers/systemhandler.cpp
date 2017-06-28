@@ -110,7 +110,8 @@ bool SystemHandler::isApplicableType(const QString &installType) const
                         << "gnome_shell_themes";
     }
     else if (desktop == "xfce") {
-        applicableTypes << "wallpapers";
+        applicableTypes << "wallpapers"
+                        << "icons";
     }
 
     return applicableTypes.contains(installType);
@@ -160,6 +161,9 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
         else if (desktop == "xfce") {
             if (installType == "wallpapers") {
                 return applyXfceWallpaper(path);
+            }
+            else if (installType == "icons") {
+                return applyXfceIcon(themeName);
             }
         }
     }
@@ -300,5 +304,10 @@ bool SystemHandler::setConfigWithXfconf(const QString &channel, const QString &p
 bool SystemHandler::applyXfceWallpaper(const QString &path) const
 {
     return setConfigWithXfconf("xfce4-desktop", "/backdrop/screen0/monitor0/workspace0/last-image", path);
+}
+
+bool SystemHandler::applyXfceIcon(const QString &themeName) const
+{
+    return setConfigWithXfconf("xsettings", "/Net/IconThemeName", themeName);
 }
 #endif
