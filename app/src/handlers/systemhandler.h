@@ -2,10 +2,6 @@
 
 #include <QObject>
 
-#ifdef QTLIB_UNIX
-#include <QDBusVariant>
-#endif
-
 class SystemHandler : public QObject
 {
     Q_OBJECT
@@ -29,19 +25,19 @@ private:
 #ifdef QTLIB_UNIX
     bool setConfigWithPlasmaShell(const QString &script) const;
     bool applyKdeWallpaper(const QString &path) const;
-    bool applyKdeIcon(const QString &path) const;
-    bool applyKdeCursor(const QString &path) const;
-    bool applyKdePlasmaDesktoptheme(const QString &path) const;
-    bool applyKdeAuroraeTheme(const QString &path) const;
+    bool applyKdeIcon(const QString &themeName) const;
+    bool applyKdeCursor(const QString &themeName) const;
+    bool applyKdePlasmaDesktoptheme(const QString &themeName) const;
+    bool applyKdeAuroraeTheme(const QString &themeName) const;
 
     bool setConfigWithGsettings(const QString &schema, const QString &key, const QString &value) const;
     bool applyGnomeWallpaper(const QString &path) const;
-    bool applyGnomeIcon(const QString &path) const;
-    bool applyGnomeCursor(const QString &path) const;
-    bool applyGnomeGtk3Theme(const QString &path) const;
-    bool applyGnomeGnomeShellTheme(const QString &path) const;
+    bool applyGnomeIcon(const QString &themeName) const;
+    bool applyGnomeCursor(const QString &themeName) const;
+    bool applyGnomeGtk3Theme(const QString &themeName) const;
+    bool applyGnomeGnomeShellTheme(const QString &themeName) const;
 
-    bool setConfigWithXfconf(const QString &channel, const QString &property, const QDBusVariant &value) const;
+    bool setConfigWithXfconf(const QString &channel, const QString &property, const QString &value) const;
     bool applyXfceWallpaper(const QString &path) const;
 #endif
 };
