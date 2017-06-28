@@ -2,6 +2,10 @@
 
 #include <QObject>
 
+#ifdef QTLIB_UNIX
+#include <QDBusVariant>
+#endif
+
 class SystemHandler : public QObject
 {
     Q_OBJECT
@@ -36,6 +40,7 @@ private:
     bool applyGnomeGtk3Theme(const QString &path) const;
     bool applyGnomeGnomeShellTheme(const QString &path) const;
 
+    bool setPropertyWithXfconf(const QString &channel, const QString &property, const QDBusVariant &value) const;
     bool applyXfceWallpaper(const QString &path) const;
 #endif
 };
