@@ -113,7 +113,7 @@ bool SystemHandler::isApplicableType(const QString &installType) const
         applicableTypes << "wallpapers"
                         << "icons"
                         << "cursors"
-                        << "gtk3_themes"
+                        << "gtk2_themes"
                         << "xfwm4_themes";
     }
 
@@ -171,8 +171,8 @@ bool SystemHandler::applyFile(const QString &path, const QString &installType) c
             else if (installType == "cursors") {
                 return applyXfceCursor(themeName);
             }
-            else if (installType == "gtk3_themes") {
-                return applyXfceGtk3Theme(themeName);
+            else if (installType == "gtk2_themes") {
+                return applyXfceGtk2Theme(themeName);
             }
             else if (installType == "xfwm4_themes") {
                 return applyXfceXfwm4Theme(themeName);
@@ -328,7 +328,7 @@ bool SystemHandler::applyXfceCursor(const QString &themeName) const
     return setConfigWithXfconf("xsettings", "/Gtk/CursorThemeName", themeName);
 }
 
-bool SystemHandler::applyXfceGtk3Theme(const QString &themeName) const
+bool SystemHandler::applyXfceGtk2Theme(const QString &themeName) const
 {
     return setConfigWithXfconf("xsettings", "/Net/ThemeName", themeName);
 }
