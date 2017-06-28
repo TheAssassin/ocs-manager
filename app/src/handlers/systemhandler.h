@@ -40,5 +40,6 @@ private:
     bool setConfigWithXfconf(const QString &channel, const QString &property, const QString &value) const;
     bool applyXfceWallpaper(const QString &path) const;
     bool applyXfceIcon(const QString &themeName) const;
+    bool applyXfceCursor(const QString &themeName) const;
 #endif
 };
