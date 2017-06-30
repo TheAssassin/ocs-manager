@@ -282,8 +282,8 @@ bool SystemHandler::applyKdeAuroraeTheme(const QString &themeName) const
         << "c.writeEntry('theme', '__aurorae__svg__" + themeName + "');";
 
     if (setConfigWithPlasmaShell(script)) {
-        auto message = QDBusMessage::createSignal("/KWin", "org.kde.KWin", "reloadConfig");
-        QDBusConnection::sessionBus().send(message);
+        auto reloadConfig = QDBusMessage::createSignal("/KWin", "org.kde.KWin", "reloadConfig");
+        QDBusConnection::sessionBus().send(reloadConfig);
         return true;
     }
     return false;
