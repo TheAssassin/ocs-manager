@@ -221,7 +221,8 @@ bool SystemHandler::applyKdeIcon(const QString &themeName) const
         << "c.writeEntry('Theme', '" + themeName + "');";
 
     if (setConfigWithPlasmaShell(script)) {
-        QProcess::startDetached("kquitapp5 plasmashell && kstart5 plasmashell");
+        QProcess::startDetached("kquitapp5 plasmashell");
+        QProcess::startDetached("kstart5 plasmashell");
         return true;
     }
     return false;
@@ -258,7 +259,8 @@ bool SystemHandler::applyKdePlasmaDesktoptheme(const QString &themeName) const
         << "c.writeEntry('name', '" + themeName + "');";
 
     if (setConfigWithPlasmaShell(script)) {
-        QProcess::startDetached("kquitapp5 plasmashell && kstart5 plasmashell");
+        QProcess::startDetached("kquitapp5 plasmashell");
+        QProcess::startDetached("kstart5 plasmashell");
         return true;
     }
     return false;
