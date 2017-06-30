@@ -221,8 +221,14 @@ bool SystemHandler::applyKdeIcon(const QString &themeName) const
         << "c.writeEntry('Theme', '" + themeName + "');";
 
     if (setConfigWithPlasmaShell(script)) {
-        QProcess::startDetached("kquitapp5 plasmashell");
-        QProcess::startDetached("kstart5 plasmashell");
+        auto iconChangedMessage = QDBusMessage::createSignal("/KIconLoader", "org.kde.KIconLoader", "iconChanged");
+        iconChangedMessage.setArguments(QVariantList() << QVariant(qint32(0)));
+        QDBusConnection::sessionBus().send(iconChangedMessage);
+
+        auto notifyChangeMessage = QDBusMessage::createSignal("/KGlobalSettings", "org.kde.KGlobalSettings", "notifyChange");
+        notifyChangeMessage.setArguments(QVariantList() << QVariant(qint32(4)) << QVariant(qint32(0)));
+        QDBusConnection::sessionBus().send(notifyChangeMessage);
+
         return true;
     }
     return false;
