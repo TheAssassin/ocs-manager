@@ -235,6 +235,17 @@ bool SystemHandler::applyKdeCursor(const QString &themeName) const
         << "c.group = 'Mouse';"
         << "c.writeEntry('cursorTheme', '" + themeName + "');";
 
+    /*if (setConfigWithPlasmaShell(script)) {
+        auto envMessage = QDBusMessage::createMethodCall("org.kde.klauncher5", "/KLauncher", "org.kde.KLauncher", "setLaunchEnv");
+        envMessage.setArguments(QVariantList() << QVariant(QString("XCURSOR_THEME")) << QVariant(themeName));
+        QDBusConnection::sessionBus().call(envMessage);
+
+        auto notifyMessage = QDBusMessage::createSignal("/KGlobalSettings", "org.kde.KGlobalSettings", "notifyChange");
+        notifyMessage.setArguments(QVariantList() << QVariant(qint32(5)) << QVariant(qint32(0)));
+        QDBusConnection::sessionBus().send(notifyMessage);
+        return true;
+    }
+    return false;*/
     return setConfigWithPlasmaShell(script);
 }
 
@@ -263,8 +274,8 @@ bool SystemHandler::applyKdeAuroraeTheme(const QString &themeName) const
         << "c.writeEntry('theme', '__aurorae__svg__" + themeName + "');";
 
     if (setConfigWithPlasmaShell(script)) {
-        auto message = QDBusMessage::createMethodCall("org.kde.KWin", "/KWin", "org.kde.KWin", "reconfigure");
-        QDBusConnection::sessionBus().call(message);
+        auto message = QDBusMessage::createSignal("/KWin", "org.kde.KWin", "reloadConfig");
+        QDBusConnection::sessionBus().send(message);
         return true;
     }
     return false;
