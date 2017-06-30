@@ -221,7 +221,14 @@ bool SystemHandler::applyKdeIcon(const QString &themeName) const
         << "c.writeEntry('Theme', '" + themeName + "');";
 
     if (setConfigWithPlasmaShell(script)) {
-        QProcess::startDetached("kquitapp5 plasmashell && kstart5 plasmashell");
+        auto iconChanged = QDBusMessage::createSignal("/KIconLoader", "org.kde.KIconLoader", "iconChanged");
+        iconChanged.setArguments(QVariantList() << QVariant(qint32(0)));
+        QDBusConnection::sessionBus().send(iconChanged);
+
+        auto notifyChange = QDBusMessage::createSignal("/KGlobalSettings", "org.kde.KGlobalSettings", "notifyChange");
+        notifyChange.setArguments(QVariantList() << QVariant(qint32(4)) << QVariant(qint32(0)));
+        QDBusConnection::sessionBus().send(notifyChange);
+
         return true;
     }
     return false;
@@ -235,7 +242,18 @@ bool SystemHandler::applyKdeCursor(const QString &themeName) const
         << "c.group = 'Mouse';"
         << "c.writeEntry('cursorTheme', '" + themeName + "');";
 
-    return setConfigWithPlasmaShell(script);
+    if (setConfigWithPlasmaShell(script)) {
+        auto setLaunchEnv = QDBusMessage::createMethodCall("org.kde.klauncher5", "/KLauncher", "org.kde.KLauncher", "setLaunchEnv");
+        setLaunchEnv.setArguments(QVariantList() << QVariant(QString("XCURSOR_THEME")) << QVariant(themeName));
+        QDBusConnection::sessionBus().call(setLaunchEnv);
+
+        auto notifyChange = QDBusMessage::createSignal("/KGlobalSettings", "org.kde.KGlobalSettings", "notifyChange");
+        notifyChange.setArguments(QVariantList() << QVariant(qint32(5)) << QVariant(qint32(0)));
+        QDBusConnection::sessionBus().send(notifyChange);
+
+        return true;
+    }
+    return false;
 }
 
 bool SystemHandler::applyKdePlasmaDesktoptheme(const QString &themeName) const
@@ -247,7 +265,8 @@ bool SystemHandler::applyKdePlasmaDesktoptheme(const QString &themeName) const
         << "c.writeEntry('name', '" + themeName + "');";
 
     if (setConfigWithPlasmaShell(script)) {
-        QProcess::startDetached("kquitapp5 plasmashell && kstart5 plasmashell");
+        QProcess::startDetached("kquitapp5 plasmashell");
+        QProcess::startDetached("kstart5 plasmashell");
         return true;
     }
     return false;
@@ -263,8 +282,8 @@ bool SystemHandler::applyKdeAuroraeTheme(const QString &themeName) const
         << "c.writeEntry('theme', '__aurorae__svg__" + themeName + "');";
 
     if (setConfigWithPlasmaShell(script)) {
-        auto message = QDBusMessage::createMethodCall("org.kde.KWin", "/KWin", "org.kde.KWin", "reconfigure");
-        QDBusConnection::sessionBus().call(message);
+        auto reloadConfig = QDBusMessage::createSignal("/KWin", "org.kde.KWin", "reloadConfig");
+        QDBusConnection::sessionBus().send(reloadConfig);
         return true;
     }
     return false;
