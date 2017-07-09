@@ -72,7 +72,7 @@ bool KdeTheme::applyAsCursor() const
     return false;
 }
 
-bool KdeTheme::applyAsPlasmaDesktoptheme() const
+bool KdeTheme::applyAsPlasma5Desktoptheme() const
 {
     QString script;
     QTextStream out(&script);

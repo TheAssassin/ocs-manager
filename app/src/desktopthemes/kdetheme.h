@@ -12,7 +12,7 @@ public:
     bool applyAsWallpaper() const;
     bool applyAsIcon() const;
     bool applyAsCursor() const;
-    bool applyAsPlasmaDesktoptheme() const;
+    bool applyAsPlasma5Desktoptheme() const;
     bool applyAsAuroraeTheme() const;
 
 private:
