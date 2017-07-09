@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
     // Setup websocket server
     auto *wsServer = new WebSocketServer(configHandler, appConfigApplication["id"].toString(), port, &app);
-    QObject::connect(wsServer, &WebSocketServer::stopped, &app, &QCoreApplication::quit);
+    QObject::connect(wsServer, &WebSocketServer::stopped, &app, &QGuiApplication::quit);
 
     if (wsServer->start()) {
         qDebug() << "Websocket server started at:" << wsServer->serverUrl().toString();

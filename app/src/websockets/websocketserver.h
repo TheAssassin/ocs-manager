@@ -10,6 +10,7 @@ class QWebSocket;
 
 class ConfigHandler;
 class SystemHandler;
+class DesktopThemeHandler;
 class OcsApiHandler;
 class ItemHandler;
 
@@ -55,6 +56,7 @@ private:
 
     ConfigHandler *configHandler_;
     SystemHandler *systemHandler_;
+    DesktopThemeHandler *desktopThemeHandler_;
     OcsApiHandler *ocsApiHandler_;
     ItemHandler *itemHandler_;
 
