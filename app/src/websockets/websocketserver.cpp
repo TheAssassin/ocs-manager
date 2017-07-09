@@ -8,6 +8,7 @@
 
 #include "handlers/confighandler.h"
 #include "handlers/systemhandler.h"
+#include "handlers/desktopthemehandler.h"
 #include "handlers/ocsapihandler.h"
 #include "handlers/itemhandler.h"
 
@@ -21,6 +22,7 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
 
     configHandler_->setParent(this);
     systemHandler_ = new SystemHandler(this);
+    desktopThemeHandler_ = new DesktopThemeHandler(this);
     ocsApiHandler_ = new OcsApiHandler(configHandler_, this);
     itemHandler_ = new ItemHandler(configHandler_, this);
 
@@ -276,15 +278,16 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     else if (func == "SystemHandler::openUrl") {
         resultData.append(systemHandler_->openUrl(data.at(0).toString()));
     }
-    else if (func == "SystemHandler::desktopEnvironment") {
-        resultData.append(systemHandler_->desktopEnvironment());
+    // DesktopThemeHandler
+    else if (func == "DesktopThemeHandler::desktopEnvironment") {
+        resultData.append(desktopThemeHandler_->desktopEnvironment());
     }
-    else if (func == "SystemHandler::isApplicableType") {
-        resultData.append(systemHandler_->isApplicableType(data.at(0).toString()));
+    else if (func == "DesktopThemeHandler::isApplicableType") {
+        resultData.append(desktopThemeHandler_->isApplicableType(data.at(0).toString()));
     }
-    else if (func == "SystemHandler::applyFile") {
+    else if (func == "DesktopThemeHandler::applyTheme") {
 #ifdef QTLIB_UNIX
-        resultData.append(systemHandler_->applyFile(data.at(0).toString(), data.at(1).toString()));
+        resultData.append(desktopThemeHandler_->applyTheme(data.at(0).toString(), data.at(1).toString()));
 #else
         resultData.append(false);
 #endif
