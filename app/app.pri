@@ -32,11 +32,13 @@ unix:!ios:!android {
         $${PWD}/src/handlers/desktopthemehandler.h \
         $${PWD}/src/desktopthemes/kdetheme.h \
         $${PWD}/src/desktopthemes/gnometheme.h \
-        $${PWD}/src/desktopthemes/xfcetheme.h
+        $${PWD}/src/desktopthemes/xfcetheme.h \
+        $${PWD}/src/desktopthemes/matetheme.h
 
     SOURCES += \
         $${PWD}/src/handlers/desktopthemehandler.cpp \
         $${PWD}/src/desktopthemes/kdetheme.cpp \
         $${PWD}/src/desktopthemes/gnometheme.cpp \
-        $${PWD}/src/desktopthemes/xfcetheme.cpp
+        $${PWD}/src/desktopthemes/xfcetheme.cpp \
+        $${PWD}/src/desktopthemes/matetheme.cpp
 }
