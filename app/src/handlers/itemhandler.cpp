@@ -314,8 +314,10 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
     auto filename = metadata["filename"].toString();
     auto installType = metadata["install_type"].toString();
 
-    auto tempDirPrefix = configHandler_->getAppConfigApplication()["id"].toString() + "_" + filename;
-    qtlib::Dir tempDir(qtlib::Dir::tempPath() + "/" + tempDirPrefix);
+    QString tempDirPrefix = "temp_" + filename;
+    qtlib::Dir tempDir(qtlib::Dir::genericCachePath() + "/"
+                       + configHandler_->getAppConfigApplication()["id"].toString() + "/"
+                       + tempDirPrefix);
     tempDir.make();
     qtlib::Dir tempDestDir(tempDir.path() + "/dest");
     tempDestDir.make();
