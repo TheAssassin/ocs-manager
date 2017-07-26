@@ -169,7 +169,7 @@ bool DesktopThemeHandler::applyTheme(const QString &path, const QString &install
             else if (installType == "gtk3_themes") {
                 return cinnamonTheme.applyAsGtk3Theme();
             }
-            else if (installType == "gnome_shell_themes") {
+            else if (installType == "cinnamon_themes") {
                 return cinnamonTheme.applyAsCinnamonTheme();
             }
         }
