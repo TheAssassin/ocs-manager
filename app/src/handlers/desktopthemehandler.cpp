@@ -82,6 +82,7 @@ bool DesktopThemeHandler::isApplicableType(const QString &installType) const
                         << "icons"
                         << "cursors"
                         << "gtk3_themes"
+                        << "metacity_themes"
                         << "cinnamon_themes";
     }
     else if (desktop == "mate") {
@@ -168,6 +169,9 @@ bool DesktopThemeHandler::applyTheme(const QString &path, const QString &install
             }
             else if (installType == "gtk3_themes") {
                 return cinnamonTheme.applyAsGtk3Theme();
+            }
+            else if (installType == "metacity_themes") {
+                return cinnamonTheme.applyAsMetacityTheme();
             }
             else if (installType == "cinnamon_themes") {
                 return cinnamonTheme.applyAsCinnamonTheme();

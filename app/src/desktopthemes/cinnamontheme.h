@@ -13,6 +13,7 @@ public:
     bool applyAsIcon() const;
     bool applyAsCursor() const;
     bool applyAsGtk3Theme() const;
+    bool applyAsMetacityTheme() const;
     bool applyAsCinnamonTheme() const;
 
 private:
