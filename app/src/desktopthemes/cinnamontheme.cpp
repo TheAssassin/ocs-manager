@@ -32,7 +32,7 @@ bool CinnamonTheme::applyAsGtk3Theme() const
 
 bool CinnamonTheme::applyAsMetacityTheme() const
 {
-    return setConfig("org.cinnamon.desktop.wm.preferences", "name", themeName_);
+    return setConfig("org.cinnamon.desktop.wm.preferences", "theme", themeName_);
 }
 
 bool CinnamonTheme::applyAsCinnamonTheme() const
