@@ -33,6 +33,7 @@ unix:!ios:!android {
         $${PWD}/src/desktopthemes/kdetheme.h \
         $${PWD}/src/desktopthemes/gnometheme.h \
         $${PWD}/src/desktopthemes/xfcetheme.h \
+        $${PWD}/src/desktopthemes/cinnamontheme.h \
         $${PWD}/src/desktopthemes/matetheme.h
 
     SOURCES += \
@@ -40,5 +41,6 @@ unix:!ios:!android {
         $${PWD}/src/desktopthemes/kdetheme.cpp \
         $${PWD}/src/desktopthemes/gnometheme.cpp \
         $${PWD}/src/desktopthemes/xfcetheme.cpp \
+        $${PWD}/src/desktopthemes/cinnamontheme.cpp \
         $${PWD}/src/desktopthemes/matetheme.cpp
 }
