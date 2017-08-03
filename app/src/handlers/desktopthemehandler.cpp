@@ -8,6 +8,8 @@
 #include "desktopthemes/kdetheme.h"
 #include "desktopthemes/gnometheme.h"
 #include "desktopthemes/xfcetheme.h"
+#include "desktopthemes/cinnamontheme.h"
+#include "desktopthemes/matetheme.h"
 #endif
 
 DesktopThemeHandler::DesktopThemeHandler(QObject *parent)
@@ -37,6 +39,12 @@ QString DesktopThemeHandler::desktopEnvironment() const
     }
     else if (currentDesktop.contains("xfce")) {
         desktop = "xfce";
+    }
+    else if (currentDesktop.contains("cinnamon")) {
+        desktop = "cinnamon";
+    }
+    else if (currentDesktop.contains("mate")) {
+        desktop = "mate";
     }
 
     return desktop;
@@ -68,6 +76,21 @@ bool DesktopThemeHandler::isApplicableType(const QString &installType) const
                         << "cursors"
                         << "gtk2_themes"
                         << "xfwm4_themes";
+    }
+    else if (desktop == "cinnamon") {
+        applicableTypes << "wallpapers"
+                        << "icons"
+                        << "cursors"
+                        << "gtk3_themes"
+                        << "metacity_themes"
+                        << "cinnamon_themes";
+    }
+    else if (desktop == "mate") {
+        applicableTypes << "wallpapers"
+                        << "icons"
+                        << "cursors"
+                        << "gtk2_themes"
+                        << "metacity_themes";
     }
 
     return applicableTypes.contains(installType);
@@ -131,6 +154,45 @@ bool DesktopThemeHandler::applyTheme(const QString &path, const QString &install
             }
             else if (installType == "xfwm4_themes") {
                 return xfceTheme.applyAsXfwm4Theme();
+            }
+        }
+        else if (desktop == "cinnamon") {
+            CinnamonTheme cinnamonTheme(path);
+            if (installType == "wallpapers") {
+                return cinnamonTheme.applyAsWallpaper();
+            }
+            else if (installType == "icons") {
+                return cinnamonTheme.applyAsIcon();
+            }
+            else if (installType == "cursors") {
+                return cinnamonTheme.applyAsCursor();
+            }
+            else if (installType == "gtk3_themes") {
+                return cinnamonTheme.applyAsGtk3Theme();
+            }
+            else if (installType == "metacity_themes") {
+                return cinnamonTheme.applyAsMetacityTheme();
+            }
+            else if (installType == "cinnamon_themes") {
+                return cinnamonTheme.applyAsCinnamonTheme();
+            }
+        }
+        else if (desktop == "mate") {
+            MateTheme mateTheme(path);
+            if (installType == "wallpapers") {
+                return mateTheme.applyAsWallpaper();
+            }
+            else if (installType == "icons") {
+                return mateTheme.applyAsIcon();
+            }
+            else if (installType == "cursors") {
+                return mateTheme.applyAsCursor();
+            }
+            else if (installType == "gtk2_themes") {
+                return mateTheme.applyAsGtk2Theme();
+            }
+            else if (installType == "metacity_themes") {
+                return mateTheme.applyAsMetacityTheme();
             }
         }
     }
