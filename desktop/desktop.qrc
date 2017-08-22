@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/desktop">
+        <file>ocs-manager.svg</file>
+    </qresource>
+</RCC>
