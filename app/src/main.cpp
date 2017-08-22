@@ -5,6 +5,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QGuiApplication>
+#include <QIcon>
 #include <QDebug>
 
 #include "handlers/confighandler.h"
@@ -22,6 +23,7 @@ int main(int argc, char *argv[])
     app.setApplicationVersion(appConfigApplication["version"].toString());
     app.setOrganizationName(appConfigApplication["organization"].toString());
     app.setOrganizationDomain(appConfigApplication["domain"].toString());
+    app.setWindowIcon(QIcon::fromTheme(appConfigApplication["id"].toString(), QIcon(appConfigApplication["icon"].toString())));
 
     // Setup translator
     QTranslator translator;
