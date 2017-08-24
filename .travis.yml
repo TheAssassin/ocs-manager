@@ -1,0 +1,15 @@
+dist: trusty
+sudo: required
+services:
+  - docker
+
+branches:
+  only:
+    - master
+
+script:
+  - mntdir='/mnt/ocs-manager'
+  #- docker run --rm -v $(pwd):${mntdir} ubuntu:16.04 /bin/bash -c "sh ${mntdir}/scripts/build-docker.sh snap"
+  #- docker run --rm -v $(pwd):${mntdir} ubuntu:16.04 /bin/bash -c "sh ${mntdir}/scripts/build-docker.sh flatpak"
+  - docker run --rm -v $(pwd):${mntdir} ubuntu:16.04 /bin/bash -c "sh ${mntdir}/scripts/build-docker.sh appimage"
+  - cat transfer.log
