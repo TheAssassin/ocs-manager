@@ -7,6 +7,12 @@ branches:
   only:
     - master
 
+before_install:
+  - sudo apt-get install -qq pkg-config fuse
+  - sudo modprobe fuse
+  - sudo chmod 666 /dev/fuse
+  - sudo chown root:$USER /etc/fuse.conf
+
 script:
   - mntdir='/mnt/ocs-manager'
   #- docker run --rm -v $(pwd):${mntdir} ubuntu:16.04 /bin/bash -c "sh ${mntdir}/scripts/build-docker.sh snap"
