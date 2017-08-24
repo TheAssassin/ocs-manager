@@ -33,7 +33,14 @@ build_flatpak() {
 }
 
 build_appimage() {
-    echo 'Not implemented yet'
+    cd "${PROJDIR}"
+    mkdir -p "${BUILDDIR}"
+    export_srcarchive "${SRCARCHIVE}"
+
+    tar -xzvf "${SRCARCHIVE}" -C "${BUILDDIR}"
+    cp "${PROJDIR}/pkg/appimage/appimage.sh" "${BUILDDIR}/${PKGNAME}"
+    cd "${BUILDDIR}/${PKGNAME}"
+    sh appimage.sh
 }
 
 if [ "${BUILDTYPE}" = 'snap' ]; then
