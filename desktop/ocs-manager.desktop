@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=ocs-manager
+Exec=ocs-manager
+Icon=ocs-manager
+Type=Application
+Terminal=true
+NoDisplay=true
+Categories=Network;Utility;
