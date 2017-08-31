@@ -34,7 +34,7 @@ build_flatpak() {
 }
 
 build_appimage() {
-    # docker-image: ubuntu:16.04
+    # docker-image: ubuntu:17.10
     apt update -qq
     apt -y install build-essential qt5-default libqt5websockets5-dev
     apt -y install git
