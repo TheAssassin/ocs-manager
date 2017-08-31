@@ -8,16 +8,3 @@ A tool to handle item installation from OCS provider, file management, and apply
 Copyright: 2017, Opendesktop.org
 
 License: GPL-3+
-
-
-### Package depends
-
-* libqt5gui5
-* libqt5websockets5
-* libqt5dbus5
-
-### Package depends (build)
-
-* build-essential
-* qt5-default
-* libqt5websockets5-dev
