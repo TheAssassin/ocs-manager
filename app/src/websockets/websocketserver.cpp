@@ -8,9 +8,10 @@
 
 #include "handlers/confighandler.h"
 #include "handlers/systemhandler.h"
-#include "handlers/desktopthemehandler.h"
 #include "handlers/ocsapihandler.h"
 #include "handlers/itemhandler.h"
+#include "handlers/appimagehandler.h"
+#include "handlers/desktopthemehandler.h"
 
 WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &serverName, quint16 serverPort, QObject *parent)
     : QObject(parent), configHandler_(configHandler), serverName_(serverName), serverPort_(serverPort)
@@ -22,9 +23,10 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
 
     configHandler_->setParent(this);
     systemHandler_ = new SystemHandler(this);
-    desktopThemeHandler_ = new DesktopThemeHandler(this);
     ocsApiHandler_ = new OcsApiHandler(configHandler_, this);
     itemHandler_ = new ItemHandler(configHandler_, this);
+    appImageHandler_ = new AppImageHandler(configHandler_, this);
+    desktopThemeHandler_ = new DesktopThemeHandler(this);
 
     connect(itemHandler_, &ItemHandler::metadataSetChanged, this, &WebSocketServer::itemMetadataSetChanged);
     connect(itemHandler_, &ItemHandler::downloadStarted, this, &WebSocketServer::itemDownloadStarted);
@@ -278,20 +280,6 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     else if (func == "SystemHandler::openUrl") {
         resultData.append(systemHandler_->openUrl(data.at(0).toString()));
     }
-    // DesktopThemeHandler
-    else if (func == "DesktopThemeHandler::desktopEnvironment") {
-        resultData.append(desktopThemeHandler_->desktopEnvironment());
-    }
-    else if (func == "DesktopThemeHandler::isApplicableType") {
-        resultData.append(desktopThemeHandler_->isApplicableType(data.at(0).toString()));
-    }
-    else if (func == "DesktopThemeHandler::applyTheme") {
-#ifdef QTLIB_UNIX
-        resultData.append(desktopThemeHandler_->applyTheme(data.at(0).toString(), data.at(1).toString()));
-#else
-        resultData.append(false);
-#endif
-    }
     // OcsApiHandler
     else if (func == "OcsApiHandler::addProviders") {
         resultData.append(ocsApiHandler_->addProviders(data.at(0).toString()));
@@ -326,6 +314,31 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     }
     else if (func == "ItemHandler::uninstall") {
         itemHandler_->uninstall(data.at(0).toString());
+    }
+    // AppImageHandler
+    else if (func == "AppImageHandler::isUpdateAvailable") {
+        resultData.append(appImageHandler_->isUpdateAvailable(data.at(0).toString()));
+    }
+    else if (func == "AppImageHandler::updateAppImage") {
+#ifdef QTLIB_UNIX
+        resultData.append(appImageHandler_->updateAppImage(data.at(0).toString()));
+#else
+        resultData.append(false);
+#endif
+    }
+    // DesktopThemeHandler
+    else if (func == "DesktopThemeHandler::desktopEnvironment") {
+        resultData.append(desktopThemeHandler_->desktopEnvironment());
+    }
+    else if (func == "DesktopThemeHandler::isApplicableType") {
+        resultData.append(desktopThemeHandler_->isApplicableType(data.at(0).toString()));
+    }
+    else if (func == "DesktopThemeHandler::applyTheme") {
+#ifdef QTLIB_UNIX
+        resultData.append(desktopThemeHandler_->applyTheme(data.at(0).toString(), data.at(1).toString()));
+#else
+        resultData.append(false);
+#endif
     }
     // Not supported
     else {

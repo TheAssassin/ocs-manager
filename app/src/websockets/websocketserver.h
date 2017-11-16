@@ -10,9 +10,10 @@ class QWebSocket;
 
 class ConfigHandler;
 class SystemHandler;
-class DesktopThemeHandler;
 class OcsApiHandler;
 class ItemHandler;
+class AppImageHandler;
+class DesktopThemeHandler;
 
 class WebSocketServer : public QObject
 {
@@ -56,9 +57,10 @@ private:
 
     ConfigHandler *configHandler_;
     SystemHandler *systemHandler_;
-    DesktopThemeHandler *desktopThemeHandler_;
     OcsApiHandler *ocsApiHandler_;
     ItemHandler *itemHandler_;
+    AppImageHandler *appImageHandler_;
+    DesktopThemeHandler *desktopThemeHandler_;
 
     QString serverName_;
     quint16 serverPort_;

@@ -11,7 +11,9 @@ HEADERS += \
     $${PWD}/src/handlers/confighandler.h \
     $${PWD}/src/handlers/systemhandler.h \
     $${PWD}/src/handlers/ocsapihandler.h \
-    $${PWD}/src/handlers/itemhandler.h
+    $${PWD}/src/handlers/itemhandler.h \
+    $${PWD}/src/handlers/appimagehandler.h \
+    $${PWD}/src/handlers/desktopthemehandler.h
 
 SOURCES += \
     $${PWD}/src/main.cpp \
@@ -19,7 +21,9 @@ SOURCES += \
     $${PWD}/src/handlers/confighandler.cpp \
     $${PWD}/src/handlers/systemhandler.cpp \
     $${PWD}/src/handlers/ocsapihandler.cpp \
-    $${PWD}/src/handlers/itemhandler.cpp
+    $${PWD}/src/handlers/itemhandler.cpp \
+    $${PWD}/src/handlers/appimagehandler.cpp \
+    $${PWD}/src/handlers/desktopthemehandler.cpp
 
 RESOURCES += $${PWD}/configs/configs.qrc
 
@@ -29,8 +33,6 @@ unix:!ios:!android {
     QT += dbus
 
     HEADERS += \
-        $${PWD}/src/handlers/appimagehandler.h \
-        $${PWD}/src/handlers/desktopthemehandler.h \
         $${PWD}/src/desktopthemes/kdetheme.h \
         $${PWD}/src/desktopthemes/gnometheme.h \
         $${PWD}/src/desktopthemes/xfcetheme.h \
@@ -38,8 +40,6 @@ unix:!ios:!android {
         $${PWD}/src/desktopthemes/matetheme.h
 
     SOURCES += \
-        $${PWD}/src/handlers/appimagehandler.cpp \
-        $${PWD}/src/handlers/desktopthemehandler.cpp \
         $${PWD}/src/desktopthemes/kdetheme.cpp \
         $${PWD}/src/desktopthemes/gnometheme.cpp \
         $${PWD}/src/desktopthemes/xfcetheme.cpp \

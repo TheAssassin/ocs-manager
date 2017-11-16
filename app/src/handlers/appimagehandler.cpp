@@ -15,9 +15,7 @@ bool AppImageHandler::isUpdateAvailable(const QString &path) const
 #ifdef QTLIB_UNIX
     appimage::update::Updater appImageUpdater(path.toStdString());
     bool updateAvailable;
-    if (appImageUpdater.checkForChanges(updateAvailable)) {
-        return true;
-    }
+    return appImageUpdater.checkForChanges(updateAvailable);
 #endif
     return false;
 }
