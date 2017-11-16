@@ -29,6 +29,7 @@ unix:!ios:!android {
     QT += dbus
 
     HEADERS += \
+        $${PWD}/src/handlers/appimagehandler.h \
         $${PWD}/src/handlers/desktopthemehandler.h \
         $${PWD}/src/desktopthemes/kdetheme.h \
         $${PWD}/src/desktopthemes/gnometheme.h \
@@ -37,6 +38,7 @@ unix:!ios:!android {
         $${PWD}/src/desktopthemes/matetheme.h
 
     SOURCES += \
+        $${PWD}/src/handlers/appimagehandler.cpp \
         $${PWD}/src/handlers/desktopthemehandler.cpp \
         $${PWD}/src/desktopthemes/kdetheme.cpp \
         $${PWD}/src/desktopthemes/gnometheme.cpp \
