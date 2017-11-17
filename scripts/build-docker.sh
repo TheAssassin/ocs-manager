@@ -37,7 +37,7 @@ build_appimage() {
     # docker-image: ubuntu:17.10
     apt update -qq
     apt -y install build-essential qt5-default libqt5websockets5-dev
-    apt -y install cmake libcurl4-gnutls-dev libxpm-dev
+    apt -y install cmake libssl-dev libssh2-1-dev libcurl4-gnutls-dev libxpm-dev
     apt -y install libssl1.0.0 zlib1g
     apt -y install git
     apt -y install curl
