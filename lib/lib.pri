@@ -21,5 +21,5 @@ unix:!ios:!android {
         $${PWD}/AppImageUpdate-prebuilt/lib/zsync2/lib/libzsync/libzsync.a \
         $${PWD}/AppImageUpdate-prebuilt/lib/zsync2/lib/librcksum/librcksum.a
 
-    LIBS += -L$${PWD}/AppImageUpdate-prebuilt/lib/ -lcurl
+    LIBS += -lcurl
 }
