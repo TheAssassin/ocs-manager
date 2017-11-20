@@ -38,6 +38,10 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
     connect(itemHandler_, &ItemHandler::installFinished, this, &WebSocketServer::itemInstallFinished);
     connect(itemHandler_, &ItemHandler::uninstallStarted, this, &WebSocketServer::itemUninstallStarted);
     connect(itemHandler_, &ItemHandler::uninstallFinished, this, &WebSocketServer::itemUninstallFinished);
+
+    connect(appImageHandler_, &AppImageHandler::updateStarted, this, &WebSocketServer::appImageUpdateStarted);
+    connect(appImageHandler_, &AppImageHandler::updateFinished, this, &WebSocketServer::appImageUpdateFinished);
+    connect(appImageHandler_, &AppImageHandler::updateProgress, this, &WebSocketServer::appImageUpdateProgress);
 }
 
 WebSocketServer::~WebSocketServer()
@@ -191,6 +195,28 @@ void WebSocketServer::itemUninstallFinished(QJsonObject result)
     QJsonArray data;
     data.append(result);
     sendMessage("", "ItemHandler::uninstallFinished", data);
+}
+
+void WebSocketServer::appImageUpdateStarted(QString path)
+{
+    QJsonArray data;
+    data.append(path);
+    sendMessage("", "AppImageHandler::updateStarted", data);
+}
+
+void WebSocketServer::appImageUpdateFinished(QString path)
+{
+    QJsonArray data;
+    data.append(path);
+    sendMessage("", "AppImageHandler::updateFinished", data);
+}
+
+void WebSocketServer::appImageUpdateProgress(QString path, int progress)
+{
+    QJsonArray data;
+    data.append(path);
+    data.append(progress);
+    sendMessage("", "AppImageHandler::updateProgress", data);
 }
 
 void WebSocketServer::receiveMessage(const QString &id, const QString &func, const QJsonArray &data)

@@ -51,6 +51,10 @@ private slots:
     void itemUninstallStarted(QJsonObject result);
     void itemUninstallFinished(QJsonObject result);
 
+    void appImageUpdateStarted(QString path);
+    void appImageUpdateFinished(QString path);
+    void appImageUpdateProgress(QString path, int progress);
+
 private:
     void receiveMessage(const QString &id, const QString &func, const QJsonArray &data);
     void sendMessage(const QString &id, const QString &func, const QJsonArray &data);

@@ -1,6 +1,9 @@
 #include "appimagehandler.h"
 
 #ifdef QTLIB_UNIX
+#include <thread>
+#include <chrono>
+
 #include "appimage/update.h"
 #endif
 
@@ -39,12 +42,23 @@ bool AppImageHandler::isUpdateAvailable(const QString &path) const
 }
 
 #ifdef QTLIB_UNIX
-bool AppImageHandler::updateAppImage(const QString &path) const
+bool AppImageHandler::updateAppImage(const QString &path)
 {
     appimage::update::Updater appImageUpdater(path.toStdString(), false);
-    /*if (appImageUpdater.start()) {
-        // TODO: make signals&slots bindings later
-    }*/
+    if (appImageUpdater.start()) {
+        emit updateStarted(path);
+        while (!appImageUpdater.isDone()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            double progress;
+            if (appImageUpdater.progress(progress)) {
+                emit updateProgress(path, progress * 100);
+            }
+        }
+        emit updateFinished(path);
+        if (!appImageUpdater.hasError()) {
+            return true;
+        }
+    }
 
     return false;
 }
