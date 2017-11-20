@@ -12,6 +12,7 @@ public:
     explicit AppImageHandler(ConfigHandler *configHandler, QObject *parent = nullptr);
 
 public slots:
+    QString describeAppImage(const QString &path) const;
     bool isUpdateAvailable(const QString &path) const;
 
 #ifdef QTLIB_UNIX

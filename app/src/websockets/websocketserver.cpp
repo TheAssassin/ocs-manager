@@ -316,6 +316,9 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
         itemHandler_->uninstall(data.at(0).toString());
     }
     // AppImageHandler
+    else if (func == "AppImageHandler::describeAppImage") {
+        resultData.append(appImageHandler_->describeAppImage(data.at(0).toString()));
+    }
     else if (func == "AppImageHandler::isUpdateAvailable") {
         resultData.append(appImageHandler_->isUpdateAvailable(data.at(0).toString()));
     }
