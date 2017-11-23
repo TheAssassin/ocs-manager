@@ -12,7 +12,7 @@ HEADERS += \
     $${PWD}/src/handlers/systemhandler.h \
     $${PWD}/src/handlers/ocsapihandler.h \
     $${PWD}/src/handlers/itemhandler.h \
-    $${PWD}/src/handlers/appimagehandler.h \
+    $${PWD}/src/handlers/updatehandler.h \
     $${PWD}/src/handlers/desktopthemehandler.h
 
 SOURCES += \
@@ -22,7 +22,7 @@ SOURCES += \
     $${PWD}/src/handlers/systemhandler.cpp \
     $${PWD}/src/handlers/ocsapihandler.cpp \
     $${PWD}/src/handlers/itemhandler.cpp \
-    $${PWD}/src/handlers/appimagehandler.cpp \
+    $${PWD}/src/handlers/updatehandler.cpp \
     $${PWD}/src/handlers/desktopthemehandler.cpp
 
 RESOURCES += $${PWD}/configs/configs.qrc

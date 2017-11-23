@@ -12,7 +12,7 @@ class ConfigHandler;
 class SystemHandler;
 class OcsApiHandler;
 class ItemHandler;
-class AppImageHandler;
+class UpdateHandler;
 class DesktopThemeHandler;
 
 class WebSocketServer : public QObject
@@ -51,9 +51,11 @@ private slots:
     void itemUninstallStarted(QJsonObject result);
     void itemUninstallFinished(QJsonObject result);
 
-    void appImageUpdateStarted(QString path);
-    void appImageUpdateFinished(QString path);
-    void appImageUpdateProgress(QString path, int progress);
+    void updateCheckAllStarted();
+    void updateCheckAllFinished();
+    void updateUpdateStarted(QString path);
+    void updateUpdateFinished(QString path, QString newPath);
+    void updateUpdateProgress(QString path, int progress);
 
 private:
     void receiveMessage(const QString &id, const QString &func, const QJsonArray &data);
@@ -63,7 +65,7 @@ private:
     SystemHandler *systemHandler_;
     OcsApiHandler *ocsApiHandler_;
     ItemHandler *itemHandler_;
-    AppImageHandler *appImageHandler_;
+    UpdateHandler *updateHandler_;
     DesktopThemeHandler *desktopThemeHandler_;
 
     QString serverName_;

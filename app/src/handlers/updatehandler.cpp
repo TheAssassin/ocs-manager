@@ -1,4 +1,4 @@
-#include "appimagehandler.h"
+#include "updatehandler.h"
 
 #ifdef QTLIB_UNIX
 #include <thread>
@@ -9,40 +9,41 @@
 
 #include "handlers/confighandler.h"
 
-AppImageHandler::AppImageHandler(ConfigHandler *configHandler, QObject *parent)
+UpdateHandler::UpdateHandler(ConfigHandler *configHandler, QObject *parent)
     : QObject(parent), configHandler_(configHandler)
 {}
 
-QString AppImageHandler::describeAppImage(const QString &path) const
+QString UpdateHandler::checkAll() const
 {
-    QString updateInformation;
+}
+
+QString UpdateHandler::update(const QString &path) const
+{
+}
 
 #ifdef QTLIB_UNIX
+QString UpdateHandler::describeAppImage(const QString &path) const
+{
     appimage::update::Updater appImageUpdater(path.toStdString());
+    QString updateInformation;
     std::string description;
     if (appImageUpdater.describeAppImage(description)) {
         updateInformation = QString::fromStdString(description);
     }
-#endif
-
     return updateInformation;
 }
 
-bool AppImageHandler::isUpdateAvailable(const QString &path) const
+bool UpdateHandler::checkAppImage(const QString &path) const
 {
-#ifdef QTLIB_UNIX
     appimage::update::Updater appImageUpdater(path.toStdString());
     bool updateAvailable;
     if (appImageUpdater.checkForChanges(updateAvailable)) {
         return updateAvailable;
     }
-#endif
-
     return false;
 }
 
-#ifdef QTLIB_UNIX
-bool AppImageHandler::updateAppImage(const QString &path)
+bool UpdateHandler::updateAppImage(const QString &path)
 {
     appimage::update::Updater appImageUpdater(path.toStdString(), false);
     if (appImageUpdater.start()) {
@@ -54,12 +55,12 @@ bool AppImageHandler::updateAppImage(const QString &path)
                 emit updateProgress(path, progress * 100);
             }
         }
-        emit updateFinished(path);
+        auto newPath = path; // dummy
+        emit updateFinished(path, newPath);
         if (!appImageUpdater.hasError()) {
             return true;
         }
     }
-
     return false;
 }
 #endif

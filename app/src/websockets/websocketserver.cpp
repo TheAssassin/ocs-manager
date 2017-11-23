@@ -10,7 +10,7 @@
 #include "handlers/systemhandler.h"
 #include "handlers/ocsapihandler.h"
 #include "handlers/itemhandler.h"
-#include "handlers/appimagehandler.h"
+#include "handlers/updatehandler.h"
 #include "handlers/desktopthemehandler.h"
 
 WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &serverName, quint16 serverPort, QObject *parent)
@@ -25,7 +25,7 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
     systemHandler_ = new SystemHandler(this);
     ocsApiHandler_ = new OcsApiHandler(configHandler_, this);
     itemHandler_ = new ItemHandler(configHandler_, this);
-    appImageHandler_ = new AppImageHandler(configHandler_, this);
+    updateHandler_ = new UpdateHandler(configHandler_, this);
     desktopThemeHandler_ = new DesktopThemeHandler(this);
 
     connect(itemHandler_, &ItemHandler::metadataSetChanged, this, &WebSocketServer::itemMetadataSetChanged);
@@ -39,9 +39,11 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
     connect(itemHandler_, &ItemHandler::uninstallStarted, this, &WebSocketServer::itemUninstallStarted);
     connect(itemHandler_, &ItemHandler::uninstallFinished, this, &WebSocketServer::itemUninstallFinished);
 
-    connect(appImageHandler_, &AppImageHandler::updateStarted, this, &WebSocketServer::appImageUpdateStarted);
-    connect(appImageHandler_, &AppImageHandler::updateFinished, this, &WebSocketServer::appImageUpdateFinished);
-    connect(appImageHandler_, &AppImageHandler::updateProgress, this, &WebSocketServer::appImageUpdateProgress);
+    connect(updateHandler_, &UpdateHandler::checkAllStarted, this, &WebSocketServer::updateCheckAllStarted);
+    connect(updateHandler_, &UpdateHandler::checkAllFinished, this, &WebSocketServer::updateCheckAllFinished);
+    connect(updateHandler_, &UpdateHandler::updateStarted, this, &WebSocketServer::updateUpdateStarted);
+    connect(updateHandler_, &UpdateHandler::updateFinished, this, &WebSocketServer::updateUpdateFinished);
+    connect(updateHandler_, &UpdateHandler::updateProgress, this, &WebSocketServer::updateUpdateProgress);
 }
 
 WebSocketServer::~WebSocketServer()
@@ -197,26 +199,39 @@ void WebSocketServer::itemUninstallFinished(QJsonObject result)
     sendMessage("", "ItemHandler::uninstallFinished", data);
 }
 
-void WebSocketServer::appImageUpdateStarted(QString path)
+void WebSocketServer::updateCheckAllStarted()
+{
+    QJsonArray data;
+    sendMessage("", "ItemHandler::checkAllStarted", data);
+}
+
+void WebSocketServer::updateCheckAllFinished()
+{
+    QJsonArray data;
+    sendMessage("", "ItemHandler::checkAllFinished", data);
+}
+
+void WebSocketServer::updateUpdateStarted(QString path)
 {
     QJsonArray data;
     data.append(path);
-    sendMessage("", "AppImageHandler::updateStarted", data);
+    sendMessage("", "UpdateHandler::updateStarted", data);
 }
 
-void WebSocketServer::appImageUpdateFinished(QString path)
+void WebSocketServer::updateUpdateFinished(QString path, QString newPath)
 {
     QJsonArray data;
     data.append(path);
-    sendMessage("", "AppImageHandler::updateFinished", data);
+    data.append(newPath);
+    sendMessage("", "UpdateHandler::updateFinished", data);
 }
 
-void WebSocketServer::appImageUpdateProgress(QString path, int progress)
+void WebSocketServer::updateUpdateProgress(QString path, int progress)
 {
     QJsonArray data;
     data.append(path);
     data.append(progress);
-    sendMessage("", "AppImageHandler::updateProgress", data);
+    sendMessage("", "UpdateHandler::updateProgress", data);
 }
 
 void WebSocketServer::receiveMessage(const QString &id, const QString &func, const QJsonArray &data)
@@ -341,19 +356,12 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     else if (func == "ItemHandler::uninstall") {
         itemHandler_->uninstall(data.at(0).toString());
     }
-    // AppImageHandler
-    else if (func == "AppImageHandler::describeAppImage") {
-        resultData.append(appImageHandler_->describeAppImage(data.at(0).toString()));
+    // UpdateHandler
+    else if (func == "UpdateHandler::checkAll") {
+        resultData.append(updateHandler_->checkAll());
     }
-    else if (func == "AppImageHandler::isUpdateAvailable") {
-        resultData.append(appImageHandler_->isUpdateAvailable(data.at(0).toString()));
-    }
-    else if (func == "AppImageHandler::updateAppImage") {
-#ifdef QTLIB_UNIX
-        resultData.append(appImageHandler_->updateAppImage(data.at(0).toString()));
-#else
-        resultData.append(false);
-#endif
+    else if (func == "UpdateHandler::update") {
+        resultData.append(updateHandler_->update(data.at(0).toString()));
     }
     // DesktopThemeHandler
     else if (func == "DesktopThemeHandler::desktopEnvironment") {
