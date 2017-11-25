@@ -211,25 +211,24 @@ void WebSocketServer::updateCheckAllFinished()
     sendMessage("", "ItemHandler::checkAllFinished", data);
 }
 
-void WebSocketServer::updateUpdateStarted(QString path)
+void WebSocketServer::updateUpdateStarted(QString fileKey)
 {
     QJsonArray data;
-    data.append(path);
+    data.append(fileKey);
     sendMessage("", "UpdateHandler::updateStarted", data);
 }
 
-void WebSocketServer::updateUpdateFinished(QString path, QString newPath)
+void WebSocketServer::updateUpdateFinished(QString fileKey)
 {
     QJsonArray data;
-    data.append(path);
-    data.append(newPath);
+    data.append(fileKey);
     sendMessage("", "UpdateHandler::updateFinished", data);
 }
 
-void WebSocketServer::updateUpdateProgress(QString path, int progress)
+void WebSocketServer::updateUpdateProgress(QString fileKey, int progress)
 {
     QJsonArray data;
-    data.append(path);
+    data.append(fileKey);
     data.append(progress);
     sendMessage("", "UpdateHandler::updateProgress", data);
 }
@@ -358,10 +357,10 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     }
     // UpdateHandler
     else if (func == "UpdateHandler::checkAll") {
-        resultData.append(updateHandler_->checkAll());
+        updateHandler_->checkAll();
     }
     else if (func == "UpdateHandler::update") {
-        resultData.append(updateHandler_->update(data.at(0).toString()));
+        updateHandler_->update(data.at(0).toString());
     }
     // DesktopThemeHandler
     else if (func == "DesktopThemeHandler::desktopEnvironment") {
