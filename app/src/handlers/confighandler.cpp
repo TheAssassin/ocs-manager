@@ -31,6 +31,11 @@ QJsonObject ConfigHandler::getUsrConfigApplication() const
 
 bool ConfigHandler::setUsrConfigApplication(const QJsonObject &object) const
 {
+    /* object format
+    {
+        "update_checked_at": 1483658977219
+    }
+    */
     return usrConfig_.set("application", object);
 }
 
@@ -62,6 +67,16 @@ QJsonObject ConfigHandler::getUsrConfigInstalledItems() const
 bool ConfigHandler::setUsrConfigInstalledItems(const QJsonObject &object) const
 {
     return usrConfig_.set("installed_items", object);
+}
+
+QJsonObject ConfigHandler::getUsrConfigUpdateAvailable() const
+{
+    return usrConfig_.get("update_available");
+}
+
+bool ConfigHandler::setUsrConfigUpdateAvailable(const QJsonObject &object) const
+{
+    return usrConfig_.set("update_available", object);
 }
 
 bool ConfigHandler::setUsrConfigProvidersProvider(const QString &providerKey, const QJsonObject &object) const
@@ -160,6 +175,28 @@ bool ConfigHandler::removeUsrConfigInstalledItemsItem(const QString &itemKey) co
     auto installedItems = getUsrConfigInstalledItems();
     installedItems.remove(itemKey);
     return setUsrConfigInstalledItems(installedItems);
+}
+
+bool ConfigHandler::setUsrConfigUpdateAvailableFile(const QString &fileKey, const QJsonObject &object) const
+{
+    /* object format
+    {
+        "path": "/home/user/.local/bin/example.AppImage",
+        "filename": "example.AppImage",
+        "installed_item": "http://example.com/downloads/example.AppImage",
+        "update_method": "appimageupdate"
+    }
+    */
+    auto updateAvailable = getUsrConfigUpdateAvailable();
+    updateAvailable[fileKey] = object;
+    return setUsrConfigUpdateAvailable(updateAvailable);
+}
+
+bool ConfigHandler::removeUsrConfigUpdateAvailableFile(const QString &fileKey) const
+{
+    auto updateAvailable = getUsrConfigUpdateAvailable();
+    updateAvailable.remove(fileKey);
+    return setUsrConfigUpdateAvailable(updateAvailable);
 }
 
 void ConfigHandler::importAppConfigApplication()
