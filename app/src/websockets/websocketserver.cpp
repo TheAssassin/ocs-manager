@@ -370,11 +370,7 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
         resultData.append(desktopThemeHandler_->isApplicableType(data.at(0).toString()));
     }
     else if (func == "DesktopThemeHandler::applyTheme") {
-#ifdef QTLIB_UNIX
         resultData.append(desktopThemeHandler_->applyTheme(data.at(0).toString(), data.at(1).toString()));
-#else
-        resultData.append(false);
-#endif
     }
     // Not supported
     else {

@@ -12,8 +12,5 @@ public:
 public slots:
     QString desktopEnvironment() const;
     bool isApplicableType(const QString &installType) const;
-
-#ifdef QTLIB_UNIX
     bool applyTheme(const QString &path, const QString &installType) const;
-#endif
 };
