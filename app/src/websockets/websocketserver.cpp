@@ -202,13 +202,13 @@ void WebSocketServer::itemUninstallFinished(QJsonObject result)
 void WebSocketServer::updateCheckAllStarted()
 {
     QJsonArray data;
-    sendMessage("", "ItemHandler::checkAllStarted", data);
+    sendMessage("", "UpdateHandler::checkAllStarted", data);
 }
 
 void WebSocketServer::updateCheckAllFinished()
 {
     QJsonArray data;
-    sendMessage("", "ItemHandler::checkAllFinished", data);
+    sendMessage("", "UpdateHandler::checkAllFinished", data);
 }
 
 void WebSocketServer::updateUpdateStarted(QString fileKey)

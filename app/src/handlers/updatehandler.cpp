@@ -5,11 +5,10 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QDateTime>
+#include <QThread>
+#include <QDebug>
 
 #ifdef QTLIB_UNIX
-#include <thread>
-#include <chrono>
-
 #include "appimage/update.h"
 #endif
 
@@ -28,11 +27,13 @@ void UpdateHandler::checkAll()
     auto application = configHandler_->getUsrConfigApplication();
     auto installedItems = configHandler_->getUsrConfigInstalledItems();
 
-    if (installedItems.isEmpty()
-            || (application.contains("update_checked_at")
-                && application["update_checked_at"].toInt() + (1000 * 60 * 60 * 24) > QDateTime::currentMSecsSinceEpoch())) {
-        emit checkAllFinished();
-        return;
+    if (installedItems.isEmpty() || application.contains("update_checked_at")) {
+        auto currentDate = QDateTime::currentDateTime();
+        auto checkedDate = QDateTime::fromMSecsSinceEpoch(application["update_checked_at"].toInt());
+        if (currentDate.daysTo(checkedDate.addDays(1)) <= 0) {
+            emit checkAllFinished();
+            return;
+        }
     }
 
     // Clear data
@@ -83,12 +84,14 @@ void UpdateHandler::checkAll()
 void UpdateHandler::update(const QString &fileKey)
 {
     if (configHandler_->getUsrConfigUpdateAvailable().contains(fileKey)) {
-        auto updateAvailableFile = configHandler_->getUsrConfigUpdateAvailable()[fileKey].toObject();
+        auto updateMethod = configHandler_->getUsrConfigUpdateAvailable()[fileKey].toObject()["update_method"].toString();
 
 #ifdef QTLIB_UNIX
-        if (updateAvailableFile["update_method"].toString() == "appimageupdate") {
+        if (updateMethod == "appimageupdate") {
             updateAppImage(fileKey);
         }
+        //else if (updateMethod == "appimageupdatewithocsapi") {
+        //}
 #endif
     }
 }
@@ -127,7 +130,7 @@ void UpdateHandler::updateAppImage(const QString &fileKey)
     auto updateInformation = describeAppImage(path);
     for (const auto &info : updateInformation.split("\n")) {
         if (info.endsWith(".zsync", Qt::CaseInsensitive)) {
-            newFilename = info.replace(".zsync", "", Qt::CaseInsensitive).split("/").last();
+            newFilename = info.split("|").last().split("/").last().replace(".zsync", "", Qt::CaseInsensitive);
             break;
         }
     }
@@ -137,7 +140,7 @@ void UpdateHandler::updateAppImage(const QString &fileKey)
         emit updateStarted(fileKey);
 
         while (!appImageUpdater.isDone()) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            QThread::msleep(100);
             double progress;
             if (appImageUpdater.progress(progress)) {
                 emit updateProgress(fileKey, progress * 100);
@@ -162,6 +165,12 @@ void UpdateHandler::updateAppImage(const QString &fileKey)
             }
 
             configHandler_->removeUsrConfigUpdateAvailableFile(fileKey);
+        }
+        else {
+            std::string nextMessage;
+            while (appImageUpdater.nextStatusMessage(nextMessage)) {
+                qWarning() << QString::fromStdString(nextMessage);
+            }
         }
 
         emit updateFinished(fileKey);
