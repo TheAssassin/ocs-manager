@@ -14,19 +14,19 @@ public:
 signals:
     void checkAllStarted();
     void checkAllFinished();
-    void updateStarted(QString fileKey);
-    void updateFinished(QString fileKey);
-    void updateProgress(QString fileKey, int progress);
+    void updateStarted(QString itemKey);
+    void updateFinished(QString itemKey);
+    void updateProgress(QString itemKey, int progress);
 
 public slots:
     void checkAll();
-    void update(const QString &fileKey);
+    void update(const QString &itemKey);
 
 private:
 #ifdef QTLIB_UNIX
     QString describeAppImage(const QString &path) const;
     bool checkAppImage(const QString &path) const;
-    void updateAppImage(const QString &fileKey);
+    void updateAppImage(const QString &itemKey);
 #endif
 
     ConfigHandler *configHandler_;

@@ -24,76 +24,67 @@ void UpdateHandler::checkAll()
 {
     emit checkAllStarted();
 
-    auto application = configHandler_->getUsrConfigApplication();
+    QJsonObject updateAvailableItems;
+    configHandler_->setUsrConfigUpdateAvailableItems(updateAvailableItems); // Resets data
+
     auto installedItems = configHandler_->getUsrConfigInstalledItems();
 
-    if (installedItems.isEmpty() || application.contains("update_checked_at")) {
-        auto currentDate = QDateTime::currentDateTime();
-        auto checkedDate = QDateTime::fromMSecsSinceEpoch(application["update_checked_at"].toInt());
-        if (currentDate.daysTo(checkedDate.addDays(1)) <= 0) {
-            emit checkAllFinished();
-            return;
-        }
+    if (installedItems.isEmpty()) {
+        emit checkAllFinished();
+        return;
     }
-
-    // Clear data
-    QJsonObject updateAvailable;
-    configHandler_->setUsrConfigUpdateAvailable(updateAvailable);
 
     for (const auto &itemKey : installedItems.keys()) {
         auto installedItem = installedItems[itemKey].toObject();
+        auto filename = installedItem["filename"].toString();
         auto installType = installedItem["install_type"].toString();
 
-        QString destDir = "";
+        qtlib::File file;
 #ifdef QTLIB_UNIX
-        destDir = configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString();
+        file.setPath(configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString() + "/" + filename);
 #else
-        destDir = configHandler_->getAppConfigInstallTypes()[installType].toObject()["generic_destination"].toString();
+        file.setPath(configHandler_->getAppConfigInstallTypes()[installType].toObject()["generic_destination"].toString() + "/" + filename);
 #endif
+
+        QJsonObject updateAvailableItem;
 
         if (installType == "bin") {
-            for (const auto &filenameValue : installedItem["files"].toArray()) {
-                auto filename = filenameValue.toString();
-                QString path = destDir + "/" + filename;
-                // Use file path as unique key for entry in update_available data
-                auto fileKey = path;
-                QJsonObject updateAvailableFile;
-
 #ifdef QTLIB_UNIX
-                if (filename.endsWith(".appimage", Qt::CaseInsensitive)) {
-                    if (checkAppImage(path)) {
-                        updateAvailableFile["path"] = path;
-                        updateAvailableFile["filename"] = filename;
-                        updateAvailableFile["installed_item"] = itemKey;
-                        updateAvailableFile["update_method"] = QString("appimageupdate");
-                        configHandler_->setUsrConfigUpdateAvailableFile(fileKey, updateAvailableFile);
-                    }
-                    //else if (checkAppImageWithOcsApi(itemKey, filename)) {}
+            if (file.path().endsWith(".appimage", Qt::CaseInsensitive)) {
+                if (checkAppImage(file.path())) {
+                    updateAvailableItem["installed_item"] = itemKey;
+                    updateAvailableItem["update_method"] = QString("appimageupdate");
+                    configHandler_->setUsrConfigUpdateAvailableItemsItem(itemKey, updateAvailableItem);
                 }
-#endif
+                //else if (checkAppImageWithOcsApi(itemKey)) {}
             }
+#endif
         }
     }
 
+    auto application = configHandler_->getUsrConfigApplication();
     application["update_checked_at"] = QDateTime::currentMSecsSinceEpoch();
     configHandler_->setUsrConfigApplication(application);
 
     emit checkAllFinished();
 }
 
-void UpdateHandler::update(const QString &fileKey)
+void UpdateHandler::update(const QString &itemKey)
 {
-    if (configHandler_->getUsrConfigUpdateAvailable().contains(fileKey)) {
-        auto updateMethod = configHandler_->getUsrConfigUpdateAvailable()[fileKey].toObject()["update_method"].toString();
+    auto updateAvailableItems = configHandler_->getUsrConfigUpdateAvailableItems();
+
+    if (!updateAvailableItems.contains(itemKey)) {
+        return;
+    }
+
+    auto updateMethod = updateAvailableItems[itemKey].toObject()["update_method"].toString();
 
 #ifdef QTLIB_UNIX
-        if (updateMethod == "appimageupdate") {
-            updateAppImage(fileKey);
-        }
-        //else if (updateMethod == "appimageupdatewithocsapi") {
-        //}
-#endif
+    if (updateMethod == "appimageupdate") {
+        updateAppImage(itemKey);
     }
+    //else if (updateMethod == "appimageupdatewithocsapi") {}
+#endif
 }
 
 #ifdef QTLIB_UNIX
@@ -118,16 +109,25 @@ bool UpdateHandler::checkAppImage(const QString &path) const
     return false;
 }
 
-void UpdateHandler::updateAppImage(const QString &fileKey)
+void UpdateHandler::updateAppImage(const QString &itemKey)
 {
-    auto updateAvailableFile = configHandler_->getUsrConfigUpdateAvailable()[fileKey].toObject();
+    auto installedItems = configHandler_->getUsrConfigInstalledItems();
+    auto updateAvailableItem = configHandler_->getUsrConfigUpdateAvailableItems()[itemKey].toObject();
+    auto installedItemKey = updateAvailableItem["installed_item"].toString();
 
-    auto path = updateAvailableFile["path"].toString();
-    auto filename = updateAvailableFile["filename"].toString();
-    auto itemKey = updateAvailableFile["installed_item"].toString();
+    if (!installedItems.contains(installedItemKey)) {
+        return;
+    }
+
+    auto installedItem = installedItems[installedItemKey].toObject();
+
+    auto filename = installedItem["filename"].toString();
+    auto installType = installedItem["install_type"].toString();
+
+    qtlib::File file(configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString() + "/" + filename);
 
     auto newFilename = filename;
-    auto updateInformation = describeAppImage(path);
+    auto updateInformation = describeAppImage(file.path());
     for (const auto &info : updateInformation.split("\n")) {
         if (info.endsWith(".zsync", Qt::CaseInsensitive)) {
             newFilename = info.split("|").last().split("/").last().replace(".zsync", "", Qt::CaseInsensitive);
@@ -135,48 +135,45 @@ void UpdateHandler::updateAppImage(const QString &fileKey)
         }
     }
 
-    appimage::update::Updater appImageUpdater(path.toStdString(), false);
-    if (appImageUpdater.start()) {
-        emit updateStarted(fileKey);
-
-        while (!appImageUpdater.isDone()) {
-            QThread::msleep(100);
-            double progress;
-            if (appImageUpdater.progress(progress)) {
-                emit updateProgress(fileKey, progress * 100);
-            }
-        }
-
-        if (appImageUpdater.hasError()) {
-            std::string nextMessage;
-            while (appImageUpdater.nextStatusMessage(nextMessage)) {
-                qWarning() << QString::fromStdString(nextMessage);
-            }
-
-            emit updateFinished(fileKey);
-            return;
-        }
-
-        configHandler_->removeUsrConfigUpdateAvailableFile(fileKey);
-
-        if (newFilename != filename) {
-            auto installedItem = configHandler_->getUsrConfigInstalledItems()[itemKey].toObject();
-            QJsonArray files;
-            for (const auto &file : installedItem["files"].toArray()) {
-                if (file.toString() == filename) {
-                    files.append(QJsonValue(newFilename));
-                }
-                else {
-                    files.append(file);
-                }
-            }
-            installedItem["files"] = files;
-            installedItem["installed_at"] = QDateTime::currentMSecsSinceEpoch();
-            configHandler_->setUsrConfigInstalledItemsItem(itemKey, installedItem);
-            qtlib::File(path).remove();
-        }
-
-        emit updateFinished(fileKey);
+    appimage::update::Updater appImageUpdater(file.path().toStdString(), false);
+    if (!appImageUpdater.start()) {
+        return;
     }
+
+    emit updateStarted(itemKey);
+
+    while (!appImageUpdater.isDone()) {
+        QThread::msleep(100);
+        double progress;
+        if (appImageUpdater.progress(progress)) {
+            emit updateProgress(itemKey, progress * 100);
+        }
+    }
+
+    if (appImageUpdater.hasError()) {
+        std::string nextMessage;
+        while (appImageUpdater.nextStatusMessage(nextMessage)) {
+            qWarning() << QString::fromStdString(nextMessage);
+        }
+
+        emit updateFinished(itemKey);
+        return;
+    }
+
+    installedItem["filename"] = newFilename;
+    QJsonArray files;
+    files.append(QJsonValue(newFilename));
+    installedItem["files"] = files;
+    installedItem["installed_at"] = QDateTime::currentMSecsSinceEpoch();
+
+    configHandler_->setUsrConfigInstalledItemsItem(installedItemKey, installedItem);
+
+    if (newFilename != filename) {
+        file.remove();
+    }
+
+    configHandler_->removeUsrConfigUpdateAvailableItemsItem(itemKey);
+
+    emit updateFinished(itemKey);
 }
 #endif

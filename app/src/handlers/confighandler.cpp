@@ -69,14 +69,14 @@ bool ConfigHandler::setUsrConfigInstalledItems(const QJsonObject &object) const
     return usrConfig_.set("installed_items", object);
 }
 
-QJsonObject ConfigHandler::getUsrConfigUpdateAvailable() const
+QJsonObject ConfigHandler::getUsrConfigUpdateAvailableItems() const
 {
-    return usrConfig_.get("update_available");
+    return usrConfig_.get("update_available_items");
 }
 
-bool ConfigHandler::setUsrConfigUpdateAvailable(const QJsonObject &object) const
+bool ConfigHandler::setUsrConfigUpdateAvailableItems(const QJsonObject &object) const
 {
-    return usrConfig_.set("update_available", object);
+    return usrConfig_.set("update_available_items", object);
 }
 
 bool ConfigHandler::setUsrConfigProvidersProvider(const QString &providerKey, const QJsonObject &object) const
@@ -177,26 +177,24 @@ bool ConfigHandler::removeUsrConfigInstalledItemsItem(const QString &itemKey) co
     return setUsrConfigInstalledItems(installedItems);
 }
 
-bool ConfigHandler::setUsrConfigUpdateAvailableFile(const QString &fileKey, const QJsonObject &object) const
+bool ConfigHandler::setUsrConfigUpdateAvailableItemsItem(const QString &itemKey, const QJsonObject &object) const
 {
     /* object format
     {
-        "path": "/home/user/.local/bin/example.AppImage",
-        "filename": "example.AppImage",
         "installed_item": "http://example.com/downloads/example.AppImage",
         "update_method": "appimageupdate"
     }
     */
-    auto updateAvailable = getUsrConfigUpdateAvailable();
-    updateAvailable[fileKey] = object;
-    return setUsrConfigUpdateAvailable(updateAvailable);
+    auto updateAvailableItems = getUsrConfigUpdateAvailableItems();
+    updateAvailableItems[itemKey] = object;
+    return setUsrConfigUpdateAvailableItems(updateAvailableItems);
 }
 
-bool ConfigHandler::removeUsrConfigUpdateAvailableFile(const QString &fileKey) const
+bool ConfigHandler::removeUsrConfigUpdateAvailableItemsItem(const QString &itemKey) const
 {
-    auto updateAvailable = getUsrConfigUpdateAvailable();
-    updateAvailable.remove(fileKey);
-    return setUsrConfigUpdateAvailable(updateAvailable);
+    auto updateAvailableItems = getUsrConfigUpdateAvailableItems();
+    updateAvailableItems.remove(itemKey);
+    return setUsrConfigUpdateAvailableItems(updateAvailableItems);
 }
 
 void ConfigHandler::importAppConfigApplication()

@@ -24,8 +24,8 @@ public slots:
     bool setUsrConfigCategories(const QJsonObject &object) const;
     QJsonObject getUsrConfigInstalledItems() const;
     bool setUsrConfigInstalledItems(const QJsonObject &object) const;
-    QJsonObject getUsrConfigUpdateAvailable() const;
-    bool setUsrConfigUpdateAvailable(const QJsonObject &object) const;
+    QJsonObject getUsrConfigUpdateAvailableItems() const;
+    bool setUsrConfigUpdateAvailableItems(const QJsonObject &object) const;
 
     bool setUsrConfigProvidersProvider(const QString &providerKey, const QJsonObject &object) const;
     bool removeUsrConfigProvidersProvider(const QString &providerKey) const;
@@ -34,8 +34,8 @@ public slots:
     bool setUsrConfigCategoriesInstallType(const QString &providerKey, const QString &categoryKey, const QString &installType) const;
     bool setUsrConfigInstalledItemsItem(const QString &itemKey, const QJsonObject &object) const;
     bool removeUsrConfigInstalledItemsItem(const QString &itemKey) const;
-    bool setUsrConfigUpdateAvailableFile(const QString &fileKey, const QJsonObject &object) const;
-    bool removeUsrConfigUpdateAvailableFile(const QString &fileKey) const;
+    bool setUsrConfigUpdateAvailableItemsItem(const QString &itemKey, const QJsonObject &object) const;
+    bool removeUsrConfigUpdateAvailableItemsItem(const QString &itemKey) const;
 
 private:
     void importAppConfigApplication();

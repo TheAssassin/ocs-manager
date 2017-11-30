@@ -53,9 +53,9 @@ private slots:
 
     void updateCheckAllStarted();
     void updateCheckAllFinished();
-    void updateUpdateStarted(QString fileKey);
-    void updateUpdateFinished(QString fileKey);
-    void updateUpdateProgress(QString fileKey, int progress);
+    void updateUpdateStarted(QString itemKey);
+    void updateUpdateFinished(QString itemKey);
+    void updateUpdateProgress(QString itemKey, int progress);
 
 private:
     void receiveMessage(const QString &id, const QString &func, const QJsonArray &data);

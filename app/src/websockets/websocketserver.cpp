@@ -211,24 +211,24 @@ void WebSocketServer::updateCheckAllFinished()
     sendMessage("", "UpdateHandler::checkAllFinished", data);
 }
 
-void WebSocketServer::updateUpdateStarted(QString fileKey)
+void WebSocketServer::updateUpdateStarted(QString itemKey)
 {
     QJsonArray data;
-    data.append(fileKey);
+    data.append(itemKey);
     sendMessage("", "UpdateHandler::updateStarted", data);
 }
 
-void WebSocketServer::updateUpdateFinished(QString fileKey)
+void WebSocketServer::updateUpdateFinished(QString itemKey)
 {
     QJsonArray data;
-    data.append(fileKey);
+    data.append(itemKey);
     sendMessage("", "UpdateHandler::updateFinished", data);
 }
 
-void WebSocketServer::updateUpdateProgress(QString fileKey, int progress)
+void WebSocketServer::updateUpdateProgress(QString itemKey, int progress)
 {
     QJsonArray data;
-    data.append(fileKey);
+    data.append(itemKey);
     data.append(progress);
     sendMessage("", "UpdateHandler::updateProgress", data);
 }
@@ -289,11 +289,11 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     else if (func == "ConfigHandler::setUsrConfigInstalledItems") {
         resultData.append(configHandler_->setUsrConfigInstalledItems(data.at(0).toObject()));
     }
-    else if (func == "ConfigHandler::getUsrConfigUpdateAvailable") {
-        resultData.append(configHandler_->getUsrConfigUpdateAvailable());
+    else if (func == "ConfigHandler::getUsrConfigUpdateAvailableItems") {
+        resultData.append(configHandler_->getUsrConfigUpdateAvailableItems());
     }
-    else if (func == "ConfigHandler::setUsrConfigUpdateAvailable") {
-        resultData.append(configHandler_->setUsrConfigUpdateAvailable(data.at(0).toObject()));
+    else if (func == "ConfigHandler::setUsrConfigUpdateAvailableItems") {
+        resultData.append(configHandler_->setUsrConfigUpdateAvailableItems(data.at(0).toObject()));
     }
     else if (func == "ConfigHandler::setUsrConfigProvidersProvider") {
         resultData.append(configHandler_->setUsrConfigProvidersProvider(data.at(0).toString(), data.at(1).toObject()));
@@ -316,11 +316,11 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     else if (func == "ConfigHandler::removeUsrConfigInstalledItemsItem") {
         resultData.append(configHandler_->removeUsrConfigInstalledItemsItem(data.at(0).toString()));
     }
-    else if (func == "ConfigHandler::setUsrConfigUpdateAvailableFile") {
-        resultData.append(configHandler_->setUsrConfigUpdateAvailableFile(data.at(0).toString(), data.at(1).toObject()));
+    else if (func == "ConfigHandler::setUsrConfigUpdateAvailableItemsItem") {
+        resultData.append(configHandler_->setUsrConfigUpdateAvailableItemsItem(data.at(0).toString(), data.at(1).toObject()));
     }
-    else if (func == "ConfigHandler::removeUsrConfigUpdateAvailableFile") {
-        resultData.append(configHandler_->removeUsrConfigUpdateAvailableFile(data.at(0).toString()));
+    else if (func == "ConfigHandler::removeUsrConfigUpdateAvailableItemsItem") {
+        resultData.append(configHandler_->removeUsrConfigUpdateAvailableItemsItem(data.at(0).toString()));
     }
     // SystemHandler
     else if (func == "SystemHandler::isUnix") {
