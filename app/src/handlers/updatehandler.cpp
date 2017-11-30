@@ -160,6 +160,7 @@ void UpdateHandler::updateAppImage(const QString &fileKey)
                     }
                 }
                 installedItem["files"] = files;
+                installedItem["installed_at"] = QDateTime::currentMSecsSinceEpoch();
                 configHandler_->setUsrConfigInstalledItemsItem(itemKey, installedItem);
                 qtlib::File(path).remove();
             }
