@@ -147,31 +147,33 @@ void UpdateHandler::updateAppImage(const QString &fileKey)
             }
         }
 
-        if (!appImageUpdater.hasError()) {
-            if (newFilename != filename) {
-                auto installedItem = configHandler_->getUsrConfigInstalledItems()[itemKey].toObject();
-                QJsonArray files;
-                for (const auto &file : installedItem["files"].toArray()) {
-                    if (file.toString() == filename) {
-                        files.append(QJsonValue(newFilename));
-                    }
-                    else {
-                        files.append(file);
-                    }
-                }
-                installedItem["files"] = files;
-                installedItem["installed_at"] = QDateTime::currentMSecsSinceEpoch();
-                configHandler_->setUsrConfigInstalledItemsItem(itemKey, installedItem);
-                qtlib::File(path).remove();
-            }
-
-            configHandler_->removeUsrConfigUpdateAvailableFile(fileKey);
-        }
-        else {
+        if (appImageUpdater.hasError()) {
             std::string nextMessage;
             while (appImageUpdater.nextStatusMessage(nextMessage)) {
                 qWarning() << QString::fromStdString(nextMessage);
             }
+
+            emit updateFinished(fileKey);
+            return;
+        }
+
+        configHandler_->removeUsrConfigUpdateAvailableFile(fileKey);
+
+        if (newFilename != filename) {
+            auto installedItem = configHandler_->getUsrConfigInstalledItems()[itemKey].toObject();
+            QJsonArray files;
+            for (const auto &file : installedItem["files"].toArray()) {
+                if (file.toString() == filename) {
+                    files.append(QJsonValue(newFilename));
+                }
+                else {
+                    files.append(file);
+                }
+            }
+            installedItem["files"] = files;
+            installedItem["installed_at"] = QDateTime::currentMSecsSinceEpoch();
+            configHandler_->setUsrConfigInstalledItemsItem(itemKey, installedItem);
+            qtlib::File(path).remove();
         }
 
         emit updateFinished(fileKey);
