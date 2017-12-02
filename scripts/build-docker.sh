@@ -36,10 +36,12 @@ build_flatpak() {
 build_appimage() {
     # docker-image: ubuntu:17.10
     apt update -qq
+    apt -y install curl git
+
     apt -y install build-essential qt5-default libqt5websockets5-dev
+    apt -y install cmake libssl-dev libcurl4-gnutls-dev libxpm-dev
+
     apt -y install libssl1.0.0 zlib1g
-    apt -y install git
-    apt -y install curl
 
     useradd -m ${PKGUSER}
     export HOME="/home/${PKGUSER}"

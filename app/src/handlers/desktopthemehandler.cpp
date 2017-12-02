@@ -96,9 +96,9 @@ bool DesktopThemeHandler::isApplicableType(const QString &installType) const
     return applicableTypes.contains(installType);
 }
 
-#ifdef QTLIB_UNIX
 bool DesktopThemeHandler::applyTheme(const QString &path, const QString &installType) const
 {
+#ifdef QTLIB_UNIX
     if (QFileInfo::exists(path) && isApplicableType(installType)) {
         auto desktop = desktopEnvironment();
 
@@ -196,7 +196,7 @@ bool DesktopThemeHandler::applyTheme(const QString &path, const QString &install
             }
         }
     }
+#endif
 
     return false;
 }
-#endif

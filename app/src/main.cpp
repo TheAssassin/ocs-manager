@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     QObject::connect(wsServer, &WebSocketServer::stopped, &app, &QGuiApplication::quit);
 
     if (wsServer->start()) {
-        qDebug() << "Websocket server started at:" << wsServer->serverUrl().toString();
+        qInfo() << "Websocket server started at:" << wsServer->serverUrl().toString();
     }
     else {
         qCritical() << "Failed to start websocket server:" << wsServer->errorString();
