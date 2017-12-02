@@ -24,8 +24,9 @@ void UpdateHandler::checkAll()
 {
     emit checkAllStarted();
 
+    // Resets data
     QJsonObject updateAvailableItems;
-    configHandler_->setUsrConfigUpdateAvailableItems(updateAvailableItems); // Resets data
+    configHandler_->setUsrConfigUpdateAvailableItems(updateAvailableItems);
 
     auto installedItems = configHandler_->getUsrConfigInstalledItems();
 
@@ -46,19 +47,27 @@ void UpdateHandler::checkAll()
         file.setPath(configHandler_->getAppConfigInstallTypes()[installType].toObject()["generic_destination"].toString() + "/" + filename);
 #endif
 
-        QJsonObject updateAvailableItem;
+        QString updateMethod = "";
 
         if (installType == "bin") {
 #ifdef QTLIB_UNIX
             if (file.path().endsWith(".appimage", Qt::CaseInsensitive)) {
                 if (checkAppImage(file.path())) {
-                    updateAvailableItem["installed_item"] = itemKey;
-                    updateAvailableItem["update_method"] = QString("appimageupdate");
-                    configHandler_->setUsrConfigUpdateAvailableItemsItem(itemKey, updateAvailableItem);
+                    updateMethod = "appimageupdate";
                 }
-                //else if (checkAppImageWithOcsApi(itemKey)) {}
+                //else if (checkAppImageWithOcsApi(itemKey)) {
+                //    updateMethod = "appimageupdatewithocsapi";
+                //}
             }
 #endif
+        }
+
+        if (!updateMethod.isEmpty()) {
+            QJsonObject updateAvailableItem;
+            updateAvailableItem["installed_item"] = itemKey;
+            updateAvailableItem["update_method"] = updateMethod;
+            // Use installed item's key as unique key to the update available item
+            configHandler_->setUsrConfigUpdateAvailableItemsItem(itemKey, updateAvailableItem);
         }
     }
 
@@ -83,7 +92,9 @@ void UpdateHandler::update(const QString &itemKey)
     if (updateMethod == "appimageupdate") {
         updateAppImage(itemKey);
     }
-    //else if (updateMethod == "appimageupdatewithocsapi") {}
+    //else if (updateMethod == "appimageupdatewithocsapi") {
+    //    updateAppImageWithOcsApi(itemKey);
+    //}
 #endif
 }
 
@@ -111,16 +122,15 @@ bool UpdateHandler::checkAppImage(const QString &path) const
 
 void UpdateHandler::updateAppImage(const QString &itemKey)
 {
-    auto installedItems = configHandler_->getUsrConfigInstalledItems();
     auto updateAvailableItem = configHandler_->getUsrConfigUpdateAvailableItems()[itemKey].toObject();
     auto installedItemKey = updateAvailableItem["installed_item"].toString();
+    auto installedItems = configHandler_->getUsrConfigInstalledItems();
 
     if (!installedItems.contains(installedItemKey)) {
         return;
     }
 
     auto installedItem = installedItems[installedItemKey].toObject();
-
     auto filename = installedItem["filename"].toString();
     auto installType = installedItem["install_type"].toString();
 
@@ -136,6 +146,7 @@ void UpdateHandler::updateAppImage(const QString &itemKey)
     }
 
     appimage::update::Updater appImageUpdater(file.path().toStdString(), false);
+
     if (!appImageUpdater.start()) {
         return;
     }
