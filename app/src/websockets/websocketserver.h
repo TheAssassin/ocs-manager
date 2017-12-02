@@ -10,9 +10,10 @@ class QWebSocket;
 
 class ConfigHandler;
 class SystemHandler;
-class DesktopThemeHandler;
 class OcsApiHandler;
 class ItemHandler;
+class UpdateHandler;
+class DesktopThemeHandler;
 
 class WebSocketServer : public QObject
 {
@@ -50,15 +51,22 @@ private slots:
     void itemUninstallStarted(QJsonObject result);
     void itemUninstallFinished(QJsonObject result);
 
+    void updateCheckAllStarted();
+    void updateCheckAllFinished();
+    void updateUpdateStarted(QString itemKey);
+    void updateUpdateFinished(QString itemKey);
+    void updateUpdateProgress(QString itemKey, int progress);
+
 private:
     void receiveMessage(const QString &id, const QString &func, const QJsonArray &data);
     void sendMessage(const QString &id, const QString &func, const QJsonArray &data);
 
     ConfigHandler *configHandler_;
     SystemHandler *systemHandler_;
-    DesktopThemeHandler *desktopThemeHandler_;
     OcsApiHandler *ocsApiHandler_;
     ItemHandler *itemHandler_;
+    UpdateHandler *updateHandler_;
+    DesktopThemeHandler *desktopThemeHandler_;
 
     QString serverName_;
     quint16 serverPort_;

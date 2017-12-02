@@ -8,9 +8,10 @@
 
 #include "handlers/confighandler.h"
 #include "handlers/systemhandler.h"
-#include "handlers/desktopthemehandler.h"
 #include "handlers/ocsapihandler.h"
 #include "handlers/itemhandler.h"
+#include "handlers/updatehandler.h"
+#include "handlers/desktopthemehandler.h"
 
 WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &serverName, quint16 serverPort, QObject *parent)
     : QObject(parent), configHandler_(configHandler), serverName_(serverName), serverPort_(serverPort)
@@ -22,9 +23,10 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
 
     configHandler_->setParent(this);
     systemHandler_ = new SystemHandler(this);
-    desktopThemeHandler_ = new DesktopThemeHandler(this);
     ocsApiHandler_ = new OcsApiHandler(configHandler_, this);
     itemHandler_ = new ItemHandler(configHandler_, this);
+    updateHandler_ = new UpdateHandler(configHandler_, this);
+    desktopThemeHandler_ = new DesktopThemeHandler(this);
 
     connect(itemHandler_, &ItemHandler::metadataSetChanged, this, &WebSocketServer::itemMetadataSetChanged);
     connect(itemHandler_, &ItemHandler::downloadStarted, this, &WebSocketServer::itemDownloadStarted);
@@ -36,6 +38,12 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
     connect(itemHandler_, &ItemHandler::installFinished, this, &WebSocketServer::itemInstallFinished);
     connect(itemHandler_, &ItemHandler::uninstallStarted, this, &WebSocketServer::itemUninstallStarted);
     connect(itemHandler_, &ItemHandler::uninstallFinished, this, &WebSocketServer::itemUninstallFinished);
+
+    connect(updateHandler_, &UpdateHandler::checkAllStarted, this, &WebSocketServer::updateCheckAllStarted);
+    connect(updateHandler_, &UpdateHandler::checkAllFinished, this, &WebSocketServer::updateCheckAllFinished);
+    connect(updateHandler_, &UpdateHandler::updateStarted, this, &WebSocketServer::updateUpdateStarted);
+    connect(updateHandler_, &UpdateHandler::updateFinished, this, &WebSocketServer::updateUpdateFinished);
+    connect(updateHandler_, &UpdateHandler::updateProgress, this, &WebSocketServer::updateUpdateProgress);
 }
 
 WebSocketServer::~WebSocketServer()
@@ -191,6 +199,40 @@ void WebSocketServer::itemUninstallFinished(QJsonObject result)
     sendMessage("", "ItemHandler::uninstallFinished", data);
 }
 
+void WebSocketServer::updateCheckAllStarted()
+{
+    QJsonArray data;
+    sendMessage("", "UpdateHandler::checkAllStarted", data);
+}
+
+void WebSocketServer::updateCheckAllFinished()
+{
+    QJsonArray data;
+    sendMessage("", "UpdateHandler::checkAllFinished", data);
+}
+
+void WebSocketServer::updateUpdateStarted(QString itemKey)
+{
+    QJsonArray data;
+    data.append(itemKey);
+    sendMessage("", "UpdateHandler::updateStarted", data);
+}
+
+void WebSocketServer::updateUpdateFinished(QString itemKey)
+{
+    QJsonArray data;
+    data.append(itemKey);
+    sendMessage("", "UpdateHandler::updateFinished", data);
+}
+
+void WebSocketServer::updateUpdateProgress(QString itemKey, int progress)
+{
+    QJsonArray data;
+    data.append(itemKey);
+    data.append(progress);
+    sendMessage("", "UpdateHandler::updateProgress", data);
+}
+
 void WebSocketServer::receiveMessage(const QString &id, const QString &func, const QJsonArray &data)
 {
     /* message object format
@@ -247,6 +289,12 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     else if (func == "ConfigHandler::setUsrConfigInstalledItems") {
         resultData.append(configHandler_->setUsrConfigInstalledItems(data.at(0).toObject()));
     }
+    else if (func == "ConfigHandler::getUsrConfigUpdateAvailableItems") {
+        resultData.append(configHandler_->getUsrConfigUpdateAvailableItems());
+    }
+    else if (func == "ConfigHandler::setUsrConfigUpdateAvailableItems") {
+        resultData.append(configHandler_->setUsrConfigUpdateAvailableItems(data.at(0).toObject()));
+    }
     else if (func == "ConfigHandler::setUsrConfigProvidersProvider") {
         resultData.append(configHandler_->setUsrConfigProvidersProvider(data.at(0).toString(), data.at(1).toObject()));
     }
@@ -268,6 +316,12 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     else if (func == "ConfigHandler::removeUsrConfigInstalledItemsItem") {
         resultData.append(configHandler_->removeUsrConfigInstalledItemsItem(data.at(0).toString()));
     }
+    else if (func == "ConfigHandler::setUsrConfigUpdateAvailableItemsItem") {
+        resultData.append(configHandler_->setUsrConfigUpdateAvailableItemsItem(data.at(0).toString(), data.at(1).toObject()));
+    }
+    else if (func == "ConfigHandler::removeUsrConfigUpdateAvailableItemsItem") {
+        resultData.append(configHandler_->removeUsrConfigUpdateAvailableItemsItem(data.at(0).toString()));
+    }
     // SystemHandler
     else if (func == "SystemHandler::isUnix") {
         resultData.append(systemHandler_->isUnix());
@@ -277,20 +331,6 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     }
     else if (func == "SystemHandler::openUrl") {
         resultData.append(systemHandler_->openUrl(data.at(0).toString()));
-    }
-    // DesktopThemeHandler
-    else if (func == "DesktopThemeHandler::desktopEnvironment") {
-        resultData.append(desktopThemeHandler_->desktopEnvironment());
-    }
-    else if (func == "DesktopThemeHandler::isApplicableType") {
-        resultData.append(desktopThemeHandler_->isApplicableType(data.at(0).toString()));
-    }
-    else if (func == "DesktopThemeHandler::applyTheme") {
-#ifdef QTLIB_UNIX
-        resultData.append(desktopThemeHandler_->applyTheme(data.at(0).toString(), data.at(1).toString()));
-#else
-        resultData.append(false);
-#endif
     }
     // OcsApiHandler
     else if (func == "OcsApiHandler::addProviders") {
@@ -326,6 +366,23 @@ void WebSocketServer::receiveMessage(const QString &id, const QString &func, con
     }
     else if (func == "ItemHandler::uninstall") {
         itemHandler_->uninstall(data.at(0).toString());
+    }
+    // UpdateHandler
+    else if (func == "UpdateHandler::checkAll") {
+        updateHandler_->checkAll();
+    }
+    else if (func == "UpdateHandler::update") {
+        updateHandler_->update(data.at(0).toString());
+    }
+    // DesktopThemeHandler
+    else if (func == "DesktopThemeHandler::desktopEnvironment") {
+        resultData.append(desktopThemeHandler_->desktopEnvironment());
+    }
+    else if (func == "DesktopThemeHandler::isApplicableType") {
+        resultData.append(desktopThemeHandler_->isApplicableType(data.at(0).toString()));
+    }
+    else if (func == "DesktopThemeHandler::applyTheme") {
+        resultData.append(desktopThemeHandler_->applyTheme(data.at(0).toString(), data.at(1).toString()));
     }
     // Not supported
     else {
