@@ -207,6 +207,7 @@ void ItemHandler::uninstall(const QString &itemKey)
 #endif
 
     configHandler_->removeUsrConfigInstalledItemsItem(itemKey);
+    configHandler_->removeUsrConfigUpdateAvailableItemsItem(itemKey);
 
     result["status"] = QString("success_uninstall");
     result["message"] = tr("Uninstalled");
