@@ -41,6 +41,8 @@ build_appimage() {
     apt -y install build-essential qt5-default libqt5websockets5-dev
     apt -y install cmake libssl-dev libcurl4-gnutls-dev libxpm-dev
 
+    apt -y install file
+
     apt -y install libssl1.0.0 zlib1g
 
     useradd -m ${PKGUSER}
