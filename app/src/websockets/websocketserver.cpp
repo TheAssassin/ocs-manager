@@ -229,7 +229,7 @@ void WebSocketServer::updateUpdateFinished(QString itemKey, bool status)
     sendMessage("", "UpdateHandler::updateFinished", data);
 }
 
-void WebSocketServer::updateUpdateProgress(QString itemKey, int progress)
+void WebSocketServer::updateUpdateProgress(QString itemKey, double progress)
 {
     QJsonArray data;
     data.append(itemKey);
