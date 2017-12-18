@@ -51,11 +51,11 @@ private slots:
     void itemUninstallStarted(QJsonObject result);
     void itemUninstallFinished(QJsonObject result);
 
-    void updateCheckAllStarted();
-    void updateCheckAllFinished();
-    void updateUpdateStarted(QString itemKey);
-    void updateUpdateFinished(QString itemKey);
     void updateUpdateProgress(QString itemKey, int progress);
+    void updateCheckAllStarted(bool status);
+    void updateCheckAllFinished(bool status);
+    void updateUpdateStarted(QString itemKey, bool status);
+    void updateUpdateFinished(QString itemKey, bool status);
 
 private:
     void receiveMessage(const QString &id, const QString &func, const QJsonArray &data);
