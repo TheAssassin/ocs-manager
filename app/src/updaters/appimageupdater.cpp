@@ -40,14 +40,14 @@ QString AppImageUpdater::errorString() const
 QString AppImageUpdater::describeAppImage() const
 {
     std::string description = "";
-    updater_.describeAppImage(description);
+    updater_->describeAppImage(description);
     return QString::fromStdString(description);
 }
 
 bool AppImageUpdater::checkAppImage() const
 {
     bool updateAvailable = false;
-    updater_.checkForChanges(updateAvailable);
+    updater_->checkForChanges(updateAvailable);
     return updateAvailable;
 }
 
@@ -56,7 +56,7 @@ void AppImageUpdater::updateAppImage()
     isFinishedWithNoError_ = false;
     errorString_ = "";
 
-    if (!updater_.start()) {
+    if (!updater_->start()) {
         emit finished(this);
         return;
     }
@@ -71,15 +71,15 @@ void AppImageUpdater::checkUpdaterProgress()
 {
     if (!updater_->isDone()) {
         double progress;
-        if (updater_.progress(progress)) {
+        if (updater_->progress(progress)) {
             emit updateProgress(id_, progress);
         }
         return;
     }
 
-    if (updater_.hasError()) {
+    if (updater_->hasError()) {
         std::string message;
-        while (updater_.nextStatusMessage(message)) {
+        while (updater_->nextStatusMessage(message)) {
             errorString_ += QString::fromStdString(message) + "\n";
         }
         emit finished(this);
