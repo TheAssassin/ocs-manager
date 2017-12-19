@@ -1,6 +1,6 @@
 #include "appimageupdater.h"
 
-#include <QThread>
+#include <QTimer>
 
 #include "appimage/update.h"
 
@@ -9,6 +9,12 @@ AppImageUpdater::AppImageUpdater(const QString &id, const QString &path, QObject
 {
     isFinishedWithNoError_ = false;
     errorString_ = "";
+    updater_ = new appimage::update::Updater(path_.toStdString(), false);
+}
+
+AppImageUpdater::~AppImageUpdater()
+{
+    delete updater_;
 }
 
 QString AppImageUpdater::id() const
@@ -21,54 +27,6 @@ QString AppImageUpdater::path() const
     return path_;
 }
 
-QString AppImageUpdater::describeAppImage() const
-{
-    std::string description = "";
-    appimage::update::Updater updater(path_.toStdString());
-    updater.describeAppImage(description);
-    return QString::fromStdString(description);
-}
-
-bool AppImageUpdater::checkAppImage() const
-{
-    bool updateAvailable = false;
-    appimage::update::Updater updater(path_.toStdString());
-    updater.checkForChanges(updateAvailable);
-    return updateAvailable;
-}
-
-void AppImageUpdater::updateAppImage()
-{
-    isFinishedWithNoError_ = false;
-    errorString_ = "";
-    appimage::update::Updater updater(path_.toStdString(), false);
-
-    if (!updater.start()) {
-        emit finished(this);
-        return;
-    }
-
-    while (!updater.isDone()) {
-        QThread::msleep(100);
-        double progress;
-        if (updater.progress(progress)) {
-            emit updateProgress(id_, progress);
-        }
-    }
-
-    if (updater.hasError()) {
-        std::string message;
-        while (updater.nextStatusMessage(message)) {
-            errorString_ += QString::fromStdString(message) + "\n";
-        }
-        emit finished(this);
-        return;
-    }
-
-    isFinishedWithNoError_ = true;
-    emit finished(this);
-}
-
 bool AppImageUpdater::isFinishedWithNoError() const
 {
     return isFinishedWithNoError_;
@@ -77,4 +35,57 @@ bool AppImageUpdater::isFinishedWithNoError() const
 QString AppImageUpdater::errorString() const
 {
     return errorString_;
+}
+
+QString AppImageUpdater::describeAppImage() const
+{
+    std::string description = "";
+    updater_.describeAppImage(description);
+    return QString::fromStdString(description);
+}
+
+bool AppImageUpdater::checkAppImage() const
+{
+    bool updateAvailable = false;
+    updater_.checkForChanges(updateAvailable);
+    return updateAvailable;
+}
+
+void AppImageUpdater::updateAppImage()
+{
+    isFinishedWithNoError_ = false;
+    errorString_ = "";
+
+    if (!updater_.start()) {
+        emit finished(this);
+        return;
+    }
+
+    auto timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &AppImageUpdater::checkUpdaterProgress);
+    connect(this, &AppImageUpdater::finished, timer, &QTimer::stop);
+    timer->start(100);
+}
+
+void AppImageUpdater::checkUpdaterProgress()
+{
+    if (!updater_->isDone()) {
+        double progress;
+        if (updater_.progress(progress)) {
+            emit updateProgress(id_, progress);
+        }
+        return;
+    }
+
+    if (updater_.hasError()) {
+        std::string message;
+        while (updater_.nextStatusMessage(message)) {
+            errorString_ += QString::fromStdString(message) + "\n";
+        }
+        emit finished(this);
+        return;
+    }
+
+    isFinishedWithNoError_ = true;
+    emit finished(this);
 }

@@ -4,6 +4,7 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QDateTime>
+//#include <QThread>
 
 #include "qtlib_file.h"
 
@@ -106,6 +107,7 @@ void UpdateHandler::appImageUpdaterFinished(AppImageUpdater *updater)
 
     if (!updater->isFinishedWithNoError()) {
         emit updateFinished(itemKey, false);
+        updater->deleteLater();
         return;
     }
 
@@ -129,6 +131,7 @@ void UpdateHandler::appImageUpdaterFinished(AppImageUpdater *updater)
     configHandler_->removeUsrConfigUpdateAvailableItemsItem(itemKey);
 
     emit updateFinished(itemKey, true);
+    updater->deleteLater();
 }
 #endif
 
@@ -147,11 +150,17 @@ void UpdateHandler::updateAppImage(const QString &itemKey)
     auto installedItem = installedItems[installedItemKey].toObject();
     auto filename = installedItem["filename"].toString();
     auto installType = installedItem["install_type"].toString();
-
     auto filePath = configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString() + "/" + filename;
+
+    //auto *thread = new QThread(this);
     auto *updater = new AppImageUpdater(itemKey, filePath, this);
+    //updater->moveToThread(thread);
+
+    //connect(thread, &QThread::started, updater, &AppImageUpdater::updateAppImage);
     connect(updater, &AppImageUpdater::updateProgress, this, &UpdateHandler::updateProgress);
     connect(updater, &AppImageUpdater::finished, this, &UpdateHandler::appImageUpdaterFinished);
+    //connect(updater, &AppImageUpdater::finished, thread, &QThread::quit);
+    //connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
     QJsonObject metadata;
     metadata["installed_item_key"] = installedItemKey;
@@ -170,5 +179,6 @@ void UpdateHandler::updateAppImage(const QString &itemKey)
 
     emit updateStarted(itemKey, true);
     updater->updateAppImage();
+    //thread->start();
 }
 #endif
