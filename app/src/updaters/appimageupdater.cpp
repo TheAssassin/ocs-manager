@@ -39,16 +39,20 @@ QString AppImageUpdater::errorString() const
 
 QString AppImageUpdater::describeAppImage() const
 {
-    std::string description = "";
-    updater_->describeAppImage(description);
-    return QString::fromStdString(description);
+    std::string description;
+    if (updater_->describeAppImage(description)) {
+        return QString::fromStdString(description);
+    }
+    return QString();
 }
 
 bool AppImageUpdater::checkForChanges() const
 {
-    bool updateAvailable = false;
-    updater_->checkForChanges(updateAvailable);
-    return updateAvailable;
+    bool updateAvailable;
+    if (updater_->checkForChanges(updateAvailable)) {
+        return updateAvailable;
+    }
+    return false;
 }
 
 void AppImageUpdater::start()
