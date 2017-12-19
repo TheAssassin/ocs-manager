@@ -44,14 +44,14 @@ QString AppImageUpdater::describeAppImage() const
     return QString::fromStdString(description);
 }
 
-bool AppImageUpdater::checkAppImage() const
+bool AppImageUpdater::checkForChanges() const
 {
     bool updateAvailable = false;
     updater_->checkForChanges(updateAvailable);
     return updateAvailable;
 }
 
-void AppImageUpdater::updateAppImage()
+void AppImageUpdater::start()
 {
     isFinishedWithNoError_ = false;
     errorString_ = "";
@@ -62,12 +62,12 @@ void AppImageUpdater::updateAppImage()
     }
 
     auto timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &AppImageUpdater::checkUpdaterProgress);
+    connect(timer, &QTimer::timeout, this, &AppImageUpdater::checkProgress);
     connect(this, &AppImageUpdater::finished, timer, &QTimer::stop);
     timer->start(100);
 }
 
-void AppImageUpdater::checkUpdaterProgress()
+void AppImageUpdater::checkProgress()
 {
     if (!updater_->isDone()) {
         double progress;

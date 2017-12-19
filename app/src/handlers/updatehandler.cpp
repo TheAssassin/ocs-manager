@@ -4,7 +4,6 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QDateTime>
-//#include <QThread>
 
 #include "qtlib_file.h"
 
@@ -50,7 +49,7 @@ void UpdateHandler::checkAll()
         if (installType == "bin") {
 #ifdef QTLIB_UNIX
             if (filePath.endsWith(".appimage", Qt::CaseInsensitive)) {
-                if (AppImageUpdater(itemKey, filePath).checkAppImage()) {
+                if (AppImageUpdater(itemKey, filePath).checkForChanges()) {
                     updateMethod = "appimageupdate";
                 }
                 //else if (OcsFileUpdater(url).checkFile()) {
@@ -152,15 +151,9 @@ void UpdateHandler::updateAppImage(const QString &itemKey)
     auto installType = installedItem["install_type"].toString();
     auto filePath = configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString() + "/" + filename;
 
-    //auto *thread = new QThread(this);
     auto *updater = new AppImageUpdater(itemKey, filePath, this);
-    //updater->moveToThread(thread);
-
-    //connect(thread, &QThread::started, updater, &AppImageUpdater::updateAppImage);
     connect(updater, &AppImageUpdater::updateProgress, this, &UpdateHandler::updateProgress);
     connect(updater, &AppImageUpdater::finished, this, &UpdateHandler::appImageUpdaterFinished);
-    //connect(updater, &AppImageUpdater::finished, thread, &QThread::quit);
-    //connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
     QJsonObject metadata;
     metadata["installed_item_key"] = installedItemKey;
@@ -178,7 +171,6 @@ void UpdateHandler::updateAppImage(const QString &itemKey)
     metadataSet_[itemKey] = metadata;
 
     emit updateStarted(itemKey, true);
-    updater->updateAppImage();
-    //thread->start();
+    updater->start();
 }
 #endif

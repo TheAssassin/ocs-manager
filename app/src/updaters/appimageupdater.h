@@ -22,15 +22,15 @@ public:
     QString errorString() const;
 
     QString describeAppImage() const;
-    bool checkAppImage() const;
-    void updateAppImage();
+    bool checkForChanges() const;
+    void start();
 
 signals:
     void finished(AppImageUpdater *updater);
     void updateProgress(QString id, double progress);
 
 private slots:
-    void checkUpdaterProgress();
+    void checkProgress();
 
 private:
     QString id_;
