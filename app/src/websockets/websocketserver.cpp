@@ -199,33 +199,37 @@ void WebSocketServer::itemUninstallFinished(QJsonObject result)
     sendMessage("", "ItemHandler::uninstallFinished", data);
 }
 
-void WebSocketServer::updateCheckAllStarted()
+void WebSocketServer::updateCheckAllStarted(bool status)
 {
     QJsonArray data;
+    data.append(status);
     sendMessage("", "UpdateHandler::checkAllStarted", data);
 }
 
-void WebSocketServer::updateCheckAllFinished()
+void WebSocketServer::updateCheckAllFinished(bool status)
 {
     QJsonArray data;
+    data.append(status);
     sendMessage("", "UpdateHandler::checkAllFinished", data);
 }
 
-void WebSocketServer::updateUpdateStarted(QString itemKey)
+void WebSocketServer::updateUpdateStarted(QString itemKey, bool status)
 {
     QJsonArray data;
     data.append(itemKey);
+    data.append(status);
     sendMessage("", "UpdateHandler::updateStarted", data);
 }
 
-void WebSocketServer::updateUpdateFinished(QString itemKey)
+void WebSocketServer::updateUpdateFinished(QString itemKey, bool status)
 {
     QJsonArray data;
     data.append(itemKey);
+    data.append(status);
     sendMessage("", "UpdateHandler::updateFinished", data);
 }
 
-void WebSocketServer::updateUpdateProgress(QString itemKey, int progress)
+void WebSocketServer::updateUpdateProgress(QString itemKey, double progress)
 {
     QJsonArray data;
     data.append(itemKey);
