@@ -5,6 +5,6 @@
 
 A tool to handle item installation from OCS provider, file management, and apply themes.
 
-Copyright: 2017, Opendesktop.org
+Copyright: 2017-2018, Opendesktop.org
 
 License: GPL-3+
