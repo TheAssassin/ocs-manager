@@ -48,7 +48,7 @@ build_appimage() {
     curl -fsSL https://download.opensuse.org/repositories/home:TheAssassin:AppImageLibraries/xUbuntu_14.04/Release.key | apt-key add -
     apt update -qq
 
-    apt -y install build-essential qt59base qt59websockets
+    apt -y install build-essential libgl1-mesa-dev qt59base qt59websockets
     source /opt/qt59/bin/qt59-env.sh
 
     curl -fsSL https://cmake.org/files/v3.10/cmake-3.10.0-rc5-Linux-x86_64.tar.gz | tar -xz --strip-components=1 -C /
