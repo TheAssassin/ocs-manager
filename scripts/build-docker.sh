@@ -52,7 +52,7 @@ build_appimage() {
     source /opt/qt59/bin/qt59-env.sh
 
     curl -fsSL https://cmake.org/files/v3.10/cmake-3.10.0-rc5-Linux-x86_64.tar.gz | tar -xz --strip-components=1 -C /
-    apt -y install libssl-dev libcurl3 libcurl3-gnutls libxpm-dev
+    apt -y install libssl-dev libcurl3 libcurl3-gnutls libcurl4-gnutls-dev libxpm-dev
 
     useradd -m ${PKGUSER}
     export HOME="/home/${PKGUSER}"
