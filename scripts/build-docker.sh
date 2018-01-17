@@ -34,16 +34,23 @@ build_flatpak() {
 }
 
 build_appimage() {
-    # docker-image: ubuntu:16.04
-    apt update -qq
-    apt -y install curl git
+    # docker-image: ubuntu:14.04
+    apt-get update -qq
+    apt-get -y install curl git
+    apt-get -y install build-essential cmake
+    #apt-get -y install qt5-default libqt5websockets5-dev
+    #apt-get -y install libssl-dev libcurl4-gnutls-dev libxpm-dev
+    apt-get -y install libssl1.0.0 zlib1g
 
-    apt -y install build-essential qt5-default libqt5websockets5-dev
-    apt -y install cmake libssl-dev libcurl4-gnutls-dev libxpm-dev
+    add-apt-repository -y ppa:beineri/opt-qt593-trusty
+    echo 'deb http://download.opensuse.org/repositories/home:/TheAssassin:/AppImageLibraries/xUbuntu_14.04/ /' > /etc/apt/sources.list.d/curl-httponly.list
+    curl -fsSL https://download.opensuse.org/repositories/home:TheAssassin:AppImageLibraries/xUbuntu_14.04/Release.key | apt-key add -
+    apt-get update -qq
 
-    apt -y install file
+    apt-get -y install qt59base qt59websockets
+    source /opt/qt59/bin/qt59-env.sh
 
-    apt -y install libssl1.0.0 zlib1g
+    apt-get -y install libssl-dev libcurl3 libcurl3-gnutls libxpm-dev
 
     useradd -m ${PKGUSER}
     export HOME="/home/${PKGUSER}"
