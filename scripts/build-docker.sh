@@ -49,7 +49,6 @@ build_appimage() {
     apt update -qq
 
     apt -y install build-essential libgl1-mesa-dev qt59base qt59websockets
-    source /opt/qt59/bin/qt59-env.sh
 
     curl -fsSL https://cmake.org/files/v3.10/cmake-3.10.0-rc5-Linux-x86_64.tar.gz | tar -xz --strip-components=1 -C /
     apt -y install libssl-dev libcurl3 libcurl3-gnutls libcurl4-gnutls-dev libxpm-dev
@@ -58,7 +57,7 @@ build_appimage() {
     export HOME="/home/${PKGUSER}"
     chown -R ${PKGUSER}:${PKGUSER} "${PROJDIR}"
 
-    su -c "sh "${BUILDSCRIPT}" ${BUILDTYPE}" ${PKGUSER}
+    su -c "source /opt/qt59/bin/qt59-env.sh && sh "${BUILDSCRIPT}" ${BUILDTYPE}" ${PKGUSER}
 
     transfer_file "$(find "${PROJDIR}/build_"*${BUILDTYPE} -type f -name "${PKGNAME}*.AppImage")"
 }
