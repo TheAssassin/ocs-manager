@@ -12,7 +12,7 @@ unix:!ios:!android {
         -L$${PWD}/AppImageUpdate-prebuilt/lib/zsync2/lib/librcksum/ -lrcksum \
         -L$${PWD}/AppImageUpdate-prebuilt/lib/zsync2/lib/zlib/ -lz \
         -L$${PWD}/AppImageUpdate-prebuilt/lib/ -lcpr \
-        -L$${PWD}/AppImageUpdate-prebuilt/lib/zsync2/lib/hashlib/ -lhashlib
+        $${PWD}/AppImageUpdate-prebuilt/lib/zsync2/lib/hashlib/hashlib.a
 
     PRE_TARGETDEPS += \
         $${PWD}/AppImageUpdate-prebuilt/src/libappimageupdate.a \
