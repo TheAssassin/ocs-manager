@@ -42,6 +42,7 @@ build_appimage() {
     #apt -y install build-essential qt5-default libqt5websockets5-dev
     #apt -y install cmake libssl-dev libcurl4-gnutls-dev libxpm-dev
     apt -y install libssl1.0.0 zlib1g
+    apt -y install unzip p7zip unrar-free
 
     add-apt-repository -y ppa:beineri/opt-qt593-trusty
     echo 'deb http://download.opensuse.org/repositories/home:/TheAssassin:/AppImageLibraries/xUbuntu_14.04/ /' > /etc/apt/sources.list.d/curl-httponly.list
