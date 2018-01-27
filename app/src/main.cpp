@@ -14,10 +14,10 @@
 int main(int argc, char *argv[])
 {
     // Init
-    auto envPath = QGuiApplication::applicationDirPath() + ":" + QString::fromLocal8Bit(qgetenv("PATH").constData());
-    qputenv("PATH", envPath.toUtf8().constData());
-
     QGuiApplication app(argc, argv); // This is backend program, but need GUI module
+
+    auto envPath = app.applicationDirPath() + ":" + QString::fromLocal8Bit(qgetenv("PATH").constData());
+    qputenv("PATH", envPath.toUtf8().constData());
 
     auto *configHandler = new ConfigHandler(&app);
     auto appConfigApplication = configHandler->getAppConfigApplication();
