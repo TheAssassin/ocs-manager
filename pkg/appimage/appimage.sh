@@ -21,7 +21,7 @@ install -D -m 755 /lib/x86_64-linux-gnu/libz.so.1 ${PKGNAME}.AppDir/usr/lib/libz
 
 install -D -m 755 /usr/bin/unzip ${PKGNAME}.AppDir/usr/bin/unzip
 install -D -m 755 /usr/lib/p7zip/7zr ${PKGNAME}.AppDir/usr/bin/7z
-install -D -m 755 /usr/bin/unrar-free ${PKGNAME}.AppDir/usr/bin/unrar
+install -D -m 755 /usr/bin/unrar ${PKGNAME}.AppDir/usr/bin/unrar
 
 ./squashfs-root/AppRun ${PKGNAME}.AppDir/usr/share/applications/${PKGNAME}.desktop -appimage
 
