@@ -14,8 +14,11 @@
 int main(int argc, char *argv[])
 {
     // Init
-    auto envPath = QGuiApplication::applicationDirPath() + ":" + QString::fromLocal8Bit(qgetenv("PATH").constData());
+    auto appDirPath = QGuiApplication::applicationDirPath();
+    auto envPath = appDirPath + ":" + appDirPath + "/usr/bin:" + QString::fromLocal8Bit(qgetenv("PATH").constData());
     qputenv("PATH", envPath.toUtf8().constData());
+
+    qDebug() << QString::fromLocal8Bit(qgetenv("PATH").constData());
 
     QGuiApplication app(argc, argv); // This is backend program, but need GUI module
 
