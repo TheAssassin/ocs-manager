@@ -6,14 +6,14 @@
 #include <QFileInfo>
 #include <QDateTime>
 
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
 #include <QProcess>
 #endif
 
-#include "qtlib_dir.h"
-#include "qtlib_file.h"
-#include "qtlib_networkresource.h"
-#include "qtlib_package.h"
+#include "qtil_dir.h"
+#include "qtil_file.h"
+#include "qtil_networkresource.h"
+#include "qtil_package.h"
 
 #include "handlers/confighandler.h"
 
@@ -67,9 +67,9 @@ void ItemHandler::getItem(const QString &command, const QString &url, const QStr
     itemMetadataSet[itemKey] = metadata;
     setMetadataSet(itemMetadataSet);
 
-    auto *resource = new qtlib::NetworkResource(itemKey, QUrl(url), true, this);
-    connect(resource, &qtlib::NetworkResource::downloadProgress, this, &ItemHandler::downloadProgress);
-    connect(resource, &qtlib::NetworkResource::finished, this, &ItemHandler::networkResourceFinished);
+    auto *resource = new qtil::NetworkResource(itemKey, QUrl(url), true, this);
+    connect(resource, &qtil::NetworkResource::downloadProgress, this, &ItemHandler::downloadProgress);
+    connect(resource, &qtil::NetworkResource::finished, this, &ItemHandler::networkResourceFinished);
     resource->get();
 
     result["status"] = QString("success_downloadstart");
@@ -146,8 +146,8 @@ void ItemHandler::uninstall(const QString &itemKey)
     auto installedItem = configHandler_->getUsrConfigInstalledItems()[itemKey].toObject();
     auto installType = installedItem["install_type"].toString();
 
-    qtlib::Dir destDir;
-#ifdef QTLIB_UNIX
+    qtil::Dir destDir;
+#ifdef QTIL_OS_UNIX
     destDir.setPath(configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString());
 
     for (const auto &filename : installedItem["files"].toArray()) {
@@ -155,7 +155,7 @@ void ItemHandler::uninstall(const QString &itemKey)
 
         // plasmapkg: Installation process has should be saved plasmapkg into destination directory
 
-        qtlib::Package package(fileInfo.filePath());
+        qtil::Package package(fileInfo.filePath());
 
         // Uninstall
         if (installType == "bin") {
@@ -186,10 +186,10 @@ void ItemHandler::uninstall(const QString &itemKey)
 
         // Remove file
         if (fileInfo.isDir()) {
-            qtlib::Dir(fileInfo.filePath()).remove();
+            qtil::Dir(fileInfo.filePath()).remove();
         }
         else {
-            qtlib::File(fileInfo.filePath()).remove();
+            qtil::File(fileInfo.filePath()).remove();
         }
     }
 #else
@@ -198,10 +198,10 @@ void ItemHandler::uninstall(const QString &itemKey)
     for (const auto &filename : installedItem["files"].toArray()) {
         QFileInfo fileInfo(destDir.path() + "/" + filename.toString());
         if (fileInfo.isDir()) {
-            qtlib::Dir(fileInfo.filePath()).remove();
+            qtil::Dir(fileInfo.filePath()).remove();
         }
         else {
-            qtlib::File(fileInfo.filePath()).remove();
+            qtil::File(fileInfo.filePath()).remove();
         }
     }
 #endif
@@ -214,7 +214,7 @@ void ItemHandler::uninstall(const QString &itemKey)
     emit uninstallFinished(result);
 }
 
-void ItemHandler::networkResourceFinished(qtlib::NetworkResource *resource)
+void ItemHandler::networkResourceFinished(qtil::NetworkResource *resource)
 {
     auto itemKey = resource->id();
 
@@ -252,7 +252,7 @@ void ItemHandler::setMetadataSet(const QJsonObject &metadataSet)
     emit metadataSetChanged();
 }
 
-void ItemHandler::saveDownloadedFile(qtlib::NetworkResource *resource)
+void ItemHandler::saveDownloadedFile(qtil::NetworkResource *resource)
 {
     auto itemKey = resource->id();
 
@@ -271,9 +271,9 @@ void ItemHandler::saveDownloadedFile(qtlib::NetworkResource *resource)
     auto filename = metadata["filename"].toString();
     auto installType = metadata["install_type"].toString();
 
-    qtlib::Dir destDir(configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString());
+    qtil::Dir destDir(configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString());
     destDir.make();
-    qtlib::File destFile(destDir.path() + "/" + filename);
+    qtil::File destFile(destDir.path() + "/" + filename);
 
     if (destFile.exists()) {
         auto filenamePrefix = QString::number(QDateTime::currentMSecsSinceEpoch()) + "_";
@@ -295,7 +295,7 @@ void ItemHandler::saveDownloadedFile(qtlib::NetworkResource *resource)
     resource->deleteLater();
 }
 
-void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
+void ItemHandler::installDownloadedFile(qtil::NetworkResource *resource)
 {
     // Installation pre-process
     auto itemKey = resource->id();
@@ -316,13 +316,13 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
     auto installType = metadata["install_type"].toString();
 
     QString tempDirPrefix = "temp_" + filename;
-    qtlib::Dir tempDir(qtlib::Dir::genericCachePath() + "/"
+    qtil::Dir tempDir(qtil::Dir::genericCachePath() + "/"
                        + configHandler_->getAppConfigApplication()["id"].toString() + "/"
                        + tempDirPrefix);
     tempDir.make();
-    qtlib::Dir tempDestDir(tempDir.path() + "/dest");
+    qtil::Dir tempDestDir(tempDir.path() + "/dest");
     tempDestDir.make();
-    qtlib::Package package(tempDir.path() + "/" + filename);
+    qtil::Package package(tempDir.path() + "/" + filename);
 
     if (!resource->saveData(package.path())) {
         result["status"] = QString("error_save");
@@ -342,8 +342,8 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
     result["message"] = tr("Installing");
     emit installStarted(result);
 
-    qtlib::Dir destDir;
-#ifdef QTLIB_UNIX
+    qtil::Dir destDir;
+#ifdef QTIL_OS_UNIX
     destDir.setPath(configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString());
 
     // plasmapkg: Need to save package to remove installed files later
@@ -399,7 +399,7 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
 #else
     destDir.setPath(configHandler_->getAppConfigInstallTypes()[installType].toObject()["generic_destination"].toString());
 
-    if (qtlib::File(package.path()).copy(tempDestDir.path() + "/" + filename)) {
+    if (qtil::File(package.path()).copy(tempDestDir.path() + "/" + filename)) {
         result["message"] = tr("The file has been installed");
     }
     else {
@@ -424,10 +424,10 @@ void ItemHandler::installDownloadedFile(qtlib::NetworkResource *resource)
         }
 
         if (fileInfo.isDir()) {
-            qtlib::Dir(fileInfo.filePath()).move(destDir.path() + "/" + destFilename);
+            qtil::Dir(fileInfo.filePath()).move(destDir.path() + "/" + destFilename);
         }
         else {
-            qtlib::File(fileInfo.filePath()).move(destDir.path() + "/" + destFilename);
+            qtil::File(fileInfo.filePath()).move(destDir.path() + "/" + destFilename);
         }
 
         installedFiles.append(QJsonValue(destFilename));

@@ -3,7 +3,7 @@
 #include <QStringList>
 #include <QJsonValue>
 
-#include "qtlib_ocsapi.h"
+#include "qtil_ocsapi.h"
 
 #include "handlers/confighandler.h"
 
@@ -13,7 +13,7 @@ OcsApiHandler::OcsApiHandler(ConfigHandler *configHandler, QObject *parent)
 
 bool OcsApiHandler::addProviders(const QString &providerFileUrl) const
 {
-    auto providers = qtlib::OcsApi::getProviderFile(QUrl(providerFileUrl));
+    auto providers = qtil::OcsApi::getProviderFile(QUrl(providerFileUrl));
     if (!providers.isEmpty()) {
         for (const auto &providerValue : providers) {
             auto provider = providerValue.toObject();
@@ -60,7 +60,7 @@ bool OcsApiHandler::updateCategories(const QString &providerKey, bool force) con
     }
 
     auto baseUrl = providers[providerKey].toObject()["location"].toString();
-    auto response = qtlib::OcsApi(baseUrl, QUrl(baseUrl)).getContentCategories();
+    auto response = qtil::OcsApi(baseUrl, QUrl(baseUrl)).getContentCategories();
 
     if (!response.contains("data")) {
         return false;
@@ -185,7 +185,7 @@ QJsonObject OcsApiHandler::getContents(const QString &providerKeys, const QStrin
             query.addQueryItem("sortmode", sortmode);
             query.addQueryItem("pagesize", QString::number(pagesize));
             query.addQueryItem("page", QString::number(page));
-            responseSet[providerKey] = qtlib::OcsApi(baseUrl, QUrl(baseUrl)).getContentDataSet(query);
+            responseSet[providerKey] = qtil::OcsApi(baseUrl, QUrl(baseUrl)).getContentDataSet(query);
         }
     }
 
@@ -198,7 +198,7 @@ QJsonObject OcsApiHandler::getContent(const QString &providerKey, const QString 
     auto providers = configHandler_->getUsrConfigProviders();
     if (providers.contains(providerKey)) {
         auto baseUrl = providers[providerKey].toObject()["location"].toString();
-        response = qtlib::OcsApi(baseUrl, QUrl(baseUrl)).getContentData(contentId);
+        response = qtil::OcsApi(baseUrl, QUrl(baseUrl)).getContentData(contentId);
     }
     return response;
 }

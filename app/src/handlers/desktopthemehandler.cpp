@@ -2,7 +2,7 @@
 
 #include <QStringList>
 
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
 #include <QFileInfo>
 
 #include "desktopthemes/kdetheme.h"
@@ -98,7 +98,7 @@ bool DesktopThemeHandler::isApplicableType(const QString &installType) const
 
 bool DesktopThemeHandler::applyTheme(const QString &path, const QString &installType) const
 {
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
     if (QFileInfo::exists(path) && isApplicableType(installType)) {
         auto desktop = desktopEnvironment();
 

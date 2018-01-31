@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     // Init
     QGuiApplication app(argc, argv); // This is backend program, but need GUI module
 
-    auto envPath = app.applicationDirPath() + ":" + QString::fromLocal8Bit(qgetenv("PATH").constData());
+    auto envPath = QString::fromLocal8Bit(qgetenv("PATH").constData()) + ":" + app.applicationDirPath();
     qputenv("PATH", envPath.toUtf8().constData());
 
     auto *configHandler = new ConfigHandler(&app);

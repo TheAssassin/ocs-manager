@@ -5,11 +5,11 @@
 #include <QJsonArray>
 #include <QDateTime>
 
-#include "qtlib_file.h"
+#include "qtil_file.h"
 
 #include "handlers/confighandler.h"
 
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
 #include "updaters/appimageupdater.h"
 #endif
 
@@ -38,7 +38,7 @@ void UpdateHandler::checkAll()
         auto installType = installedItem["install_type"].toString();
 
         QString filePath = "";
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
         filePath = configHandler_->getAppConfigInstallTypes()[installType].toObject()["destination"].toString() + "/" + filename;
 #else
         filePath = configHandler_->getAppConfigInstallTypes()[installType].toObject()["generic_destination"].toString() + "/" + filename;
@@ -47,7 +47,7 @@ void UpdateHandler::checkAll()
         QString updateMethod = "";
 
         if (installType == "bin") {
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
             if (filePath.endsWith(".appimage", Qt::CaseInsensitive)) {
                 if (AppImageUpdater(itemKey, filePath).checkForChanges()) {
                     updateMethod = "appimageupdate";
@@ -86,7 +86,7 @@ void UpdateHandler::update(const QString &itemKey)
 
     auto updateMethod = updateAvailableItems[itemKey].toObject()["update_method"].toString();
 
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
     if (updateMethod == "appimageupdate") {
         updateAppImage(itemKey);
     }
@@ -96,7 +96,7 @@ void UpdateHandler::update(const QString &itemKey)
 #endif
 }
 
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
 void UpdateHandler::appImageUpdaterFinished(AppImageUpdater *updater)
 {
     auto itemKey = updater->id();
@@ -124,7 +124,7 @@ void UpdateHandler::appImageUpdaterFinished(AppImageUpdater *updater)
     configHandler_->setUsrConfigInstalledItemsItem(installedItemKey, installedItem);
 
     if (newFilename != filename) {
-        qtlib::File(updater->path()).remove();
+        qtil::File(updater->path()).remove();
     }
 
     configHandler_->removeUsrConfigUpdateAvailableItemsItem(itemKey);
@@ -134,7 +134,7 @@ void UpdateHandler::appImageUpdaterFinished(AppImageUpdater *updater)
 }
 #endif
 
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
 void UpdateHandler::updateAppImage(const QString &itemKey)
 {
     auto updateAvailableItem = configHandler_->getUsrConfigUpdateAvailableItems()[itemKey].toObject();

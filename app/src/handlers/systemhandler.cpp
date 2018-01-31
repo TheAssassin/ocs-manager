@@ -3,13 +3,13 @@
 #include <QUrl>
 #include <QDesktopServices>
 
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
 #include <QFileInfo>
 #include <QProcess>
 #endif
 
 #ifdef Q_OS_ANDROID
-#include "qtlib_package.h"
+#include "qtil_package.h"
 #endif
 
 SystemHandler::SystemHandler(QObject *parent)
@@ -18,7 +18,7 @@ SystemHandler::SystemHandler(QObject *parent)
 
 bool SystemHandler::isUnix() const
 {
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
     return true;
 #endif
     return false;
@@ -42,7 +42,7 @@ bool SystemHandler::openUrl(const QString &url) const
     path.replace("file://localhost", "", Qt::CaseInsensitive);
     path.replace("file://", "", Qt::CaseInsensitive);
 
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
     if ((path.endsWith(".appimage", Qt::CaseInsensitive) || path.endsWith(".exe", Qt::CaseInsensitive))
             && QFileInfo(path).isExecutable()) {
         return QProcess::startDetached(path);
@@ -51,7 +51,7 @@ bool SystemHandler::openUrl(const QString &url) const
 
 #ifdef Q_OS_ANDROID
     if (path.endsWith(".apk", Qt::CaseInsensitive)) {
-        return qtlib::Package(path).installAsApk();
+        return qtil::Package(path).installAsApk();
     }
 #endif
 

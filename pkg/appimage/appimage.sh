@@ -8,7 +8,7 @@ curl -L -o linuxdeployqt "https://github.com/probonopd/linuxdeployqt/releases/do
 chmod 755 linuxdeployqt
 ./linuxdeployqt --appimage-extract
 
-sh scripts/import.sh
+sh scripts/prepare.sh
 qmake PREFIX="/usr"
 make
 make INSTALL_ROOT="${PKGNAME}.AppDir" install

@@ -1,5 +1,5 @@
 *.pro.user
 build_*/
-lib/qtlib/
+lib/qtil/
 lib/AppImageUpdate/
 lib/AppImageUpdate-prebuilt/
