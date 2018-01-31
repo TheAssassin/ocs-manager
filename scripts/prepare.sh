@@ -2,8 +2,8 @@
 
 PROJDIR="$(cd "$(dirname "${0}")/../" && pwd)"
 
-if [ ! -d "${PROJDIR}/lib/qtlib" ]; then
-    git clone https://github.com/akiraohgaki/qtlib.git -b release-0.2.1 --single-branch --depth=1 "${PROJDIR}/lib/qtlib"
+if [ ! -d "${PROJDIR}/lib/qtil" ]; then
+    git clone https://github.com/akiraohgaki/qtil.git -b release-0.3.0 --single-branch --depth=1 "${PROJDIR}/lib/qtil"
 fi
 
 if [ ! -d "${PROJDIR}/lib/AppImageUpdate" ]; then

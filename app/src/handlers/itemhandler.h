@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QJsonObject>
 
-namespace qtlib {
+namespace qtil {
 class NetworkResource;
 }
 
@@ -37,13 +37,13 @@ public slots:
     void uninstall(const QString &itemKey);
 
 private slots:
-    void networkResourceFinished(qtlib::NetworkResource *resource);
+    void networkResourceFinished(qtil::NetworkResource *resource);
 
 private:
     void setMetadataSet(const QJsonObject &metadataSet);
 
-    void saveDownloadedFile(qtlib::NetworkResource *resource);
-    void installDownloadedFile(qtlib::NetworkResource *resource);
+    void saveDownloadedFile(qtil::NetworkResource *resource);
+    void installDownloadedFile(qtil::NetworkResource *resource);
 
     ConfigHandler *configHandler_;
     QJsonObject metadataSet_;

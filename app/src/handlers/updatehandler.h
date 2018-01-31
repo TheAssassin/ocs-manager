@@ -5,7 +5,7 @@
 
 class ConfigHandler;
 
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
 class AppImageUpdater;
 #endif
 
@@ -28,12 +28,12 @@ public slots:
     void update(const QString &itemKey);
 
 private slots:
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
     void appImageUpdaterFinished(AppImageUpdater *updater);
 #endif
 
 private:
-#ifdef QTLIB_UNIX
+#ifdef QTIL_OS_UNIX
     void updateAppImage(const QString &itemKey);
 #endif
 

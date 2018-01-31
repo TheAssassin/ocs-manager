@@ -4,7 +4,7 @@
 #include <QWebSocketServer>
 #include <QWebSocket>
 
-#include "qtlib_json.h"
+#include "qtil_json.h"
 
 #include "handlers/confighandler.h"
 #include "handlers/systemhandler.h"
@@ -108,7 +108,7 @@ void WebSocketServer::wsTextMessageReceived(const QString &message)
 {
     auto *wsClient = qobject_cast<QWebSocket *>(sender());
     if (wsClient) {
-        qtlib::Json json(message.toUtf8());
+        qtil::Json json(message.toUtf8());
         if (json.isObject()) {
             auto object = json.toObject();
             receiveMessage(object["id"].toString(), object["func"].toString(), object["data"].toArray());
@@ -120,7 +120,7 @@ void WebSocketServer::wsBinaryMessageReceived(const QByteArray &message)
 {
     auto *wsClient = qobject_cast<QWebSocket *>(sender());
     if (wsClient) {
-        qtlib::Json json(message);
+        qtil::Json json(message);
         if (json.isObject()) {
             auto object = json.toObject();
             receiveMessage(object["id"].toString(), object["func"].toString(), object["data"].toArray());
@@ -411,7 +411,7 @@ void WebSocketServer::sendMessage(const QString &id, const QString &func, const 
     object["func"] = func;
     object["data"] = data;
 
-    auto binaryMessage = qtlib::Json(object).toJson();
+    auto binaryMessage = qtil::Json(object).toJson();
     auto textMessage = QString::fromUtf8(binaryMessage);
 
     for (auto *wsClient : wsClients_) {
