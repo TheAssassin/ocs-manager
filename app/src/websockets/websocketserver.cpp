@@ -55,6 +55,10 @@ WebSocketServer::~WebSocketServer()
 bool WebSocketServer::start()
 {
     if (wsServer_->listen(QHostAddress::Any, serverPort_)) {
+        auto application = configHandler_->getUsrConfigApplication();
+        application["websocket_url"] = serverUrl().toString();
+        configHandler_->setUsrConfigApplication(application);
+
         emit started();
         return true;
     }
@@ -63,6 +67,10 @@ bool WebSocketServer::start()
 
 void WebSocketServer::stop()
 {
+    auto application = configHandler_->getUsrConfigApplication();
+    application["websocket_url"] = QString("");
+    configHandler_->setUsrConfigApplication(application);
+
     wsServer_->close();
 }
 
