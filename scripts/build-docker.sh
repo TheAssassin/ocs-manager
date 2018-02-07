@@ -20,8 +20,8 @@ transfer_file() {
     if [ -f "${filepath}" ]; then
         filename="$(basename "${filepath}")"
         echo "Uploading ${filename}" >> "${TRANSFERLOG}"
-        curl -T "${filepath}" "https://transfer.sh/${filename}" >> "${TRANSFERLOG}"
-        echo "" >> "${TRANSFERLOG}"
+        curl -fsSL -T "${filepath}" "https://transfer.sh/${filename}" >> "${TRANSFERLOG}"
+        echo '' >> "${TRANSFERLOG}"
     fi
 }
 
@@ -47,10 +47,9 @@ build_appimage() {
     apt -y install libssl-dev libcurl3 libcurl3-gnutls libcurl4-gnutls-dev libxpm-dev
 
     useradd -m ${PKGUSER}
-    export HOME="/home/${PKGUSER}"
     chown -R ${PKGUSER}:${PKGUSER} "${PROJDIR}"
 
-    su -c "source /opt/qt59/bin/qt59-env.sh && sh "${BUILDSCRIPT}" ${BUILDTYPE}" ${PKGUSER}
+    su -c "export HOME=/home/${PKGUSER} && source /opt/qt59/bin/qt59-env.sh && sh "${BUILDSCRIPT}" ${BUILDTYPE}" ${PKGUSER}
 
     transfer_file "$(find "${PROJDIR}/build_"*${BUILDTYPE} -type f -name "${PKGNAME}*.AppImage")"
 }

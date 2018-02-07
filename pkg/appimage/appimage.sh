@@ -4,12 +4,12 @@ PKGNAME='ocs-manager'
 PKGVER='0.5.4'
 PKGREL='1'
 
-curl -L -o linuxdeployqt "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-chmod 755 linuxdeployqt
-./linuxdeployqt --appimage-extract
+curl -fsSL -o linuxdeployqt.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+chmod 755 linuxdeployqt.AppImage
+./linuxdeployqt.AppImage --appimage-extract
 
 sh scripts/prepare.sh
-qmake PREFIX="/usr"
+qmake PREFIX=/usr
 make
 make INSTALL_ROOT="${PKGNAME}.AppDir" install
 
