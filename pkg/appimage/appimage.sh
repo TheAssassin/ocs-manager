@@ -24,4 +24,4 @@ install -D -m 755 /usr/lib/p7zip/7zr ${PKGNAME}.AppDir/usr/bin/7z
 
 ./squashfs-root/AppRun ${PKGNAME}.AppDir/usr/share/applications/${PKGNAME}.desktop -appimage
 
-mv *.AppImage ${PKGNAME}-${PKGVER}-${PKGREL}-x86_64.AppImage
+mv ${PKGNAME}*.AppImage ${PKGNAME}-${PKGVER}-${PKGREL}-x86_64.AppImage
