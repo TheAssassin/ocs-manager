@@ -2,9 +2,9 @@
 
 PKGNAME='ocs-manager'
 
-USER='pkgbuilder'
+PKGUSER='pkgbuilder'
 
-SCRIPT="${0}"
+PKGSCRIPT="${0}"
 
 PROJDIR="$(cd "$(dirname "${0}")/../" && pwd)"
 
@@ -27,10 +27,10 @@ ci_appimage() { # docker-image: ubuntu:14.04
     curl -fsSL https://cmake.org/files/v3.10/cmake-3.10.0-rc5-Linux-x86_64.tar.gz | tar -xz --strip-components=1 -C /
     apt -y install libssl-dev libcurl3 libcurl3-gnutls libcurl4-gnutls-dev libxpm-dev
 
-    useradd -m ${USER}
-    chown -R ${USER} "${PROJDIR}"
+    useradd -m ${PKGUSER}
+    chown -R ${PKGUSER} "${PROJDIR}"
 
-    su -c "export HOME=/home/${USER} && source /opt/qt59/bin/qt59-env.sh && sh "${SCRIPT}" build_appimage" ${USER}
+    su -c "export HOME=/home/${PKGUSER} && source /opt/qt59/bin/qt59-env.sh && sh "${PKGSCRIPT}" build_appimage" ${PKGUSER}
 
     transfer_file "$(find "${BUILDDIR}" -type f -name "${PKGNAME}*.AppImage")"
 }
