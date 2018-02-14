@@ -59,6 +59,8 @@ bool KdeTheme::applyAsCursor() const
         << "c.writeEntry('cursorTheme', '" + themeName_ + "');";
 
     if (evaluateScript(script)) {
+        QProcess::startDetached("sh -c \"echo 'Xcursor.theme: " + themeName_ + "' | xrdb -merge\"");
+
         auto setLaunchEnv = QDBusMessage::createMethodCall("org.kde.klauncher5", "/KLauncher", "org.kde.KLauncher", "setLaunchEnv");
         setLaunchEnv.setArguments(QVariantList() << QVariant(QString("XCURSOR_THEME")) << QVariant(themeName_));
         QDBusConnection::sessionBus().call(setLaunchEnv);
@@ -66,6 +68,10 @@ bool KdeTheme::applyAsCursor() const
         auto notifyChange = QDBusMessage::createSignal("/KGlobalSettings", "org.kde.KGlobalSettings", "notifyChange");
         notifyChange.setArguments(QVariantList() << QVariant(qint32(5)) << QVariant(qint32(0)));
         QDBusConnection::sessionBus().send(notifyChange);
+
+        //QProcess::startDetached("kwin --replace");
+        //QProcess::startDetached("kquitapp5 plasmashell");
+        //QProcess::startDetached("kstart5 plasmashell");
 
         return true;
     }
