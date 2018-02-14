@@ -69,9 +69,9 @@ bool KdeTheme::applyAsCursor() const
         notifyChange.setArguments(QVariantList() << QVariant(qint32(5)) << QVariant(qint32(0)));
         QDBusConnection::sessionBus().send(notifyChange);
 
-        //QProcess::startDetached("kwin --replace");
-        //QProcess::startDetached("kquitapp5 plasmashell");
-        //QProcess::startDetached("kstart5 plasmashell");
+        QProcess::startDetached("kwin --replace");
+        QProcess::startDetached("kquitapp5 plasmashell");
+        QProcess::startDetached("kstart5 plasmashell");
 
         return true;
     }
