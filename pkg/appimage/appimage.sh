@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PKGNAME='ocs-manager'
-PKGVER='0.5.4'
+PKGVER='0.5.5'
 PKGREL='1'
 
 curl -fsSL -o linuxdeployqt.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
