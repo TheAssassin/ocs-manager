@@ -71,7 +71,7 @@ bool KdeTheme::applyAsCursor() const
 
         QProcess::startDetached("kwin --replace");
         QProcess::startDetached("kquitapp5 plasmashell");
-        QProcess::startDetached("kstart5 plasmashell");
+        QProcess::startDetached("sh -c \"XCURSOR_THEME='" + themeName_ + "' kstart5 plasmashell\"");
 
         return true;
     }
