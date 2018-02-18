@@ -1,1 +1,1 @@
-DISTFILES += $${PWD}/appimage/appimage.sh
+DISTFILES += $${PWD}/appimage/appimagebuild
