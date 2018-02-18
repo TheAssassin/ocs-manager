@@ -8,7 +8,7 @@ curl -fsSL -o linuxdeployqt.AppImage https://github.com/probonopd/linuxdeployqt/
 chmod 755 linuxdeployqt.AppImage
 ./linuxdeployqt.AppImage --appimage-extract
 
-sh scripts/prepare
+./scripts/prepare
 qmake PREFIX=/usr
 make
 make INSTALL_ROOT="${PKGNAME}.AppDir" install
