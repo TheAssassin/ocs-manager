@@ -112,8 +112,7 @@ void ItemHandler::getItemByOcsUrl(const QString &ocsUrl, const QString &provider
         filename = QUrl(url).fileName();
     }
 
-    // Still support xdg and xdgs schemes for backward compatibility
-    if ((scheme == "ocs" || scheme == "ocss" || scheme == "xdg" || scheme == "xdgs")
+    if ((scheme == "ocs" || scheme == "ocss")
             && (command == "download" || command == "install")
             && QUrl(url).isValid()
             && configHandler_->getAppConfigInstallTypes().contains(type)

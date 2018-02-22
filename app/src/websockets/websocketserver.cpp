@@ -28,22 +28,22 @@ WebSocketServer::WebSocketServer(ConfigHandler *configHandler, const QString &se
     updateHandler_ = new UpdateHandler(configHandler_, this);
     desktopThemeHandler_ = new DesktopThemeHandler(this);
 
-    connect(itemHandler_, &ItemHandler::metadataSetChanged, this, &WebSocketServer::itemMetadataSetChanged);
-    connect(itemHandler_, &ItemHandler::downloadStarted, this, &WebSocketServer::itemDownloadStarted);
-    connect(itemHandler_, &ItemHandler::downloadFinished, this, &WebSocketServer::itemDownloadFinished);
-    connect(itemHandler_, &ItemHandler::downloadProgress, this, &WebSocketServer::itemDownloadProgress);
-    connect(itemHandler_, &ItemHandler::saveStarted, this, &WebSocketServer::itemSaveStarted);
-    connect(itemHandler_, &ItemHandler::saveFinished, this, &WebSocketServer::itemSaveFinished);
-    connect(itemHandler_, &ItemHandler::installStarted, this, &WebSocketServer::itemInstallStarted);
-    connect(itemHandler_, &ItemHandler::installFinished, this, &WebSocketServer::itemInstallFinished);
-    connect(itemHandler_, &ItemHandler::uninstallStarted, this, &WebSocketServer::itemUninstallStarted);
-    connect(itemHandler_, &ItemHandler::uninstallFinished, this, &WebSocketServer::itemUninstallFinished);
+    connect(itemHandler_, &ItemHandler::metadataSetChanged, this, &WebSocketServer::itemHandlerMetadataSetChanged);
+    connect(itemHandler_, &ItemHandler::downloadStarted, this, &WebSocketServer::itemHandlerDownloadStarted);
+    connect(itemHandler_, &ItemHandler::downloadFinished, this, &WebSocketServer::itemHandlerDownloadFinished);
+    connect(itemHandler_, &ItemHandler::downloadProgress, this, &WebSocketServer::itemHandlerDownloadProgress);
+    connect(itemHandler_, &ItemHandler::saveStarted, this, &WebSocketServer::itemHandlerSaveStarted);
+    connect(itemHandler_, &ItemHandler::saveFinished, this, &WebSocketServer::itemHandlerSaveFinished);
+    connect(itemHandler_, &ItemHandler::installStarted, this, &WebSocketServer::itemHandlerInstallStarted);
+    connect(itemHandler_, &ItemHandler::installFinished, this, &WebSocketServer::itemHandlerInstallFinished);
+    connect(itemHandler_, &ItemHandler::uninstallStarted, this, &WebSocketServer::itemHandlerUninstallStarted);
+    connect(itemHandler_, &ItemHandler::uninstallFinished, this, &WebSocketServer::itemHandlerUninstallFinished);
 
-    connect(updateHandler_, &UpdateHandler::checkAllStarted, this, &WebSocketServer::updateCheckAllStarted);
-    connect(updateHandler_, &UpdateHandler::checkAllFinished, this, &WebSocketServer::updateCheckAllFinished);
-    connect(updateHandler_, &UpdateHandler::updateStarted, this, &WebSocketServer::updateUpdateStarted);
-    connect(updateHandler_, &UpdateHandler::updateFinished, this, &WebSocketServer::updateUpdateFinished);
-    connect(updateHandler_, &UpdateHandler::updateProgress, this, &WebSocketServer::updateUpdateProgress);
+    connect(updateHandler_, &UpdateHandler::checkAllStarted, this, &WebSocketServer::updateHandlerCheckAllStarted);
+    connect(updateHandler_, &UpdateHandler::checkAllFinished, this, &WebSocketServer::updateHandlerCheckAllFinished);
+    connect(updateHandler_, &UpdateHandler::updateStarted, this, &WebSocketServer::updateHandlerUpdateStarted);
+    connect(updateHandler_, &UpdateHandler::updateFinished, this, &WebSocketServer::updateHandlerUpdateFinished);
+    connect(updateHandler_, &UpdateHandler::updateProgress, this, &WebSocketServer::updateHandlerUpdateProgress);
 }
 
 WebSocketServer::~WebSocketServer()
@@ -136,27 +136,27 @@ void WebSocketServer::wsBinaryMessageReceived(const QByteArray &message)
     }
 }
 
-void WebSocketServer::itemMetadataSetChanged()
+void WebSocketServer::itemHandlerMetadataSetChanged()
 {
     QJsonArray data;
     sendMessage("", "ItemHandler::metadataSetChanged", data);
 }
 
-void WebSocketServer::itemDownloadStarted(QJsonObject result)
+void WebSocketServer::itemHandlerDownloadStarted(QJsonObject result)
 {
     QJsonArray data;
     data.append(result);
     sendMessage("", "ItemHandler::downloadStarted", data);
 }
 
-void WebSocketServer::itemDownloadFinished(QJsonObject result)
+void WebSocketServer::itemHandlerDownloadFinished(QJsonObject result)
 {
     QJsonArray data;
     data.append(result);
     sendMessage("", "ItemHandler::downloadFinished", data);
 }
 
-void WebSocketServer::itemDownloadProgress(QString id, qint64 bytesReceived, qint64 bytesTotal)
+void WebSocketServer::itemHandlerDownloadProgress(QString id, qint64 bytesReceived, qint64 bytesTotal)
 {
     QJsonArray data;
     data.append(id);
@@ -165,63 +165,63 @@ void WebSocketServer::itemDownloadProgress(QString id, qint64 bytesReceived, qin
     sendMessage("", "ItemHandler::downloadProgress", data);
 }
 
-void WebSocketServer::itemSaveStarted(QJsonObject result)
+void WebSocketServer::itemHandlerSaveStarted(QJsonObject result)
 {
     QJsonArray data;
     data.append(result);
     sendMessage("", "ItemHandler::saveStarted", data);
 }
 
-void WebSocketServer::itemSaveFinished(QJsonObject result)
+void WebSocketServer::itemHandlerSaveFinished(QJsonObject result)
 {
     QJsonArray data;
     data.append(result);
     sendMessage("", "ItemHandler::saveFinished", data);
 }
 
-void WebSocketServer::itemInstallStarted(QJsonObject result)
+void WebSocketServer::itemHandlerInstallStarted(QJsonObject result)
 {
     QJsonArray data;
     data.append(result);
     sendMessage("", "ItemHandler::installStarted", data);
 }
 
-void WebSocketServer::itemInstallFinished(QJsonObject result)
+void WebSocketServer::itemHandlerInstallFinished(QJsonObject result)
 {
     QJsonArray data;
     data.append(result);
     sendMessage("", "ItemHandler::installFinished", data);
 }
 
-void WebSocketServer::itemUninstallStarted(QJsonObject result)
+void WebSocketServer::itemHandlerUninstallStarted(QJsonObject result)
 {
     QJsonArray data;
     data.append(result);
     sendMessage("", "ItemHandler::uninstallStarted", data);
 }
 
-void WebSocketServer::itemUninstallFinished(QJsonObject result)
+void WebSocketServer::itemHandlerUninstallFinished(QJsonObject result)
 {
     QJsonArray data;
     data.append(result);
     sendMessage("", "ItemHandler::uninstallFinished", data);
 }
 
-void WebSocketServer::updateCheckAllStarted(bool status)
+void WebSocketServer::updateHandlerCheckAllStarted(bool status)
 {
     QJsonArray data;
     data.append(status);
     sendMessage("", "UpdateHandler::checkAllStarted", data);
 }
 
-void WebSocketServer::updateCheckAllFinished(bool status)
+void WebSocketServer::updateHandlerCheckAllFinished(bool status)
 {
     QJsonArray data;
     data.append(status);
     sendMessage("", "UpdateHandler::checkAllFinished", data);
 }
 
-void WebSocketServer::updateUpdateStarted(QString itemKey, bool status)
+void WebSocketServer::updateHandlerUpdateStarted(QString itemKey, bool status)
 {
     QJsonArray data;
     data.append(itemKey);
@@ -229,7 +229,7 @@ void WebSocketServer::updateUpdateStarted(QString itemKey, bool status)
     sendMessage("", "UpdateHandler::updateStarted", data);
 }
 
-void WebSocketServer::updateUpdateFinished(QString itemKey, bool status)
+void WebSocketServer::updateHandlerUpdateFinished(QString itemKey, bool status)
 {
     QJsonArray data;
     data.append(itemKey);
@@ -237,7 +237,7 @@ void WebSocketServer::updateUpdateFinished(QString itemKey, bool status)
     sendMessage("", "UpdateHandler::updateFinished", data);
 }
 
-void WebSocketServer::updateUpdateProgress(QString itemKey, double progress)
+void WebSocketServer::updateHandlerUpdateProgress(QString itemKey, double progress)
 {
     QJsonArray data;
     data.append(itemKey);

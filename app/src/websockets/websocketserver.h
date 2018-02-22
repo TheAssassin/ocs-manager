@@ -40,22 +40,22 @@ private slots:
     void wsTextMessageReceived(const QString &message);
     void wsBinaryMessageReceived(const QByteArray &message);
 
-    void itemMetadataSetChanged();
-    void itemDownloadStarted(QJsonObject result);
-    void itemDownloadFinished(QJsonObject result);
-    void itemDownloadProgress(QString id, qint64 bytesReceived, qint64 bytesTotal);
-    void itemSaveStarted(QJsonObject result);
-    void itemSaveFinished(QJsonObject result);
-    void itemInstallStarted(QJsonObject result);
-    void itemInstallFinished(QJsonObject result);
-    void itemUninstallStarted(QJsonObject result);
-    void itemUninstallFinished(QJsonObject result);
+    void itemHandlerMetadataSetChanged();
+    void itemHandlerDownloadStarted(QJsonObject result);
+    void itemHandlerDownloadFinished(QJsonObject result);
+    void itemHandlerDownloadProgress(QString id, qint64 bytesReceived, qint64 bytesTotal);
+    void itemHandlerSaveStarted(QJsonObject result);
+    void itemHandlerSaveFinished(QJsonObject result);
+    void itemHandlerInstallStarted(QJsonObject result);
+    void itemHandlerInstallFinished(QJsonObject result);
+    void itemHandlerUninstallStarted(QJsonObject result);
+    void itemHandlerUninstallFinished(QJsonObject result);
 
-    void updateCheckAllStarted(bool status);
-    void updateCheckAllFinished(bool status);
-    void updateUpdateStarted(QString itemKey, bool status);
-    void updateUpdateFinished(QString itemKey, bool status);
-    void updateUpdateProgress(QString itemKey, double progress);
+    void updateHandlerCheckAllStarted(bool status);
+    void updateHandlerCheckAllFinished(bool status);
+    void updateHandlerUpdateStarted(QString itemKey, bool status);
+    void updateHandlerUpdateFinished(QString itemKey, bool status);
+    void updateHandlerUpdateProgress(QString itemKey, double progress);
 
 private:
     void receiveMessage(const QString &id, const QString &func, const QJsonArray &data);
