@@ -42,8 +42,8 @@ private:
     void importAppConfigInstallTypes();
     QString convertPathString(const QString &path) const;
 
-    qtil::Config appConfig_;
-    qtil::Config usrConfig_;
+    Qtil::Config appConfig_;
+    Qtil::Config usrConfig_;
     QJsonObject appConfigApplication_;
     QJsonObject appConfigInstallTypes_;
 };

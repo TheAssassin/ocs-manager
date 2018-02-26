@@ -51,7 +51,7 @@ bool SystemHandler::openUrl(const QString &url) const
 
 #ifdef Q_OS_ANDROID
     if (path.endsWith(".apk", Qt::CaseInsensitive)) {
-        return qtil::Package(path).installAsApk();
+        return Qtil::Package(path).installAsApk();
     }
 #endif
 
