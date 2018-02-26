@@ -124,7 +124,7 @@ void UpdateHandler::appImageUpdaterFinished(AppImageUpdater *updater)
     configHandler_->setUsrConfigInstalledItemsItem(installedItemKey, installedItem);
 
     if (newFilename != filename) {
-        qtil::File(updater->path()).remove();
+        Qtil::File(updater->path()).remove();
     }
 
     configHandler_->removeUsrConfigUpdateAvailableItemsItem(itemKey);
